@@ -55,13 +55,10 @@ Store entries in localStorage as JSON array:
 - **Current level prominent**: Main screen shows current caffeine level in large text
 
 ### Common Caffeine Amounts (for quick entry)
-- Espresso (1 shot): 63mg
-- Coffee (8oz): 95mg
-- Coffee (12oz): 140mg
-- Energy drink (8oz): 80mg
-- Black tea (8oz): 47mg
-- Green tea (8oz): 28mg
-- Cola (12oz): 34mg
+- Celsius: 200mg
+- Huel: 100mg
+- Neutonic: 120mg
+- Tenzing Mango: 160mg
 
 ## Development Commands
 
