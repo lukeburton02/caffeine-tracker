@@ -40,11 +40,29 @@ function deleteEntry(id) {
 
 // --- UI updates ---
 
+function getLevelColor(mg) {
+    if (mg < 100) return { color: '#27ae60', label: 'Low' };
+    if (mg < 200) return { color: '#f39c12', label: 'Moderate' };
+    if (mg < 400) return { color: '#e67e22', label: 'High' };
+    return { color: '#e74c3c', label: 'Very High' };
+}
+
 function updateLevelDisplay() {
     const total = getTotalCurrentCaffeine();
+    const { color, label } = getLevelColor(total);
+    const maxMg = 500; // bar fills at 500mg+
+
     document.getElementById('current-level').textContent = total.toFixed(1) + ' mg';
+    document.getElementById('current-level').style.color = color;
+    document.getElementById('level-status').textContent = label;
+    document.getElementById('level-status').style.color = color;
     document.getElementById('last-updated').textContent =
         'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const bar = document.getElementById('level-bar');
+    const pct = Math.min((total / maxMg) * 100, 100);
+    bar.style.width = pct + '%';
+    bar.style.background = color;
 }
 
 function renderEntries() {
@@ -70,7 +88,7 @@ function renderEntries() {
                     <span class="entry-original">${entry.amount}mg</span>
                     <span class="entry-current">${current}mg now</span>
                 </div>
-                <button class="btn-delete" onclick="handleDelete('${entry.id}')" aria-label="Delete entry">✕</button>
+                <button class="btn-delete" onclick="handleDelete('${entry.id}', '${source}')" aria-label="Delete entry">✕</button>
             </li>
         `;
     }).join('');
@@ -111,7 +129,8 @@ function handleFormSubmit(e) {
     timeInput.value = '';
 }
 
-function handleDelete(id) {
+function handleDelete(id, source) {
+    if (!confirm(`Delete "${source}"?`)) return;
     deleteEntry(id);
     refreshUI();
 }

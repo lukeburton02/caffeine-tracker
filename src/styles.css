@@ -53,6 +53,28 @@ body {
     margin-bottom: 8px;
 }
 
+.level-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    transition: color 0.4s;
+}
+
+.level-bar-track {
+    background: #e0e0e0;
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.level-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    transition: width 0.5s ease, background 0.4s;
+}
+
 .level-updated {
     font-size: 0.8rem;
     color: #999;
