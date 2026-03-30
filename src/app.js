@@ -322,17 +322,23 @@ function showToast(message) {
 
 // --- Preset quick-add ---
 
-// Pre-fills the form with the preset values and scrolls to the time field
+// Immediately logs a preset drink using the quick-time input
 function handlePreset(amount, source) {
-    document.getElementById('amount').value = amount;
-    document.getElementById('source').value = source;
-    setDefaultTime();
+    const quickTimeInput = document.getElementById('quick-time');
+    const [hours, minutes] = quickTimeInput.value.split(':').map(Number);
+    const timestamp = new Date();
+    timestamp.setHours(hours, minutes, 0, 0);
 
-    const timeInput = document.getElementById('time');
-    timeInput.focus();
-    timeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const entry = {
+        id: Date.now().toString(),
+        timestamp: timestamp.toISOString(),
+        amount,
+        source
+    };
 
-    showToast(`${source} selected — confirm time and tap Log`);
+    saveEntry(entry);
+    refreshUI();
+    showToast(`Logged ${source} (${amount}mg)`);
 }
 
 // --- Half-life settings ---
@@ -362,7 +368,9 @@ function setDefaultTime() {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById('time').value = `${hh}:${mm}`;
+    const timeStr = `${hh}:${mm}`;
+    document.getElementById('time').value = timeStr;
+    document.getElementById('quick-time').value = timeStr;
 }
 
 // --- Service Worker ---

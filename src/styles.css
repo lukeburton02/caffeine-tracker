@@ -136,6 +136,38 @@ body {
 
 /* --- Presets --- */
 
+.quick-time-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.quick-time-row label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.quick-time-row input[type="time"] {
+    padding: 10px 14px;
+    font-size: 1rem;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    outline: none;
+    color: #2c3e50;
+    background: #fafafa;
+    transition: border-color 0.2s;
+}
+
+.quick-time-row input[type="time"]:focus {
+    border-color: #667eea;
+    background: white;
+}
+
 .presets-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
