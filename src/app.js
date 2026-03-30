@@ -106,9 +106,130 @@ function renderEntries() {
     }).join('');
 }
 
+// --- Analytics ---
+
+function getDailySummary() {
+    const entries = getEntries();
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const todayEntries = entries.filter(e => new Date(e.timestamp) >= startOfDay);
+    const totalConsumed = todayEntries.reduce((sum, e) => sum + e.amount, 0);
+
+    // Estimate peak by sampling caffeine level every 15 minutes since first entry today
+    let peakMg = 0;
+    let peakTime = null;
+
+    if (todayEntries.length > 0) {
+        const firstEntry = new Date(Math.min(...todayEntries.map(e => new Date(e.timestamp))));
+        const allEntries = getEntries();
+        let cursor = new Date(firstEntry);
+
+        while (cursor <= now) {
+            const level = allEntries.reduce((sum, entry) => {
+                const hoursElapsed = (cursor - new Date(entry.timestamp)) / (1000 * 60 * 60);
+                if (hoursElapsed < 0) return sum;
+                return sum + entry.amount * Math.pow(0.5, hoursElapsed / CAFFEINE_HALF_LIFE_HOURS);
+            }, 0);
+
+            if (level > peakMg) {
+                peakMg = level;
+                peakTime = new Date(cursor);
+            }
+            cursor = new Date(cursor.getTime() + 15 * 60 * 1000); // advance 15 mins
+        }
+    }
+
+    return { totalConsumed, peakMg, peakTime };
+}
+
+function getWeeklyTotals() {
+    const entries = getEntries();
+    const today = new Date();
+    const days = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+        const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+        const label = i === 0 ? 'Today' : date.toLocaleDateString([], { weekday: 'short' });
+        const total = entries
+            .filter(e => {
+                const t = new Date(e.timestamp);
+                return t >= date && t < nextDate;
+            })
+            .reduce((sum, e) => sum + e.amount, 0);
+        days.push({ label, total });
+    }
+    return days;
+}
+
+function updateSummary() {
+    const { totalConsumed, peakMg, peakTime } = getDailySummary();
+
+    document.getElementById('summary-total').textContent =
+        totalConsumed > 0 ? totalConsumed + 'mg' : '—';
+    document.getElementById('summary-peak').textContent =
+        peakMg > 0 ? peakMg.toFixed(0) + 'mg' : '—';
+    document.getElementById('summary-peak-time').textContent =
+        peakTime ? peakTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+}
+
+function drawWeeklyChart() {
+    const canvas = document.getElementById('weekly-chart');
+    const ctx = canvas.getContext('2d');
+    const days = getWeeklyTotals();
+    const max = Math.max(...days.map(d => d.total), 200); // min scale 200mg
+
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = canvas.parentElement.clientWidth;
+    const cssHeight = 160;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    ctx.scale(dpr, dpr);
+
+    const padLeft = 8, padRight = 8, padTop = 12, padBottom = 32;
+    const chartW = cssWidth - padLeft - padRight;
+    const chartH = cssHeight - padTop - padBottom;
+    const barW = chartW / days.length * 0.5;
+    const gap = chartW / days.length;
+
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    days.forEach((day, i) => {
+        const x = padLeft + i * gap + gap / 2;
+        const barH = day.total > 0 ? (day.total / max) * chartH : 0;
+        const y = padTop + chartH - barH;
+
+        // Bar
+        const isToday = day.label === 'Today';
+        ctx.fillStyle = isToday ? '#667eea' : '#c5cff7';
+        ctx.beginPath();
+        ctx.roundRect(x - barW / 2, y, barW, barH, 4);
+        ctx.fill();
+
+        // Amount label above bar
+        if (day.total > 0) {
+            ctx.fillStyle = isToday ? '#667eea' : '#999';
+            ctx.font = `${isToday ? 600 : 400} 10px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText(day.total + 'mg', x, y - 3);
+        }
+
+        // Day label below bar
+        ctx.fillStyle = isToday ? '#2c3e50' : '#999';
+        ctx.font = `${isToday ? 600 : 400} 11px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(day.label, x, cssHeight - 8);
+    });
+}
+
 function refreshUI() {
     cleanupDecayedEntries();
     updateLevelDisplay();
+    updateSummary();
+    drawWeeklyChart();
     renderEntries();
 }
 

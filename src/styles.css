@@ -91,6 +91,51 @@ body {
     margin-bottom: 16px;
 }
 
+/* --- Daily summary --- */
+
+.summary-section {
+    margin-bottom: 24px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.summary-card {
+    background: #f0f4ff;
+    border-radius: 12px;
+    padding: 14px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.summary-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.summary-label {
+    font-size: 0.7rem;
+    color: #999;
+    text-align: center;
+}
+
+/* --- Weekly chart --- */
+
+.chart-section {
+    margin-bottom: 24px;
+}
+
+#weekly-chart {
+    display: block;
+    width: 100%;
+}
+
 /* --- Presets --- */
 
 .presets-section {

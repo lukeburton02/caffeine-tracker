@@ -60,6 +60,31 @@
             </form>
         </section>
 
+        <!-- Daily summary -->
+        <section class="summary-section">
+            <h2 class="section-title">Today's Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <span class="summary-value" id="summary-total">—</span>
+                    <span class="summary-label">Total consumed</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-value" id="summary-peak">—</span>
+                    <span class="summary-label">Peak level</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-value" id="summary-peak-time">—</span>
+                    <span class="summary-label">Peak at</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weekly chart -->
+        <section class="chart-section">
+            <h2 class="section-title">Last 7 Days</h2>
+            <canvas id="weekly-chart" height="160"></canvas>
+        </section>
+
         <!-- Recent entries list -->
         <section class="history-section">
             <h2 class="section-title">Recent Entries</h2>
