@@ -256,7 +256,6 @@ function handleFormSubmit(e) {
     e.preventDefault();
 
     const amountInput = document.getElementById('amount');
-    const timeInput = document.getElementById('time');
     const sourceInput = document.getElementById('source');
 
     const amount = parseFloat(amountInput.value);
@@ -269,10 +268,7 @@ function handleFormSubmit(e) {
         return;
     }
 
-    const [hours, minutes] = timeInput.value.split(':').map(Number);
-    const timestamp = new Date();
-    timestamp.setHours(hours, minutes, 0, 0);
-
+    const timestamp = getEntryTimestamp();
     if (timestamp > new Date()) {
         showToast('Note: time is in the future');
     }
@@ -290,7 +286,6 @@ function handleFormSubmit(e) {
 
     amountInput.value = '';
     sourceInput.value = '';
-    setDefaultTime();
 }
 
 function handleDelete(id, source) {
@@ -322,12 +317,9 @@ function showToast(message) {
 
 // --- Preset quick-add ---
 
-// Immediately logs a preset drink using the quick-time input
+// Immediately logs a preset drink using the shared time input
 function handlePreset(amount, source) {
-    const quickTimeInput = document.getElementById('quick-time');
-    const [hours, minutes] = quickTimeInput.value.split(':').map(Number);
-    const timestamp = new Date();
-    timestamp.setHours(hours, minutes, 0, 0);
+    const timestamp = getEntryTimestamp();
 
     const entry = {
         id: Date.now().toString(),
@@ -368,9 +360,16 @@ function setDefaultTime() {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
-    const timeStr = `${hh}:${mm}`;
-    document.getElementById('time').value = timeStr;
-    document.getElementById('quick-time').value = timeStr;
+    document.getElementById('entry-time').value = `${hh}:${mm}`;
+}
+
+// Returns a Date built from the shared time input
+function getEntryTimestamp() {
+    const val = document.getElementById('entry-time').value;
+    const [hours, minutes] = val.split(':').map(Number);
+    const ts = new Date();
+    ts.setHours(hours, minutes, 0, 0);
+    return ts;
 }
 
 // --- Service Worker ---
