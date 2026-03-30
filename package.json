@@ -1,0 +1,21 @@
+{
+  "name": "caffeine-tracker",
+  "version": "0.1.0",
+  "description": "PWA for tracking caffeine intake and current levels",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "npx http-server src -p 8080 -o",
+    "dev": "npx http-server src -p 8080",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "pwa",
+    "caffeine",
+    "tracker",
+    "health"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

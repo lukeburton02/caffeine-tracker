@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="description" content="Track your caffeine intake and see current levels">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Caffeine">
+    <title>Caffeine Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- Current caffeine level display -->
+        <header class="level-display">
+            <p class="level-label">Current caffeine in system</p>
+            <p class="level-amount" id="current-level">0.0 mg</p>
+            <p class="level-updated" id="last-updated"></p>
+        </header>
+
+        <!-- Log caffeine form -->
+        <section class="log-section">
+            <h2 class="section-title">Log Caffeine</h2>
+            <form id="log-form">
+                <div class="form-group">
+                    <label for="amount">Amount (mg)</label>
+                    <input type="number" id="amount" name="amount" min="1" max="2000"
+                           placeholder="e.g. 95" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">Time consumed</label>
+                    <input type="time" id="time" name="time" required>
+                </div>
+                <div class="form-group">
+                    <label for="source">Source (optional)</label>
+                    <input type="text" id="source" name="source" placeholder="e.g. Coffee, Espresso">
+                </div>
+                <button type="submit" class="btn btn-primary">Log Caffeine</button>
+            </form>
+        </section>
+
+        <!-- Recent entries list -->
+        <section class="history-section">
+            <h2 class="section-title">Recent Entries</h2>
+            <ul class="entry-list" id="entry-list">
+                <li class="entry-empty">No entries yet. Log your first caffeine above!</li>
+            </ul>
+        </section>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
