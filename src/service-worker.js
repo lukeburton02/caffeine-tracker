@@ -1,7 +1,7 @@
 // Caffeine Tracker - Service Worker
-// Cache-first strategy for offline support
+// Network-first strategy: always try to fetch fresh, fall back to cache offline
 
-const CACHE_NAME = 'caffeine-tracker-v3';
+const CACHE_NAME = 'caffeine-tracker-v4';
 const ASSETS = [
     '/',
     '/index.html',
@@ -29,9 +29,15 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// Fetch: serve from cache, fall back to network
+// Fetch: network-first, fall back to cache for offline support
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request).then(cached => cached || fetch(event.request))
+        fetch(event.request)
+            .then(response => {
+                const clone = response.clone();
+                caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+                return response;
+            })
+            .catch(() => caches.match(event.request))
     );
 });
