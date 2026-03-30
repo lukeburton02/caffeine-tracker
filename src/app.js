@@ -23,19 +23,31 @@ function getTotalCurrentCaffeine() {
 // --- LocalStorage ---
 
 function getEntries() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+    } catch {
+        return [];
+    }
 }
 
 function saveEntry(entry) {
-    const entries = getEntries();
-    entries.push(entry);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    try {
+        const entries = getEntries();
+        entries.push(entry);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    } catch {
+        showToast('Could not save entry — storage may be full');
+    }
 }
 
 function deleteEntry(id) {
-    const entries = getEntries().filter(e => e.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    try {
+        const entries = getEntries().filter(e => e.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    } catch {
+        showToast('Could not delete entry');
+    }
 }
 
 // --- UI updates ---
@@ -109,24 +121,39 @@ function handleFormSubmit(e) {
     const timeInput = document.getElementById('time');
     const sourceInput = document.getElementById('source');
 
+    const amount = parseFloat(amountInput.value);
+    if (isNaN(amount) || amount <= 0) {
+        showToast('Please enter a valid amount');
+        return;
+    }
+    if (amount > 2000) {
+        showToast('Amount seems too high — max 2000mg');
+        return;
+    }
+
     // Build timestamp from today's date + chosen time
     const [hours, minutes] = timeInput.value.split(':').map(Number);
     const timestamp = new Date();
     timestamp.setHours(hours, minutes, 0, 0);
 
+    // Warn if time is in the future
+    if (timestamp > new Date()) {
+        showToast('Note: time is in the future');
+    }
+
     const entry = {
         id: Date.now().toString(),
         timestamp: timestamp.toISOString(),
-        amount: parseFloat(amountInput.value),
-        source: sourceInput.value.trim()
+        amount,
+        source: sourceInput.value.trim() || 'Unknown'
     };
 
     saveEntry(entry);
     refreshUI();
+    showToast(`Logged ${amount}mg`);
 
-    // Reset form but keep source for convenience
     amountInput.value = '';
-    timeInput.value = '';
+    setDefaultTime();
 }
 
 function handleDelete(id, source) {
