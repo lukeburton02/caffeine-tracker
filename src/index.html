@@ -31,10 +31,10 @@
         <section class="presets-section">
             <h2 class="section-title">Quick Add</h2>
             <div class="presets-grid">
-                <button class="btn-preset" data-amount="200" data-source="Celsius">Celsius<span>200mg</span></button>
-                <button class="btn-preset" data-amount="100" data-source="Huel">Huel<span>100mg</span></button>
-                <button class="btn-preset" data-amount="120" data-source="Neutonic">Neutonic<span>120mg</span></button>
-                <button class="btn-preset" data-amount="160" data-source="Tenzing Mango">Tenzing<span>160mg</span></button>
+                <button class="btn-preset" data-amount="200" data-source="Celsius"><span class="preset-name">Celsius</span><span class="preset-mg">200mg</span></button>
+                <button class="btn-preset" data-amount="100" data-source="Huel"><span class="preset-name">Huel</span><span class="preset-mg">100mg</span></button>
+                <button class="btn-preset" data-amount="120" data-source="Neutonic"><span class="preset-name">Neutonic</span><span class="preset-mg">120mg</span></button>
+                <button class="btn-preset" data-amount="160" data-source="Tenzing Mango"><span class="preset-name">Tenzing</span><span class="preset-mg">160mg</span></button>
             </div>
             <div id="preset-toast" class="preset-toast" aria-live="polite"></div>
         </section>
@@ -91,6 +91,20 @@
             <ul class="entry-list" id="entry-list">
                 <li class="entry-empty">No entries yet. Log your first caffeine above!</li>
             </ul>
+        </section>
+
+    </div>
+
+        <!-- Half-life settings -->
+        <section class="settings-section">
+            <h2 class="section-title">Settings</h2>
+            <div class="halflife-row">
+                <label for="halflife-input">Half-life (hours)</label>
+                <input type="number" id="halflife-input" min="1" max="24" step="0.5">
+                <button class="btn-save" id="halflife-save">Save</button>
+                <button class="btn-reset" id="halflife-reset">Reset</button>
+            </div>
+            <p class="halflife-note">Default is 5 hours. Caffeine half-life varies by individual (typically 3–7 hrs).</p>
         </section>
 
     </div>

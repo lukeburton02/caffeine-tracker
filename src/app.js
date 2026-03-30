@@ -1,7 +1,13 @@
 // Caffeine Tracker - Main Application Logic
 
-const CAFFEINE_HALF_LIFE_HOURS = 5;
+const DEFAULT_HALF_LIFE_HOURS = 5;
 const STORAGE_KEY = 'caffeine_entries';
+const HALFLIFE_KEY = 'caffeine_halflife';
+
+function getHalfLife() {
+    const stored = parseFloat(localStorage.getItem(HALFLIFE_KEY));
+    return isNaN(stored) ? DEFAULT_HALF_LIFE_HOURS : stored;
+}
 
 // --- Caffeine calculation ---
 
@@ -10,7 +16,7 @@ function calculateCurrentCaffeine(entry) {
     const now = new Date();
     const consumed = new Date(entry.timestamp);
     const hoursElapsed = (now - consumed) / (1000 * 60 * 60);
-    return entry.amount * Math.pow(0.5, hoursElapsed / CAFFEINE_HALF_LIFE_HOURS);
+    return entry.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
 }
 
 // Returns total current caffeine from all entries
@@ -62,7 +68,7 @@ function getLevelColor(mg) {
 function updateLevelDisplay() {
     const total = getTotalCurrentCaffeine();
     const { color, label } = getLevelColor(total);
-    const maxMg = 500; // bar fills at 500mg+
+    const maxMg = 500;
 
     document.getElementById('current-level').textContent = total.toFixed(1) + ' mg';
     document.getElementById('current-level').style.color = color;
@@ -79,7 +85,7 @@ function updateLevelDisplay() {
 
 function renderEntries() {
     const list = document.getElementById('entry-list');
-    const entries = getEntries().slice().reverse(); // most recent first
+    const entries = getEntries().slice().reverse();
 
     if (entries.length === 0) {
         list.innerHTML = '<li class="entry-empty">No entries yet. Log your first caffeine above!</li>';
@@ -116,7 +122,6 @@ function getDailySummary() {
     const todayEntries = entries.filter(e => new Date(e.timestamp) >= startOfDay);
     const totalConsumed = todayEntries.reduce((sum, e) => sum + e.amount, 0);
 
-    // Estimate peak by sampling caffeine level every 15 minutes since first entry today
     let peakMg = 0;
     let peakTime = null;
 
@@ -129,14 +134,14 @@ function getDailySummary() {
             const level = allEntries.reduce((sum, entry) => {
                 const hoursElapsed = (cursor - new Date(entry.timestamp)) / (1000 * 60 * 60);
                 if (hoursElapsed < 0) return sum;
-                return sum + entry.amount * Math.pow(0.5, hoursElapsed / CAFFEINE_HALF_LIFE_HOURS);
+                return sum + entry.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
             }, 0);
 
             if (level > peakMg) {
                 peakMg = level;
                 peakTime = new Date(cursor);
             }
-            cursor = new Date(cursor.getTime() + 15 * 60 * 1000); // advance 15 mins
+            cursor = new Date(cursor.getTime() + 15 * 60 * 1000);
         }
     }
 
@@ -178,7 +183,7 @@ function drawWeeklyChart() {
     const canvas = document.getElementById('weekly-chart');
     const ctx = canvas.getContext('2d');
     const days = getWeeklyTotals();
-    const max = Math.max(...days.map(d => d.total), 200); // min scale 200mg
+    const max = Math.max(...days.map(d => d.total), 200);
 
     const dpr = window.devicePixelRatio || 1;
     const cssWidth = canvas.parentElement.clientWidth;
@@ -202,14 +207,12 @@ function drawWeeklyChart() {
         const barH = day.total > 0 ? (day.total / max) * chartH : 0;
         const y = padTop + chartH - barH;
 
-        // Bar
         const isToday = day.label === 'Today';
         ctx.fillStyle = isToday ? '#667eea' : '#c5cff7';
         ctx.beginPath();
         ctx.roundRect(x - barW / 2, y, barW, barH, 4);
         ctx.fill();
 
-        // Amount label above bar
         if (day.total > 0) {
             ctx.fillStyle = isToday ? '#667eea' : '#999';
             ctx.font = `${isToday ? 600 : 400} 10px sans-serif`;
@@ -217,12 +220,15 @@ function drawWeeklyChart() {
             ctx.fillText(day.total + 'mg', x, y - 3);
         }
 
-        // Day label below bar
         ctx.fillStyle = isToday ? '#2c3e50' : '#999';
         ctx.font = `${isToday ? 600 : 400} 11px sans-serif`;
         ctx.textAlign = 'center';
         ctx.fillText(day.label, x, cssHeight - 8);
     });
+}
+
+function updateHalfLifeDisplay() {
+    document.getElementById('halflife-input').value = getHalfLife();
 }
 
 function refreshUI() {
@@ -252,12 +258,10 @@ function handleFormSubmit(e) {
         return;
     }
 
-    // Build timestamp from today's date + chosen time
     const [hours, minutes] = timeInput.value.split(':').map(Number);
     const timestamp = new Date();
     timestamp.setHours(hours, minutes, 0, 0);
 
-    // Warn if time is in the future
     if (timestamp > new Date()) {
         showToast('Note: time is in the future');
     }
@@ -274,6 +278,7 @@ function handleFormSubmit(e) {
     showToast(`Logged ${amount}mg`);
 
     amountInput.value = '';
+    sourceInput.value = '';
     setDefaultTime();
 }
 
@@ -285,7 +290,6 @@ function handleDelete(id, source) {
 
 // --- Entry cleanup ---
 
-// Remove entries where remaining caffeine has dropped below 1mg
 function cleanupDecayedEntries() {
     const entries = getEntries();
     const active = entries.filter(e => calculateCurrentCaffeine(e) >= 1);
@@ -296,26 +300,49 @@ function cleanupDecayedEntries() {
     }
 }
 
-// --- Preset quick-add ---
+// --- Toast ---
 
 function showToast(message) {
     const toast = document.getElementById('preset-toast');
     toast.textContent = message;
     toast.classList.add('visible');
-    setTimeout(() => toast.classList.remove('visible'), 2000);
+    setTimeout(() => toast.classList.remove('visible'), 2500);
 }
 
+// --- Preset quick-add ---
+
+// Pre-fills the form with the preset values and scrolls to the time field
 function handlePreset(amount, source) {
-    const now = new Date();
-    const entry = {
-        id: Date.now().toString(),
-        timestamp: now.toISOString(),
-        amount,
-        source
-    };
-    saveEntry(entry);
+    document.getElementById('amount').value = amount;
+    document.getElementById('source').value = source;
+    setDefaultTime();
+
+    const timeInput = document.getElementById('time');
+    timeInput.focus();
+    timeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    showToast(`${source} selected — confirm time and tap Log`);
+}
+
+// --- Half-life settings ---
+
+function saveHalfLife() {
+    const input = document.getElementById('halflife-input');
+    const value = parseFloat(input.value);
+    if (isNaN(value) || value < 1 || value > 24) {
+        showToast('Half-life must be between 1 and 24 hours');
+        return;
+    }
+    localStorage.setItem(HALFLIFE_KEY, value);
     refreshUI();
-    showToast(`Logged ${amount}mg ${source}`);
+    showToast(`Half-life set to ${value} hours — levels recalculated`);
+}
+
+function resetHalfLife() {
+    localStorage.removeItem(HALFLIFE_KEY);
+    updateHalfLifeDisplay();
+    refreshUI();
+    showToast(`Half-life reset to ${DEFAULT_HALF_LIFE_HOURS} hours`);
 }
 
 // --- Init ---
@@ -337,19 +364,19 @@ if ('serviceWorker' in navigator) {
 
 document.addEventListener('DOMContentLoaded', () => {
     setDefaultTime();
+    updateHalfLifeDisplay();
     refreshUI();
 
     document.getElementById('log-form').addEventListener('submit', handleFormSubmit);
 
-    // Preset buttons
     document.querySelectorAll('.btn-preset').forEach(btn => {
         btn.addEventListener('click', () => {
-            const amount = parseFloat(btn.dataset.amount);
-            const source = btn.dataset.source;
-            handlePreset(amount, source);
+            handlePreset(parseFloat(btn.dataset.amount), btn.dataset.source);
         });
     });
 
-    // Auto-refresh caffeine level every minute
+    document.getElementById('halflife-save').addEventListener('click', saveHalfLife);
+    document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
+
     setInterval(refreshUI, 60 * 1000);
 });
