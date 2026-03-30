@@ -1,97 +1,43 @@
-# 🚀 Quick Start Guide
+# Quick Start Guide
 
-## Step 1: Set Up Your Project
+## Prerequisites
 
-Open your terminal and run these commands:
+- Node.js installed (`node --version` to check; if missing: `brew install node`)
+- A modern browser (Chrome or Safari on Mac)
 
-```bash
-# Create project directory
-mkdir caffeine-tracker
-cd caffeine-tracker
-
-# Download the starter files (you'll get these from Claude)
-# Then extract them into this directory
-```
-
-## Step 2: Install Node.js (if you don't have it)
-
-**Check if you have it:**
-```bash
-node --version
-```
-
-**If not installed:**
-- **Mac**: `brew install node`
-- **Linux/WSL**: `sudo apt update && sudo apt install nodejs npm`
-- **Windows**: Download from https://nodejs.org
-
-## Step 3: Start the Development Server
+## Start the App
 
 ```bash
-# From your caffeine-tracker directory
+# From the caffeine-tracker directory
 npm run dev
 ```
 
-You should see:
-```
-Starting up http-server, serving src
-Available on:
-  http://127.0.0.1:8080
-  http://192.168.1.X:8080
-```
+Then open `http://127.0.0.1:8080` in your browser.
 
-## Step 4: Access on Your Android Phone
+## Using the App
 
-1. **Find your computer's IP address** (the 192.168.X.X one from above)
+**Quick Add** — click a preset (Celsius, Huel, Neutonic, Tenzing) to pre-fill the form, adjust the time if needed, then hit Log Caffeine.
 
-2. **On your phone, make sure you're on the same WiFi as your computer**
+**Custom Entry** — fill in amount (mg), time, and optional source, then hit Log Caffeine.
 
-3. **Open Chrome on Android** and go to:
-   ```
-   http://192.168.1.X:8080
-   ```
-   (Replace X with your actual IP)
+**Half-life** — change in Settings at the bottom. Default is 5 hours. Saving recalculates everything instantly.
 
-4. You should see the basic placeholder page!
+**Entries auto-expire** when the remaining caffeine drops below 1mg (~33 hours for a 100mg drink).
 
-## Step 5: Start Building with Claude Code
+## Accessing on Android
+
+Phone and Mac must be on the same Wi-Fi network. Find your Mac's IP:
 
 ```bash
-# In your project directory
-claude-code
+ipconfig getifaddr en0
 ```
 
-Then tell Claude:
-```
-Read TASKS.md and work on Task 1.2 - create the basic HTML structure for the caffeine tracker
-```
+Then open `http://[YOUR_MAC_IP]:8080` in Chrome on Android.
 
-## Common Issues
+## Troubleshooting
 
-**"Cannot connect" on phone:**
-- Make sure phone and computer are on same WiFi
-- Check your firewall isn't blocking port 8080
-- Try your computer's IP address, not localhost
+**Stale page after updates** — hard refresh with `Cmd+Shift+R`
 
-**"command not found: npm":**
-- You need to install Node.js first (see Step 2)
+**Android can't connect** — check both devices are on the same Wi-Fi; check Mac firewall (System Settings → Network → Firewall)
 
-**"command not found: claude-code":**
-- Install Claude Code: `npm install -g @anthropic-ai/claude-code`
-- Or follow: https://code.claude.com/docs/en/overview
-
-## Next Steps
-
-1. ✅ Get the basic page showing on your phone
-2. ✅ Start Claude Code and work through Phase 1 tasks
-3. ✅ Test each feature on your Android device as you build
-4. ✅ Once Phase 1 is done, you'll have a working caffeine tracker!
-
-## Tips
-
-- **Save often**: Claude Code auto-saves, but check the files were updated
-- **Test on phone frequently**: Don't build everything then test - test as you go
-- **Read CLAUDE.md**: It has all the context Claude needs to build this right
-- **Follow TASKS.md**: The tasks are ordered for a reason - do them in sequence
-
-Good luck! 🎉
+**Data missing after browser data clear** — entries live in localStorage, which is wiped with browser data. This is expected.
