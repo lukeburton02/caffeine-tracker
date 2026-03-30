@@ -1,7 +1,7 @@
 // Caffeine Tracker - Service Worker
 // Cache-first strategy for offline support
 
-const CACHE_NAME = 'caffeine-tracker-v2';
+const CACHE_NAME = 'caffeine-tracker-v3';
 const ASSETS = [
     '/',
     '/index.html',
