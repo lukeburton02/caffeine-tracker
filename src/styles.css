@@ -69,6 +69,66 @@ body {
     margin-bottom: 16px;
 }
 
+/* --- Presets --- */
+
+.presets-section {
+    margin-bottom: 24px;
+}
+
+.presets-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.btn-preset {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: #f0f4ff;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    min-height: 64px;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.btn-preset span {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #667eea;
+}
+
+.btn-preset:hover {
+    background: #e0e8ff;
+    border-color: #667eea;
+}
+
+.btn-preset:active {
+    transform: scale(0.96);
+}
+
+.preset-toast {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #667eea;
+    font-weight: 600;
+    height: 1.2em;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.preset-toast.visible {
+    opacity: 1;
+}
+
 /* --- Log form --- */
 
 .log-section {

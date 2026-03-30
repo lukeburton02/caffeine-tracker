@@ -77,6 +77,7 @@ function renderEntries() {
 }
 
 function refreshUI() {
+    cleanupDecayedEntries();
     updateLevelDisplay();
     renderEntries();
 }
@@ -115,6 +116,41 @@ function handleDelete(id) {
     refreshUI();
 }
 
+// --- Entry cleanup ---
+
+// Remove entries where remaining caffeine has dropped below 1mg
+function cleanupDecayedEntries() {
+    const entries = getEntries();
+    const active = entries.filter(e => calculateCurrentCaffeine(e) >= 1);
+    const removed = entries.length - active.length;
+    if (removed > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(active));
+        showToast(`${removed} fully decayed entr${removed === 1 ? 'y' : 'ies'} removed`);
+    }
+}
+
+// --- Preset quick-add ---
+
+function showToast(message) {
+    const toast = document.getElementById('preset-toast');
+    toast.textContent = message;
+    toast.classList.add('visible');
+    setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+
+function handlePreset(amount, source) {
+    const now = new Date();
+    const entry = {
+        id: Date.now().toString(),
+        timestamp: now.toISOString(),
+        amount,
+        source
+    };
+    saveEntry(entry);
+    refreshUI();
+    showToast(`Logged ${amount}mg ${source}`);
+}
+
 // --- Init ---
 
 function setDefaultTime() {
@@ -129,6 +165,15 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshUI();
 
     document.getElementById('log-form').addEventListener('submit', handleFormSubmit);
+
+    // Preset buttons
+    document.querySelectorAll('.btn-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const amount = parseFloat(btn.dataset.amount);
+            const source = btn.dataset.source;
+            handlePreset(amount, source);
+        });
+    });
 
     // Auto-refresh caffeine level every minute
     setInterval(refreshUI, 60 * 1000);

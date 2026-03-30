@@ -23,9 +23,21 @@
             <p class="level-updated" id="last-updated"></p>
         </header>
 
+        <!-- Quick entry presets -->
+        <section class="presets-section">
+            <h2 class="section-title">Quick Add</h2>
+            <div class="presets-grid">
+                <button class="btn-preset" data-amount="63" data-source="Espresso">Espresso<span>63mg</span></button>
+                <button class="btn-preset" data-amount="95" data-source="Coffee (small)">Coffee S<span>95mg</span></button>
+                <button class="btn-preset" data-amount="140" data-source="Coffee (medium)">Coffee M<span>140mg</span></button>
+                <button class="btn-preset" data-amount="80" data-source="Energy Drink">Energy<span>80mg</span></button>
+            </div>
+            <div id="preset-toast" class="preset-toast" aria-live="polite"></div>
+        </section>
+
         <!-- Log caffeine form -->
         <section class="log-section">
-            <h2 class="section-title">Log Caffeine</h2>
+            <h2 class="section-title">Custom Entry</h2>
             <form id="log-form">
                 <div class="form-group">
                     <label for="amount">Amount (mg)</label>
