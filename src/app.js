@@ -179,6 +179,14 @@ function setDefaultTime() {
     document.getElementById('time').value = `${hh}:${mm}`;
 }
 
+// --- Service Worker ---
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     setDefaultTime();
     refreshUI();
