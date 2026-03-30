@@ -68,7 +68,6 @@ function getLevelColor(mg) {
 function updateLevelDisplay() {
     const total = getTotalCurrentCaffeine();
     const { color, label } = getLevelColor(total);
-    const maxMg = 500;
 
     document.getElementById('current-level').textContent = total.toFixed(1) + ' mg';
     document.getElementById('current-level').style.color = color;
@@ -77,8 +76,20 @@ function updateLevelDisplay() {
     document.getElementById('last-updated').textContent =
         'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // Scale bar within its colour zone so small amounts are still visible:
+    // Low 0-100mg = 0-33%, Moderate 100-200mg = 33-66%, High 200-400mg = 66-100%, Very High = 100%
+    let pct;
+    if (total >= 400) {
+        pct = 100;
+    } else if (total >= 200) {
+        pct = 66 + ((total - 200) / 200) * 34;
+    } else if (total >= 100) {
+        pct = 33 + ((total - 100) / 100) * 33;
+    } else {
+        pct = (total / 100) * 33;
+    }
+
     const bar = document.getElementById('level-bar');
-    const pct = Math.min((total / maxMg) * 100, 100);
     bar.style.width = pct + '%';
     bar.style.background = color;
 }
