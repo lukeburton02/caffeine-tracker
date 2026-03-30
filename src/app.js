@@ -363,10 +363,12 @@ function setDefaultTime() {
     document.getElementById('entry-time').value = `${hh}:${mm}`;
 }
 
-// Returns a Date built from the shared time input
+// Returns a Date built from the shared time input, falls back to now
 function getEntryTimestamp() {
     const val = document.getElementById('entry-time').value;
+    if (!val) return new Date();
     const [hours, minutes] = val.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return new Date();
     const ts = new Date();
     ts.setHours(hours, minutes, 0, 0);
     return ts;
