@@ -1,5 +1,4 @@
 /* Caffeine Tracker - Styles */
-/* This is a starter file. Claude Code will expand this in Task 1.4 */
 
 * {
     margin: 0;
@@ -9,43 +8,209 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     padding: 20px;
 }
 
 .container {
     background: white;
     border-radius: 20px;
-    padding: 30px;
+    padding: 24px;
     max-width: 500px;
     width: 100%;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
-h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
+/* --- Current level display --- */
+
+.level-display {
     text-align: center;
+    background: #f0f4ff;
+    border-radius: 16px;
+    padding: 24px 16px;
+    margin-bottom: 24px;
 }
 
-.placeholder {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-.placeholder h2 {
+.level-label {
+    font-size: 0.85rem;
     color: #667eea;
-    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
-.placeholder ul {
-    list-style-position: inside;
+.level-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.level-updated {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* --- Section titles --- */
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+}
+
+/* --- Log form --- */
+
+.log-section {
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: #555;
-    line-height: 1.8;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    color: #2c3e50;
+}
+
+.form-group input:focus {
+    border-color: #667eea;
+}
+
+/* --- Buttons --- */
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    min-height: 44px;
+    transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    margin-top: 6px;
+}
+
+/* --- Entry list --- */
+
+.history-section {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 24px;
+}
+
+.entry-list {
+    list-style: none;
+}
+
+.entry-empty {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.9rem;
+    padding: 20px 0;
+}
+
+.entry-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.entry-item:last-child {
+    border-bottom: none;
+}
+
+.entry-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.entry-source {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.entry-time {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.entry-amounts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.entry-original {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.entry-current {
+    font-size: 0.8rem;
+    color: #667eea;
+}
+
+.btn-delete {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 8px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.btn-delete:hover {
+    color: #e74c3c;
+    background: #fff0f0;
 }

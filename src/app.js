@@ -1,28 +1,135 @@
 // Caffeine Tracker - Main Application Logic
-// This is a starter file. Claude Code will build the full functionality in Task 1.3
 
-console.log('Caffeine Tracker initialized');
-console.log('Ready for development! Ask Claude Code to work on Task 1.3');
-
-// Core constants
 const CAFFEINE_HALF_LIFE_HOURS = 5;
+const STORAGE_KEY = 'caffeine_entries';
 
-// Placeholder functions - Claude Code will implement these
+// --- Caffeine calculation ---
+
+// Returns how much caffeine from a single entry remains right now
 function calculateCurrentCaffeine(entry) {
-    // TODO: Implement in Task 1.3
-    return 0;
+    const now = new Date();
+    const consumed = new Date(entry.timestamp);
+    const hoursElapsed = (now - consumed) / (1000 * 60 * 60);
+    return entry.amount * Math.pow(0.5, hoursElapsed / CAFFEINE_HALF_LIFE_HOURS);
 }
 
+// Returns total current caffeine from all entries
 function getTotalCurrentCaffeine() {
-    // TODO: Implement in Task 1.3
-    return 0;
+    return getEntries().reduce((total, entry) => {
+        return total + calculateCurrentCaffeine(entry);
+    }, 0);
+}
+
+// --- LocalStorage ---
+
+function getEntries() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
 }
 
 function saveEntry(entry) {
-    // TODO: Implement in Task 1.3
+    const entries = getEntries();
+    entries.push(entry);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 }
 
-function getEntries() {
-    // TODO: Implement in Task 1.3
-    return [];
+function deleteEntry(id) {
+    const entries = getEntries().filter(e => e.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 }
+
+// --- UI updates ---
+
+function updateLevelDisplay() {
+    const total = getTotalCurrentCaffeine();
+    document.getElementById('current-level').textContent = total.toFixed(1) + ' mg';
+    document.getElementById('last-updated').textContent =
+        'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderEntries() {
+    const list = document.getElementById('entry-list');
+    const entries = getEntries().slice().reverse(); // most recent first
+
+    if (entries.length === 0) {
+        list.innerHTML = '<li class="entry-empty">No entries yet. Log your first caffeine above!</li>';
+        return;
+    }
+
+    list.innerHTML = entries.map(entry => {
+        const current = calculateCurrentCaffeine(entry).toFixed(1);
+        const time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const source = entry.source || 'Unknown';
+        return `
+            <li class="entry-item">
+                <div class="entry-info">
+                    <span class="entry-source">${source}</span>
+                    <span class="entry-time">${time}</span>
+                </div>
+                <div class="entry-amounts">
+                    <span class="entry-original">${entry.amount}mg</span>
+                    <span class="entry-current">${current}mg now</span>
+                </div>
+                <button class="btn-delete" onclick="handleDelete('${entry.id}')" aria-label="Delete entry">✕</button>
+            </li>
+        `;
+    }).join('');
+}
+
+function refreshUI() {
+    updateLevelDisplay();
+    renderEntries();
+}
+
+// --- Event handlers ---
+
+function handleFormSubmit(e) {
+    e.preventDefault();
+
+    const amountInput = document.getElementById('amount');
+    const timeInput = document.getElementById('time');
+    const sourceInput = document.getElementById('source');
+
+    // Build timestamp from today's date + chosen time
+    const [hours, minutes] = timeInput.value.split(':').map(Number);
+    const timestamp = new Date();
+    timestamp.setHours(hours, minutes, 0, 0);
+
+    const entry = {
+        id: Date.now().toString(),
+        timestamp: timestamp.toISOString(),
+        amount: parseFloat(amountInput.value),
+        source: sourceInput.value.trim()
+    };
+
+    saveEntry(entry);
+    refreshUI();
+
+    // Reset form but keep source for convenience
+    amountInput.value = '';
+    timeInput.value = '';
+}
+
+function handleDelete(id) {
+    deleteEntry(id);
+    refreshUI();
+}
+
+// --- Init ---
+
+function setDefaultTime() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('time').value = `${hh}:${mm}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setDefaultTime();
+    refreshUI();
+
+    document.getElementById('log-form').addEventListener('submit', handleFormSubmit);
+
+    // Auto-refresh caffeine level every minute
+    setInterval(refreshUI, 60 * 1000);
+});
