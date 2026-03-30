@@ -14,6 +14,12 @@ A Progressive Web App for tracking caffeine intake and calculating current caffe
 - **Works offline** — service worker caches assets
 - **Local storage only** — no accounts, no cloud, no tracking
 
+## Live App
+
+**https://lukeburton02.github.io/caffeine-tracker/**
+
+Anyone can open this in their browser — no install needed. Each user's data is stored in their own browser locally.
+
 ## Running Locally
 
 ```bash
@@ -70,6 +76,10 @@ All planned phases are complete. See TASKS.md for full history.
 - CSV export
 - Dark mode
 - Cloud sync *(requires LSHTM policy review first)*
+
+## Deployment
+
+Pushing to `main` automatically deploys to GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`). The `src/` folder is deployed to the `gh-pages` branch.
 
 ## Note on Cloud Sync
 
