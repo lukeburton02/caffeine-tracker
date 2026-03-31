@@ -33,5 +33,12 @@ coverage/
 # Local caffeine data (written by the dev server to data/caffeine_data.json)
 data/
 
+# R and IDE files
+.Rhistory
+.Rdata
+
+# Claude Code local memory
+.claude/
+
 # Local caffeine data backup (written by File System Access API in Chrome)
 caffeine_data.json
