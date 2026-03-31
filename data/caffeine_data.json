@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "lastSaved": "2026-03-31T19:52:38.165Z",
+  "entries": [
+    {
+      "id": "1774903051245",
+      "timestamp": "2026-03-30T14:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1774985226245",
+      "timestamp": "2026-03-31T08:40:00.000Z",
+      "amount": 50,
+      "source": "Lemsip"
+    },
+    {
+      "id": "1774985239777",
+      "timestamp": "2026-03-31T10:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    }
+  ],
+  "halfLife": 5
+}

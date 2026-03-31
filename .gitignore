@@ -30,9 +30,6 @@ npm-debug.log*
 coverage/
 .nyc_output/
 
-# Local caffeine data (written by the dev server to data/caffeine_data.json)
-data/
-
 # R and IDE files
 .Rhistory
 .Rdata
