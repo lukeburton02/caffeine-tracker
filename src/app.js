@@ -11,7 +11,6 @@ function getHalfLife() {
 
 // --- Caffeine calculation ---
 
-// Returns how much caffeine from a single entry remains right now
 function calculateCurrentCaffeine(entry) {
     const now = new Date();
     const consumed = new Date(entry.timestamp);
@@ -19,7 +18,6 @@ function calculateCurrentCaffeine(entry) {
     return entry.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
 }
 
-// Returns total current caffeine from all entries
 function getTotalCurrentCaffeine() {
     return getEntries().reduce((total, entry) => {
         return total + calculateCurrentCaffeine(entry);
@@ -27,6 +25,7 @@ function getTotalCurrentCaffeine() {
 }
 
 // --- LocalStorage ---
+// All entries are kept forever — never auto-deleted — so charts always have full history.
 
 function getEntries() {
     try {
@@ -42,6 +41,7 @@ function saveEntry(entry) {
         const entries = getEntries();
         entries.push(entry);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        saveBackup();
     } catch {
         showToast('Could not save entry — storage may be full');
     }
@@ -51,9 +51,22 @@ function deleteEntry(id) {
     try {
         const entries = getEntries().filter(e => e.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        saveBackup();
     } catch {
         showToast('Could not delete entry');
     }
+}
+
+// --- Entry display filter ---
+// Recent entries list shows only entries where caffeine >= 1mg AND age <= 7 days.
+// This is a display filter only — entries remain in localStorage forever.
+
+function getDisplayEntries() {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    return getEntries().filter(e => {
+        return new Date(e.timestamp) >= sevenDaysAgo && calculateCurrentCaffeine(e) >= 1;
+    });
 }
 
 // --- UI updates ---
@@ -76,8 +89,6 @@ function updateLevelDisplay() {
     document.getElementById('last-updated').textContent =
         'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // Scale bar within its colour zone so small amounts are still visible:
-    // Low 0-100mg = 0-33%, Moderate 100-200mg = 33-66%, High 200-400mg = 66-100%, Very High = 100%
     let pct;
     if (total >= 400) {
         pct = 100;
@@ -96,28 +107,41 @@ function updateLevelDisplay() {
 
 function renderEntries() {
     const list = document.getElementById('entry-list');
-    const entries = getEntries().slice().reverse();
+    const entries = getDisplayEntries().slice().reverse();
 
     if (entries.length === 0) {
-        list.innerHTML = '<li class="entry-empty">No entries yet. Log your first caffeine above!</li>';
+        list.innerHTML = '<li class="entry-empty">No active entries.</li>';
         return;
     }
 
+    const today = new Date();
+
     list.innerHTML = entries.map(entry => {
         const current = calculateCurrentCaffeine(entry).toFixed(1);
-        const time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const entryDate = new Date(entry.timestamp);
+        const isToday = entryDate.toDateString() === today.toDateString();
+
+        let timeDisplay;
+        if (isToday) {
+            timeDisplay = entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            const datePart = entryDate.toLocaleDateString([], { day: 'numeric', month: 'short' });
+            const timePart = entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            timeDisplay = `${datePart}, ${timePart}`;
+        }
+
         const source = entry.source || 'Unknown';
         return `
             <li class="entry-item">
                 <div class="entry-info">
                     <span class="entry-source">${source}</span>
-                    <span class="entry-time">${time}</span>
+                    <span class="entry-time">${timeDisplay}</span>
                 </div>
                 <div class="entry-amounts">
                     <span class="entry-original">${entry.amount}mg</span>
                     <span class="entry-current">${current}mg now</span>
                 </div>
-                <button class="btn-delete" onclick="handleDelete('${entry.id}', '${source}')" aria-label="Delete entry">✕</button>
+                <button type="button" class="btn-delete" onclick="handleDelete('${entry.id}', '${source}')" aria-label="Delete entry">✕</button>
             </li>
         `;
     }).join('');
@@ -238,16 +262,194 @@ function drawWeeklyChart() {
     });
 }
 
+// --- Full history line chart ---
+
+function buildHistoryDays() {
+    const entries = getEntries();
+    if (entries.length === 0) return [];
+
+    const allTimestamps = entries.map(e => new Date(e.timestamp));
+    const firstEntry = new Date(Math.min(...allTimestamps));
+    const today = new Date();
+
+    const start = new Date(firstEntry.getFullYear(), firstEntry.getMonth(), firstEntry.getDate());
+    const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const days = [];
+    let cursor = new Date(start);
+    while (cursor <= end) {
+        const next = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
+        const total = entries
+            .filter(e => {
+                const t = new Date(e.timestamp);
+                return t >= cursor && t < next;
+            })
+            .reduce((sum, e) => sum + e.amount, 0);
+        days.push({ date: new Date(cursor), total });
+        cursor = next;
+    }
+    return days;
+}
+
+function drawHistoryChart() {
+    const canvas = document.getElementById('history-chart');
+    const emptyMsg = document.getElementById('history-empty');
+    if (!canvas) return;
+
+    const days = buildHistoryDays();
+
+    if (days.length === 0) {
+        canvas.style.display = 'none';
+        emptyMsg.style.display = '';
+        return;
+    }
+
+    canvas.style.display = 'block';
+    emptyMsg.style.display = 'none';
+
+    const DAY_W = 44;
+    const PAD_LEFT = 50;
+    const PAD_RIGHT = 20;
+    const PAD_TOP = 20;
+    const PAD_BOTTOM = 52;
+    const CHART_H = 150;
+
+    const cssW = PAD_LEFT + days.length * DAY_W + PAD_RIGHT;
+    const cssH = PAD_TOP + CHART_H + PAD_BOTTOM;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const maxVal = Math.max(...days.map(d => d.total), 100);
+    const scaleY = val => PAD_TOP + CHART_H - (val / maxVal) * CHART_H;
+    const dayX = i => PAD_LEFT + i * DAY_W + DAY_W / 2;
+
+    // Y-axis gridlines and labels
+    const gridSteps = [0, Math.round(maxVal / 2), maxVal];
+    gridSteps.forEach(v => {
+        const y = scaleY(v);
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(PAD_LEFT, y);
+        ctx.lineTo(cssW - PAD_RIGHT, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#ccc';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(v + 'mg', PAD_LEFT - 5, y);
+    });
+
+    // Month boundary vertical dashed lines
+    days.forEach((day, i) => {
+        if (i > 0 && day.date.getDate() === 1) {
+            const x = PAD_LEFT + i * DAY_W;
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x, PAD_TOP);
+            ctx.lineTo(x, PAD_TOP + CHART_H);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    });
+
+    // Line connecting data points
+    if (days.length > 1) {
+        ctx.strokeStyle = '#667eea';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        days.forEach((day, i) => {
+            const x = dayX(i);
+            const y = scaleY(day.total);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+    }
+
+    // Data point dots
+    days.forEach((day, i) => {
+        const x = dayX(i);
+        const y = scaleY(day.total);
+        const isToday = i === days.length - 1;
+        const outerR = isToday ? 5 : 4;
+        const innerR = isToday ? 3 : 2;
+
+        ctx.beginPath();
+        ctx.arc(x, y, outerR, 0, Math.PI * 2);
+        ctx.fillStyle = '#667eea';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(x, y, innerR, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+    });
+
+    // X-axis labels
+    const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const labelY1 = PAD_TOP + CHART_H + 12; // date or month name
+    const labelY2 = PAD_TOP + CHART_H + 28; // weekday or year
+
+    days.forEach((day, i) => {
+        const x = dayX(i);
+        const isMonthBoundary = i > 0 && day.date.getDate() === 1;
+        const isToday = i === days.length - 1;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        if (isMonthBoundary) {
+            ctx.fillStyle = '#667eea';
+            ctx.font = '600 11px sans-serif';
+            ctx.fillText(MONTHS[day.date.getMonth()], x, labelY1);
+            ctx.fillStyle = '#999';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(day.date.getFullYear(), x, labelY2);
+        } else {
+            const d = String(day.date.getDate()).padStart(2, '0');
+            const m = String(day.date.getMonth() + 1).padStart(2, '0');
+            ctx.fillStyle = isToday ? '#2c3e50' : '#bbb';
+            ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
+            ctx.fillText(`${d}/${m}`, x, labelY1);
+            ctx.fillStyle = isToday ? '#667eea' : '#ccc';
+            ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
+            ctx.fillText(WEEKDAYS[day.date.getDay()], x, labelY2);
+        }
+    });
+}
+
 function updateHalfLifeDisplay() {
     document.getElementById('halflife-input').value = getHalfLife();
 }
 
+// refreshUI: called every minute — updates level, entries, 7-day chart, summary.
+// History chart is NOT redrawn here (only when data changes) to avoid unnecessary canvas work.
 function refreshUI() {
-    cleanupDecayedEntries();
     updateLevelDisplay();
     updateSummary();
     drawWeeklyChart();
     renderEntries();
+}
+
+// Called when data changes (entry added/deleted, half-life changed).
+function refreshAll() {
+    refreshUI();
+    drawHistoryChart();
 }
 
 // --- Event handlers ---
@@ -269,9 +471,7 @@ function handleFormSubmit(e) {
     }
 
     const timestamp = getEntryTimestamp();
-    if (timestamp > new Date()) {
-        showToast('Note: time is in the future');
-    }
+    if (!validateTimestamp(timestamp)) return;
 
     const entry = {
         id: Date.now().toString(),
@@ -281,7 +481,7 @@ function handleFormSubmit(e) {
     };
 
     saveEntry(entry);
-    refreshUI();
+    refreshAll();
     showToast(`Logged ${amount}mg`);
 
     amountInput.value = '';
@@ -291,19 +491,7 @@ function handleFormSubmit(e) {
 function handleDelete(id, source) {
     if (!confirm(`Delete "${source}"?`)) return;
     deleteEntry(id);
-    refreshUI();
-}
-
-// --- Entry cleanup ---
-
-function cleanupDecayedEntries() {
-    const entries = getEntries();
-    const active = entries.filter(e => calculateCurrentCaffeine(e) >= 1);
-    const removed = entries.length - active.length;
-    if (removed > 0) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(active));
-        showToast(`${removed} fully decayed entr${removed === 1 ? 'y' : 'ies'} removed`);
-    }
+    refreshAll();
 }
 
 // --- Toast ---
@@ -317,9 +505,9 @@ function showToast(message) {
 
 // --- Preset quick-add ---
 
-// Immediately logs a preset drink using the shared time input
 function handlePreset(amount, source) {
     const timestamp = getEntryTimestamp();
+    if (!validateTimestamp(timestamp)) return;
 
     const entry = {
         id: Date.now().toString(),
@@ -329,7 +517,7 @@ function handlePreset(amount, source) {
     };
 
     saveEntry(entry);
-    refreshUI();
+    refreshAll();
     showToast(`Logged ${source} (${amount}mg)`);
 }
 
@@ -343,35 +531,168 @@ function saveHalfLife() {
         return;
     }
     localStorage.setItem(HALFLIFE_KEY, value);
-    refreshUI();
+    saveBackup();
+    refreshAll();
     showToast(`Half-life set to ${value} hours — levels recalculated`);
 }
 
 function resetHalfLife() {
     localStorage.removeItem(HALFLIFE_KEY);
     updateHalfLifeDisplay();
-    refreshUI();
+    saveBackup();
+    refreshAll();
     showToast(`Half-life reset to ${DEFAULT_HALF_LIFE_HOURS} hours`);
 }
 
-// --- Init ---
+// --- Date/time input ---
 
-function setDefaultTime() {
+function setDefaultDateTime() {
     const now = new Date();
+
+    // Set date input to today
+    document.getElementById('entry-date').value = toDateInputValue(now);
+    // Set time input to now
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     document.getElementById('entry-time').value = `${hh}:${mm}`;
+
+    // Constrain date range
+    const maxDate = now;
+    const minDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    document.getElementById('entry-date').max = toDateInputValue(maxDate);
+    document.getElementById('entry-date').min = toDateInputValue(minDate);
 }
 
-// Returns a Date built from the shared time input, falls back to now
+function toDateInputValue(date) {
+    // Returns "YYYY-MM-DD" in local time (not UTC)
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
 function getEntryTimestamp() {
-    const val = document.getElementById('entry-time').value;
-    if (!val) return new Date();
-    const [hours, minutes] = val.split(':').map(Number);
-    if (isNaN(hours) || isNaN(minutes)) return new Date();
-    const ts = new Date();
-    ts.setHours(hours, minutes, 0, 0);
-    return ts;
+    const dateVal = document.getElementById('entry-date').value;
+    const timeVal = document.getElementById('entry-time').value;
+    if (!dateVal || !timeVal) return new Date();
+    const [y, mo, d] = dateVal.split('-').map(Number);
+    const [h, mi] = timeVal.split(':').map(Number);
+    return new Date(y, mo - 1, d, h, mi, 0, 0);
+}
+
+function validateTimestamp(ts) {
+    const now = new Date();
+    if (ts > now) {
+        showToast('Cannot log future entries');
+        return false;
+    }
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    if (ts < sevenDaysAgo) {
+        showToast('Cannot log entries older than 7 days');
+        return false;
+    }
+    return true;
+}
+
+// --- IndexedDB helpers (for storing backup folder handle) ---
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('caffeine-tracker', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('settings');
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = () => reject(new Error('IndexedDB unavailable'));
+    });
+}
+
+async function getDBValue(key) {
+    try {
+        const db = await openDB();
+        return new Promise(resolve => {
+            const tx = db.transaction('settings', 'readonly');
+            const req = tx.objectStore('settings').get(key);
+            req.onsuccess = e => resolve(e.target.result ?? null);
+            req.onerror = () => resolve(null);
+        });
+    } catch {
+        return null;
+    }
+}
+
+async function setDBValue(key, value) {
+    try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('settings', 'readwrite');
+            const req = tx.objectStore('settings').put(value, key);
+            req.onsuccess = () => resolve();
+            req.onerror = e => reject(e.target.error);
+        });
+    } catch {
+        // Silently fail — backup is optional
+    }
+}
+
+// --- File System Access API backup ---
+
+let backupDirHandle = null;
+
+async function initBackup() {
+    backupDirHandle = await getDBValue('backupDir');
+    updateBackupStatus();
+}
+
+async function linkBackupFolder() {
+    if (!window.showDirectoryPicker) {
+        showToast('Folder backup requires Chrome or Edge');
+        return;
+    }
+    try {
+        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        backupDirHandle = handle;
+        await setDBValue('backupDir', handle);
+        updateBackupStatus();
+        await saveBackup();
+        showToast('Folder linked — data saved');
+    } catch (e) {
+        if (e.name !== 'AbortError') showToast('Could not link folder');
+    }
+}
+
+async function saveBackup() {
+    if (!backupDirHandle) return;
+    try {
+        let perm = await backupDirHandle.queryPermission({ mode: 'readwrite' });
+        if (perm === 'prompt') {
+            perm = await backupDirHandle.requestPermission({ mode: 'readwrite' });
+        }
+        if (perm !== 'granted') return;
+
+        const fileHandle = await backupDirHandle.getFileHandle('caffeine_data.json', { create: true });
+        const writable = await fileHandle.createWritable();
+        const data = {
+            version: 1,
+            lastSaved: new Date().toISOString(),
+            entries: getEntries(),
+            halfLife: getHalfLife()
+        };
+        await writable.write(JSON.stringify(data, null, 2));
+        await writable.close();
+    } catch (e) {
+        console.warn('Backup save failed:', e.message);
+    }
+}
+
+function updateBackupStatus() {
+    const el = document.getElementById('backup-status');
+    if (!el) return;
+    if (backupDirHandle) {
+        el.textContent = `${backupDirHandle.name}/caffeine_data.json`;
+        el.className = 'backup-status backup-linked';
+    } else {
+        el.textContent = 'Not linked';
+        el.className = 'backup-status';
+    }
 }
 
 // --- Service Worker ---
@@ -382,10 +703,13 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// --- Init ---
+
 document.addEventListener('DOMContentLoaded', () => {
-    setDefaultTime();
+    setDefaultDateTime();
     updateHalfLifeDisplay();
-    refreshUI();
+    refreshAll();
+    initBackup();
 
     document.getElementById('log-form').addEventListener('submit', handleFormSubmit);
 
@@ -397,6 +721,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('halflife-save').addEventListener('click', saveHalfLife);
     document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
+    document.getElementById('backup-link').addEventListener('click', linkBackupFolder);
 
+    // Minute tick: refresh level, entries, 7-day chart (not history chart)
     setInterval(refreshUI, 60 * 1000);
 });

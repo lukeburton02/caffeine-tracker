@@ -14,97 +14,134 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <div class="layout">
 
-        <!-- Current caffeine level display -->
-        <header class="level-display">
-            <p class="level-label">Current caffeine in system</p>
-            <p class="level-amount" id="current-level">0.0 mg</p>
-            <p class="level-status" id="level-status">—</p>
-            <div class="level-bar-track">
-                <div class="level-bar" id="level-bar"></div>
-            </div>
-            <p class="level-updated" id="last-updated"></p>
-        </header>
+        <!-- LEFT PANEL -->
+        <div class="panel panel-left">
 
-        <!-- Shared time input -->
-        <section class="time-section">
-            <h2 class="section-title">Time</h2>
-            <input type="time" id="entry-time">
-        </section>
-
-        <!-- Quick entry presets -->
-        <section class="presets-section">
-            <h2 class="section-title">Quick Add</h2>
-            <div class="presets-grid">
-                <button type="button" class="btn-preset" data-amount="200" data-source="Celsius"><span class="preset-name">Celsius</span><span class="preset-mg">200mg</span></button>
-                <button type="button" class="btn-preset" data-amount="100" data-source="Huel"><span class="preset-name">Huel</span><span class="preset-mg">100mg</span></button>
-                <button type="button" class="btn-preset" data-amount="120" data-source="Neutonic"><span class="preset-name">Neutonic</span><span class="preset-mg">120mg</span></button>
-                <button type="button" class="btn-preset" data-amount="160" data-source="Tenzing Mango"><span class="preset-name">Tenzing</span><span class="preset-mg">160mg</span></button>
-            </div>
-            <div id="preset-toast" class="preset-toast" aria-live="polite"></div>
-        </section>
-
-        <!-- Custom entry form -->
-        <section class="log-section">
-            <h2 class="section-title">Custom Entry</h2>
-            <form id="log-form">
-                <div class="form-group">
-                    <label for="amount">Amount (mg)</label>
-                    <input type="number" id="amount" name="amount" min="1" max="2000" placeholder="e.g. 95" required>
+            <!-- Current caffeine level display -->
+            <header class="level-display">
+                <p class="level-label">Current caffeine in system</p>
+                <p class="level-amount" id="current-level">0.0 mg</p>
+                <p class="level-status" id="level-status">—</p>
+                <div class="level-bar-track">
+                    <div class="level-bar" id="level-bar"></div>
                 </div>
-                <div class="form-group">
-                    <label for="source">Source (optional)</label>
-                    <input type="text" id="source" name="source" placeholder="e.g. Coffee, Espresso">
-                </div>
-                <button type="submit" class="btn btn-primary">Log Caffeine</button>
-            </form>
-        </section>
+                <p class="level-updated" id="last-updated"></p>
+            </header>
 
-        <!-- Daily summary -->
-        <section class="summary-section">
-            <h2 class="section-title">Today's Summary</h2>
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <span class="summary-value" id="summary-total">—</span>
-                    <span class="summary-label">Total consumed</span>
+            <!-- Shared date + time input -->
+            <section class="time-section">
+                <h2 class="section-title">Date &amp; Time</h2>
+                <div class="datetime-row">
+                    <input type="date" id="entry-date">
+                    <input type="time" id="entry-time">
                 </div>
-                <div class="summary-card">
-                    <span class="summary-value" id="summary-peak">—</span>
-                    <span class="summary-label">Peak level</span>
+            </section>
+
+            <!-- Quick entry presets -->
+            <section class="presets-section">
+                <h2 class="section-title">Quick Add</h2>
+                <div class="presets-grid">
+                    <button type="button" class="btn-preset" data-amount="200" data-source="Celsius">
+                        <span class="preset-name">Celsius</span><span class="preset-mg">200mg</span>
+                    </button>
+                    <button type="button" class="btn-preset" data-amount="100" data-source="Huel">
+                        <span class="preset-name">Huel</span><span class="preset-mg">100mg</span>
+                    </button>
+                    <button type="button" class="btn-preset" data-amount="120" data-source="Neutonic">
+                        <span class="preset-name">Neutonic</span><span class="preset-mg">120mg</span>
+                    </button>
+                    <button type="button" class="btn-preset" data-amount="160" data-source="Tenzing Mango">
+                        <span class="preset-name">Tenzing</span><span class="preset-mg">160mg</span>
+                    </button>
                 </div>
-                <div class="summary-card">
-                    <span class="summary-value" id="summary-peak-time">—</span>
-                    <span class="summary-label">Peak at</span>
+                <div id="preset-toast" class="preset-toast" aria-live="polite"></div>
+            </section>
+
+            <!-- Custom entry form -->
+            <section class="log-section">
+                <h2 class="section-title">Custom Entry</h2>
+                <form id="log-form">
+                    <div class="form-group">
+                        <label for="amount">Amount (mg)</label>
+                        <input type="number" id="amount" name="amount" min="1" max="2000" placeholder="e.g. 95" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="source">Source (optional)</label>
+                        <input type="text" id="source" name="source" placeholder="e.g. Coffee, Espresso">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Log Caffeine</button>
+                </form>
+            </section>
+
+            <!-- Recent entries list -->
+            <section class="history-section">
+                <h2 class="section-title">Recent Entries</h2>
+                <ul class="entry-list" id="entry-list">
+                    <li class="entry-empty">No entries yet. Log your first caffeine above!</li>
+                </ul>
+            </section>
+
+            <!-- Half-life settings -->
+            <section class="settings-section">
+                <h2 class="section-title">Settings</h2>
+                <div class="halflife-row">
+                    <label for="halflife-input">Half-life (hours)</label>
+                    <input type="number" id="halflife-input" min="1" max="24" step="0.5">
+                    <button type="button" class="btn-save" id="halflife-save">Save</button>
+                    <button type="button" class="btn-reset" id="halflife-reset">Reset</button>
                 </div>
-            </div>
-        </section>
+                <p class="halflife-note">Default is 5 hours. Caffeine half-life varies by individual (typically 3–7 hrs).</p>
 
-        <!-- Weekly chart -->
-        <section class="chart-section">
-            <h2 class="section-title">Last 7 Days</h2>
-            <canvas id="weekly-chart" height="160"></canvas>
-        </section>
+                <div class="backup-row">
+                    <span class="backup-label">Local backup</span>
+                    <span id="backup-status" class="backup-status">Not linked</span>
+                    <button type="button" class="btn-backup" id="backup-link">Link folder</button>
+                </div>
+                <p class="halflife-note" id="backup-note">Link a local folder to auto-save your data as caffeine_data.json after each change.</p>
+            </section>
 
-        <!-- Recent entries list -->
-        <section class="history-section">
-            <h2 class="section-title">Recent Entries</h2>
-            <ul class="entry-list" id="entry-list">
-                <li class="entry-empty">No entries yet. Log your first caffeine above!</li>
-            </ul>
-        </section>
+        </div>
 
-        <!-- Half-life settings -->
-        <section class="settings-section">
-            <h2 class="section-title">Settings</h2>
-            <div class="halflife-row">
-                <label for="halflife-input">Half-life (hours)</label>
-                <input type="number" id="halflife-input" min="1" max="24" step="0.5">
-                <button type="button" class="btn-save" id="halflife-save">Save</button>
-                <button type="button" class="btn-reset" id="halflife-reset">Reset</button>
-            </div>
-            <p class="halflife-note">Default is 5 hours. Caffeine half-life varies by individual (typically 3–7 hrs).</p>
-        </section>
+        <!-- RIGHT PANEL -->
+        <div class="panel panel-right">
+
+            <!-- Daily summary -->
+            <section class="summary-section">
+                <h2 class="section-title">Today's Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <span class="summary-value" id="summary-total">—</span>
+                        <span class="summary-label">Total consumed</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-value" id="summary-peak">—</span>
+                        <span class="summary-label">Peak level</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-value" id="summary-peak-time">—</span>
+                        <span class="summary-label">Peak at</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weekly chart -->
+            <section class="chart-section">
+                <h2 class="section-title">Last 7 Days</h2>
+                <canvas id="weekly-chart" height="160"></canvas>
+            </section>
+
+            <!-- Full history line chart -->
+            <section class="chart-section">
+                <h2 class="section-title">Full History</h2>
+                <div class="history-chart-container" id="history-chart-container">
+                    <canvas id="history-chart"></canvas>
+                </div>
+                <p class="history-empty" id="history-empty" style="display:none">No history yet — log your first entry to see the chart.</p>
+            </section>
+
+        </div>
 
     </div>
 

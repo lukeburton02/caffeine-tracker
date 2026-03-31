@@ -29,3 +29,6 @@ npm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+
+# Local caffeine data backup (written by File System Access API)
+caffeine_data.json
