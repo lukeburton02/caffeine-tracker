@@ -443,17 +443,20 @@ function updateHalfLifeDisplay() {
 
 // refreshUI: called every minute — updates level, entries, 7-day chart, summary.
 // History chart is NOT redrawn here (only when data changes) to avoid unnecessary canvas work.
+// Called every minute: only updates values that change with time (decay).
+// Charts and summary only change when entries are added/deleted — see refreshAll().
 function refreshUI() {
     updateLevelDisplay();
-    updateSummary();
-    drawWeeklyChart();
     renderEntries();
 }
 
 // Called when data changes (entry added/deleted, half-life changed).
 function refreshAll() {
-    refreshUI();
+    updateLevelDisplay();
+    updateSummary();
+    drawWeeklyChart();
     drawHistoryChart();
+    renderEntries();
 }
 
 // --- Event handlers ---
