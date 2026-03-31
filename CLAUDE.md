@@ -92,7 +92,7 @@ The backup row in Settings reflects which method is active:
 - Chrome on deployed version → "Link folder" button
 - Safari/Firefox on deployed version → backup row hidden entirely
 
-`data/` is gitignored. `caffeine_data.json` (File System API output) is gitignored.
+`data/caffeine_data.json` and `data/caffeine_data.csv` are **committed to the repo** as example data. The File System Access API's output file (saved to a user-chosen folder) is not tracked.
 
 ### Layout
 Two-panel layout on desktop (>800px), stacked on mobile:
@@ -131,9 +131,9 @@ Two-panel layout on desktop (>800px), stacked on mobile:
 - All buttons must have `type="button"` unless they are form submit buttons
 
 ### Auto-refresh
-- 1-minute `setInterval` calls `refreshUI()`: current level, recent entries, 7-day chart, today's summary
-- History chart (`drawHistoryChart()`) is **not** on the 1-minute tick — only redraws when data changes via `refreshAll()`
-- TODO: review energy/battery impact of canvas redraws on the minute tick (see TASKS.md)
+- 1-minute `setInterval` calls `refreshUI()`: updates current level display, high caffeine warning, and recent entries list only
+- `refreshAll()` is called on data changes only: runs everything including summary, 7-day chart, and history chart
+- History chart (`drawHistoryChart()`) is **not** on the 1-minute tick — only redraws when data changes
 
 ### Development Commands
 ```bash
@@ -171,4 +171,6 @@ This project is developed on an LSHTM machine. Before adding any cloud sync or e
 - [ ] Entries older than 7 days hidden from Recent Entries but visible in charts
 - [ ] History chart scrolls horizontally when many days of data
 - [ ] History chart renders crisply (no blurriness) in both Chrome and Safari
+- [ ] High caffeine warning banner appears when level crosses above 200mg, auto-hides after 10s, does not re-fire until level drops below 200mg and rises again
+- [ ] "Download CSV" button exports all entries to a dated CSV file in Downloads
 - [ ] Android: open `http://[MAC_IP]:8080` on same Wi-Fi

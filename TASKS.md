@@ -134,12 +134,26 @@
 
 ---
 
-## Phase 6: Bug Fixes ✅
+## Phase 6: Bug Fixes & Small Features ✅
 
 ### Task 6.1: Peak Calculation Fix ✅
 - [x] Replaced 15-minute cursor sampling with exact timestamp checks
 - [x] Peak is now checked at the exact moment each today entry is consumed — the only time a local maximum can occur
 - [x] Example: 50mg at 9am + 120mg at 2pm now correctly gives ~145mg peak, not 170mg
+
+### Task 6.3: Refresh Rate Optimisation ✅
+- [x] 1-min tick reduced to `updateLevelDisplay()` + `renderEntries()` only
+- [x] `updateSummary()`, `drawWeeklyChart()`, `drawHistoryChart()` moved to `refreshAll()` (data-change only)
+
+### Task 6.4: High Caffeine Warning ✅
+- [x] Red banner inside level display when caffeine crosses above 200mg
+- [x] Visible for 10 seconds then auto-hides
+- [x] Fires once per upward crossing — resets when level drops back below 200mg
+
+### Task 6.5: CSV Download Button ✅
+- [x] "Download CSV" button at bottom of right panel
+- [x] Exports all entries as `caffeine_data_YYYY-MM-DD.csv` to Downloads folder
+- [x] Works on deployed site and locally; same format as server-written CSV
 
 ### Task 6.2: History Chart Rendering ✅
 - [x] Removed `border-radius` from scroll container (Safari compositing caused blurriness)
@@ -149,10 +163,11 @@
 ---
 
 ## Future Enhancements
+- [ ] **History chart: adaptive tick density** — as the number of days grows, the x-axis labels become cramped. Instead of labelling every day, automatically compute a tick interval (e.g. every 2, 7, or 14 days) based on the available canvas width and total date range, so labels never overlap. Month boundary markers should always be shown regardless of tick interval.
+- [ ] **History chart: windowed view toggle** — add a toggle button above the Full History chart to switch between two modes: (1) current "all-time" view (full range, horizontally scrollable); (2) "2-week window" view that shows exactly 14 days at a time, with left/right arrow buttons to step backwards/forwards by one day (or one week) at a time. The window should default to showing the most recent 14 days. Both modes should share the same canvas rendering logic, just with different date ranges passed in.
 - [ ] **Data history editor**: a dedicated view (e.g. panel or modal) to browse, edit, and delete all stored entries — including those hidden from Recent Entries (fully decayed or older than 7 days). Should show all entries in a scrollable list grouped by day, with a delete button (confirmation required) and an add-entry form. Deletions must propagate to localStorage, JSON, and CSV. Useful for correcting logging mistakes and cleaning up old data.
 - [ ] **Import from backup**: restore from `data/caffeine_data.json` manually (e.g. after moving browsers or clearing localStorage deliberately)
 - [ ] **Exploratory analyses**: ideas to consider — caffeine-free streaks, time-of-day intake patterns, weekday vs weekend averages, rolling average overlay on history chart, sleep impact estimate
-- [ ] Export data as CSV download button (for deployed version users without local server)
 - [ ] Dark mode
 - [ ] Cloud sync — **IMPORTANT: review LSHTM's policies on third-party cloud services before implementing**
 - [ ] Native Android app (very low priority)
