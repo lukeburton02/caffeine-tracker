@@ -807,6 +807,40 @@ function updateBackupStatus() {
     }
 }
 
+// --- CSV export ---
+
+function exportCSV() {
+    const entries = getEntries()
+        .slice()
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    if (entries.length === 0) {
+        showToast('No data to export');
+        return;
+    }
+
+    const escape = val => {
+        const s = String(val ?? '');
+        return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+
+    const rows = entries.map(e => {
+        const d = new Date(e.timestamp);
+        const date = [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+        const time = [String(d.getHours()).padStart(2,'0'), String(d.getMinutes()).padStart(2,'0')].join(':');
+        return [escape(date), escape(time), escape(e.amount), escape(e.source)].join(',');
+    });
+
+    const csv = ['date,time,amount_mg,source', ...rows].join('\n') + '\n';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `caffeine_data_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 // --- Service Worker ---
 
 if ('serviceWorker' in navigator) {
@@ -834,6 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('halflife-save').addEventListener('click', saveHalfLife);
     document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
     document.getElementById('backup-link').addEventListener('click', linkBackupFolder);
+    document.getElementById('export-csv').addEventListener('click', exportCSV);
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)
     setInterval(refreshUI, 60 * 1000);

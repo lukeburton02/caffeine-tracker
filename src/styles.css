@@ -213,6 +213,22 @@ body {
     padding: 24px 0;
 }
 
+.btn-export {
+    padding: 10px 18px;
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-export:hover {
+    background: #e5e5e5;
+}
+
 /* --- Presets --- */
 
 .presets-grid {
