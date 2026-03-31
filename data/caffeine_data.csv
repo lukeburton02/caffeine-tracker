@@ -1,0 +1,4 @@
+date,time,amount_mg,source
+2026-03-30,15:00,200,Celsius
+2026-03-31,09:40,50,Lemsip
+2026-03-31,11:00,120,Neutonic
