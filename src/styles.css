@@ -113,6 +113,21 @@ body {
     color: #bbb;
 }
 
+.high-warning {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #fdecea;
+    color: #c0392b;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: none;
+}
+
+.high-warning.visible {
+    display: block;
+}
+
 /* --- Date + time inputs --- */
 
 .datetime-row {

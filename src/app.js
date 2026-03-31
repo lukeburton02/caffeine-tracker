@@ -3,6 +3,10 @@
 const DEFAULT_HALF_LIFE_HOURS = 5;
 const STORAGE_KEY = 'caffeine_entries';
 const HALFLIFE_KEY = 'caffeine_halflife';
+const HIGH_THRESHOLD = 200; // mg — warn once when crossing above this
+
+let prevCaffeineLevel = null;
+let highWarningTimer = null;
 
 function getHalfLife() {
     const stored = parseFloat(localStorage.getItem(HALFLIFE_KEY));
@@ -437,6 +441,22 @@ function drawHistoryChart() {
     });
 }
 
+function checkHighWarning() {
+    const current = getTotalCurrentCaffeine();
+    const crossed = prevCaffeineLevel !== null
+        && prevCaffeineLevel < HIGH_THRESHOLD
+        && current >= HIGH_THRESHOLD;
+    prevCaffeineLevel = current;
+
+    if (!crossed) return;
+
+    const el = document.getElementById('high-warning');
+    el.textContent = `⚠ High caffeine level — ${current.toFixed(0)}mg is above ${HIGH_THRESHOLD}mg`;
+    el.classList.add('visible');
+    clearTimeout(highWarningTimer);
+    highWarningTimer = setTimeout(() => el.classList.remove('visible'), 10000);
+}
+
 function updateHalfLifeDisplay() {
     document.getElementById('halflife-input').value = getHalfLife();
 }
@@ -447,12 +467,14 @@ function updateHalfLifeDisplay() {
 // Charts and summary only change when entries are added/deleted — see refreshAll().
 function refreshUI() {
     updateLevelDisplay();
+    checkHighWarning();
     renderEntries();
 }
 
 // Called when data changes (entry added/deleted, half-life changed).
 function refreshAll() {
     updateLevelDisplay();
+    checkHighWarning();
     updateSummary();
     drawWeeklyChart();
     drawHistoryChart();
