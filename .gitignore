@@ -30,5 +30,8 @@ npm-debug.log*
 coverage/
 .nyc_output/
 
-# Local caffeine data backup (written by File System Access API)
+# Local caffeine data (written by the dev server to data/caffeine_data.json)
+data/
+
+# Local caffeine data backup (written by File System Access API in Chrome)
 caffeine_data.json

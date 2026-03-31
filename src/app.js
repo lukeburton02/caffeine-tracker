@@ -599,7 +599,56 @@ function validateTimestamp(ts) {
     return true;
 }
 
-// --- IndexedDB helpers (for storing backup folder handle) ---
+// --- Server-based save (works in all browsers when running via npm run dev) ---
+// The Express server in server.js writes data to data/caffeine_data.json on disk.
+
+let serverAvailable = false;
+
+async function checkServerAvailable() {
+    try {
+        const res = await fetch('/api/load', { method: 'GET' });
+        serverAvailable = res.ok;
+    } catch {
+        serverAvailable = false;
+    }
+}
+
+async function saveToServer() {
+    if (!serverAvailable) return;
+    const data = {
+        version: 1,
+        lastSaved: new Date().toISOString(),
+        entries: getEntries(),
+        halfLife: getHalfLife()
+    };
+    try {
+        await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch {
+        // Silent fail — server save is best-effort
+    }
+}
+
+// On startup: if localStorage is empty but server has data, import it.
+async function loadFromServer() {
+    if (!serverAvailable) return false;
+    try {
+        const res = await fetch('/api/load');
+        const data = await res.json();
+        if (!data || !Array.isArray(data.entries) || data.entries.length === 0) return false;
+        if (getEntries().length > 0) return false; // localStorage already has data
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.entries));
+        if (data.halfLife) localStorage.setItem(HALFLIFE_KEY, String(data.halfLife));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+// --- IndexedDB helpers (for storing File System Access API folder handle) ---
 
 function openDB() {
     return new Promise((resolve, reject) => {
@@ -638,41 +687,11 @@ async function setDBValue(key, value) {
     }
 }
 
-// --- File System Access API backup ---
+// --- File System Access API backup (Chrome/Edge only, used on deployed version) ---
 
 let backupDirHandle = null;
 
-async function initBackup() {
-    if (!window.showDirectoryPicker) {
-        // File System Access API not supported (Safari, Firefox) — hide the row entirely
-        const row = document.querySelector('.backup-row');
-        const note = document.getElementById('backup-note');
-        if (row) row.style.display = 'none';
-        if (note) note.style.display = 'none';
-        return;
-    }
-    backupDirHandle = await getDBValue('backupDir');
-    updateBackupStatus();
-}
-
-async function linkBackupFolder() {
-    if (!window.showDirectoryPicker) {
-        showToast('Folder backup requires Chrome or Edge');
-        return;
-    }
-    try {
-        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        backupDirHandle = handle;
-        await setDBValue('backupDir', handle);
-        updateBackupStatus();
-        await saveBackup();
-        showToast('Folder linked — data saved');
-    } catch (e) {
-        if (e.name !== 'AbortError') showToast('Could not link folder');
-    }
-}
-
-async function saveBackup() {
+async function saveToFileSystem() {
     if (!backupDirHandle) return;
     try {
         let perm = await backupDirHandle.queryPermission({ mode: 'readwrite' });
@@ -680,7 +699,6 @@ async function saveBackup() {
             perm = await backupDirHandle.requestPermission({ mode: 'readwrite' });
         }
         if (perm !== 'granted') return;
-
         const fileHandle = await backupDirHandle.getFileHandle('caffeine_data.json', { create: true });
         const writable = await fileHandle.createWritable();
         const data = {
@@ -692,7 +710,61 @@ async function saveBackup() {
         await writable.write(JSON.stringify(data, null, 2));
         await writable.close();
     } catch (e) {
-        console.warn('Backup save failed:', e.message);
+        console.warn('File system backup failed:', e.message);
+    }
+}
+
+// saveBackup: called after every data change. Uses server if available, otherwise
+// falls back to File System Access API (Chrome on deployed version).
+function saveBackup() {
+    saveToServer();      // works in all browsers locally
+    saveToFileSystem();  // Chrome/Edge on deployed version
+}
+
+async function linkBackupFolder() {
+    try {
+        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        backupDirHandle = handle;
+        await setDBValue('backupDir', handle);
+        updateBackupStatus();
+        await saveToFileSystem();
+        showToast('Folder linked — data saved');
+    } catch (e) {
+        if (e.name !== 'AbortError') showToast('Could not link folder');
+    }
+}
+
+async function initBackup() {
+    await checkServerAvailable();
+
+    const statusEl = document.getElementById('backup-status');
+    const noteEl = document.getElementById('backup-note');
+    const btnEl = document.getElementById('backup-link');
+    const rowEl = document.querySelector('.backup-row');
+
+    if (serverAvailable) {
+        // Running locally via npm run dev — server handles saving automatically
+        if (statusEl) {
+            statusEl.textContent = 'Auto-saving to data/caffeine_data.json';
+            statusEl.className = 'backup-status backup-linked';
+        }
+        if (btnEl) btnEl.style.display = 'none';
+        if (noteEl) noteEl.textContent = 'Data is automatically saved to the data/ folder in the project when running locally.';
+
+        const imported = await loadFromServer();
+        if (imported) {
+            updateHalfLifeDisplay();
+            refreshAll();
+            showToast('Data restored from local backup');
+        }
+    } else if (window.showDirectoryPicker) {
+        // Deployed version, Chrome/Edge — offer folder picker
+        backupDirHandle = await getDBValue('backupDir');
+        updateBackupStatus();
+    } else {
+        // Deployed version, Safari/Firefox — hide row (no option available)
+        if (rowEl) rowEl.style.display = 'none';
+        if (noteEl) noteEl.style.display = 'none';
     }
 }
 
