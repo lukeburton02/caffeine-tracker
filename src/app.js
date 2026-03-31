@@ -755,6 +755,9 @@ async function initBackup() {
             updateHalfLifeDisplay();
             refreshAll();
             showToast('Data restored from local backup');
+        } else {
+            // Save existing localStorage data to disk on first connection
+            saveToServer();
         }
     } else if (window.showDirectoryPicker) {
         // Deployed version, Chrome/Edge — offer folder picker
