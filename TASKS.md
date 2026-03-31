@@ -149,11 +149,10 @@
 ---
 
 ## Future Enhancements
-- [ ] **Refresh rate audit**: the 1-minute tick redraws the weekly chart and current level on every tick. Measure actual CPU/battery cost; consider whether weekly chart needs to refresh every minute or only on data change (like the history chart already does)
+- [ ] **Data history editor**: a dedicated view (e.g. panel or modal) to browse, edit, and delete all stored entries — including those hidden from Recent Entries (fully decayed or older than 7 days). Should show all entries in a scrollable list grouped by day, with a delete button (confirmation required) and an add-entry form. Deletions must propagate to localStorage, JSON, and CSV. Useful for correcting logging mistakes and cleaning up old data.
 - [ ] **Import from backup**: restore from `data/caffeine_data.json` manually (e.g. after moving browsers or clearing localStorage deliberately)
 - [ ] **Exploratory analyses**: ideas to consider — caffeine-free streaks, time-of-day intake patterns, weekday vs weekend averages, rolling average overlay on history chart, sleep impact estimate
-- [ ] Notifications when caffeine drops below a threshold
-- [ ] Export data as CSV
+- [ ] Export data as CSV download button (for deployed version users without local server)
 - [ ] Dark mode
 - [ ] Cloud sync — **IMPORTANT: review LSHTM's policies on third-party cloud services before implementing**
 - [ ] Native Android app (very low priority)
