@@ -22,6 +22,9 @@ caffeine-tracker/
 │   ├── service-worker.js  # PWA offline (network-first, falls back to cache)
 │   ├── manifest.json      # PWA config with SVG icon
 │   └── icon.svg           # App icon
+├── data/
+│   ├── caffeine_data.json # Full data backup (source of truth for restore)
+│   └── caffeine_data.csv  # Human-readable companion (date, time, amount_mg, source)
 ├── server.js              # Express local dev server with /api/save and /api/load
 ├── package.json
 ├── CLAUDE.md              # This file
@@ -80,7 +83,7 @@ Peak caffeine level for the day is calculated by checking the total level at the
 ### Data Persistence
 Three layers, tried in order:
 
-1. **Express server** (`npm run dev` locally, any browser): `saveToServer()` POSTs to `/api/save` on every data change → written to `data/caffeine_data.json`. On startup, `loadFromServer()` imports from this file if localStorage is empty.
+1. **Express server** (`npm run dev` locally, any browser): `saveToServer()` POSTs to `/api/save` on every data change → server writes `data/caffeine_data.json` (JSON) and `data/caffeine_data.csv` (human-readable). On startup, `loadFromServer()` imports from the JSON file if localStorage is empty. Both files are committed to the repo.
 2. **File System Access API** (Chrome/Edge on the deployed version only): user links a folder once; `caffeine_data.json` saved there on every change.
 3. **localStorage only** (Safari/Firefox on the deployed version): no disk backup available.
 
@@ -155,8 +158,8 @@ This project is developed on an LSHTM machine. Before adding any cloud sync or e
 
 ## Testing Checklist
 - [ ] Works in Chrome and Safari on Mac
-- [ ] `npm run dev` starts server; data saves to `data/caffeine_data.json` on each entry change
-- [ ] Closing and reopening browser restores data from server file if localStorage is empty
+- [ ] `npm run dev` starts server; both `data/caffeine_data.json` and `data/caffeine_data.csv` update on each entry change
+- [ ] Closing and reopening browser restores data from JSON file if localStorage is empty
 - [ ] Calculations accurate (100mg after 5hrs → ~50mg)
 - [ ] Peak level accounts for decay of earlier entries (not a raw sum)
 - [ ] Half-life change instantly updates level display and entry list

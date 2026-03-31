@@ -108,13 +108,15 @@
 
 ### Task 5.3: Local Data Persistence ✅
 - [x] Express server (`server.js`) replaces `npx http-server`
-- [x] `POST /api/save` — writes `data/caffeine_data.json` to disk on every data change
-- [x] `GET /api/load` — reads it back; imported on startup if localStorage is empty
+- [x] `POST /api/save` — writes `data/caffeine_data.json` and `data/caffeine_data.csv` on every data change
+- [x] `GET /api/load` — reads JSON back; imported on startup if localStorage is empty
+- [x] On startup, existing localStorage data is saved immediately when server is first detected
 - [x] Works in all browsers when running locally (Safari, Chrome, Firefox)
 - [x] Settings row shows "Auto-saving to data/caffeine_data.json" when server is detected
 - [x] File System Access API (Chrome/Edge) available as fallback on deployed version
 - [x] Backup row hidden on Safari/Firefox when using deployed version
-- [x] `data/` and `caffeine_data.json` added to .gitignore
+- [x] `data/caffeine_data.json` and `data/caffeine_data.csv` committed to repo (visible on GitHub)
+- [x] CSV format: date, time (local), amount_mg, source — sorted chronologically
 
 ### Task 5.4: Two-Panel Layout ✅
 - [x] Left panel: level display, date/time input, presets, custom entry, recent entries, settings
