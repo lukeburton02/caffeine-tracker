@@ -160,24 +160,23 @@ function getDailySummary() {
     let peakMg = 0;
     let peakTime = null;
 
+    // Peak can only occur at the exact moment an entry is consumed — after that
+    // everything only decays. Check the total level at each today entry's timestamp.
     if (todayEntries.length > 0) {
-        const firstEntry = new Date(Math.min(...todayEntries.map(e => new Date(e.timestamp))));
         const allEntries = getEntries();
-        let cursor = new Date(firstEntry);
 
-        while (cursor <= now) {
+        todayEntries.forEach(todayEntry => {
+            const t = new Date(todayEntry.timestamp);
             const level = allEntries.reduce((sum, entry) => {
-                const hoursElapsed = (cursor - new Date(entry.timestamp)) / (1000 * 60 * 60);
+                const hoursElapsed = (t - new Date(entry.timestamp)) / (1000 * 60 * 60);
                 if (hoursElapsed < 0) return sum;
                 return sum + entry.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
             }, 0);
-
             if (level > peakMg) {
                 peakMg = level;
-                peakTime = new Date(cursor);
+                peakTime = t;
             }
-            cursor = new Date(cursor.getTime() + 15 * 60 * 1000);
-        }
+        });
     }
 
     return { totalConsumed, peakMg, peakTime };
