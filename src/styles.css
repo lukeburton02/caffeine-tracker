@@ -183,8 +183,8 @@ body {
 
 .history-chart-container {
     overflow-x: auto;
-    border-radius: 12px;
-    /* Show scrollbar only when needed, but always reserve space cleanly */
+    /* No border-radius here: Safari composites scroll containers separately,
+       which can cause canvas inside to render blurry. */
 }
 
 #history-chart {

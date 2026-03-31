@@ -314,17 +314,22 @@ function drawHistoryChart() {
     const PAD_BOTTOM = 52;
     const CHART_H = 150;
 
-    const cssW = PAD_LEFT + days.length * DAY_W + PAD_RIGHT;
+    // Canvas is at least as wide as its container (so it renders at full resolution
+    // even with few data points), and wider when there are many days (triggers scroll).
+    const containerW = canvas.parentElement.clientWidth || 300;
+    const daysW = PAD_LEFT + days.length * DAY_W + PAD_RIGHT;
+    const cssW = Math.max(containerW, daysW);
     const cssH = PAD_TOP + CHART_H + PAD_BOTTOM;
 
     const dpr = window.devicePixelRatio || 1;
     canvas.style.width = cssW + 'px';
     canvas.style.height = cssH + 'px';
-    canvas.width = cssW * dpr;
-    canvas.height = cssH * dpr;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
 
     const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    // Explicitly set transform (not just scale) so there's no ambiguity about state
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
 
     const maxVal = Math.max(...days.map(d => d.total), 100);
@@ -638,6 +643,14 @@ async function setDBValue(key, value) {
 let backupDirHandle = null;
 
 async function initBackup() {
+    if (!window.showDirectoryPicker) {
+        // File System Access API not supported (Safari, Firefox) — hide the row entirely
+        const row = document.querySelector('.backup-row');
+        const note = document.getElementById('backup-note');
+        if (row) row.style.display = 'none';
+        if (note) note.style.display = 'none';
+        return;
+    }
     backupDirHandle = await getDBValue('backupDir');
     updateBackupStatus();
 }
