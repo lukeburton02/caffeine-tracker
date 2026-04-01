@@ -575,6 +575,65 @@ function handleDelete(id, source) {
     refreshAll();
 }
 
+// --- History editor modal ---
+
+function openHistoryEditor() {
+    renderHistoryEditor();
+    document.getElementById('history-editor-modal').style.display = 'flex';
+}
+
+function closeHistoryEditor() {
+    document.getElementById('history-editor-modal').style.display = 'none';
+}
+
+function renderHistoryEditor() {
+    const entries = getEntries().slice().sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const list = document.getElementById('history-editor-list');
+
+    if (entries.length === 0) {
+        list.innerHTML = '<p class="he-empty">No entries yet.</p>';
+        return;
+    }
+
+    // Group by calendar day
+    const groups = [];
+    let currentKey = null;
+    entries.forEach(entry => {
+        const d = new Date(entry.timestamp);
+        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        if (key !== currentKey) {
+            currentKey = key;
+            groups.push({ date: d, entries: [] });
+        }
+        groups[groups.length - 1].entries.push(entry);
+    });
+
+    const today = new Date();
+    list.innerHTML = groups.map(group => {
+        const d = group.date;
+        const isToday = d.toDateString() === today.toDateString();
+        const dateLabel = isToday
+            ? 'Today'
+            : d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+        const entriesHTML = group.entries.map(entry => {
+            const time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const source = entry.source || 'Unknown';
+            return `<div class="he-entry">
+                <span class="he-time">${time}</span>
+                <span class="he-source">${source}</span>
+                <span class="he-amount">${entry.amount}mg</span>
+                <button type="button" class="he-delete" data-id="${entry.id}" data-source="${source.replace(/"/g, '&quot;')}">Delete</button>
+            </div>`;
+        }).join('');
+
+        return `<div class="he-day-group">
+            <div class="he-day-header">${dateLabel}</div>
+            ${entriesHTML}
+        </div>`;
+    }).join('');
+}
+
 // --- Toast ---
 
 function showToast(message) {
@@ -921,6 +980,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
     document.getElementById('backup-link').addEventListener('click', linkBackupFolder);
     document.getElementById('export-csv').addEventListener('click', exportCSV);
+
+    document.getElementById('open-history-editor').addEventListener('click', openHistoryEditor);
+    document.getElementById('close-history-editor').addEventListener('click', closeHistoryEditor);
+    document.getElementById('history-editor-modal').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeHistoryEditor();
+    });
+    document.getElementById('history-editor-list').addEventListener('click', e => {
+        const btn = e.target.closest('.he-delete');
+        if (!btn) return;
+        const { id, source } = btn.dataset;
+        if (!confirm(`Delete "${source}"?`)) return;
+        deleteEntry(id);
+        refreshAll();
+        renderHistoryEditor();
+    });
 
     document.getElementById('history-mode-all').addEventListener('click', () => {
         historyMode = 'all';

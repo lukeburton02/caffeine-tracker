@@ -78,7 +78,10 @@
 
             <!-- Recent entries list -->
             <section class="history-section">
-                <h2 class="section-title">Recent Entries</h2>
+                <div class="recent-entries-header">
+                    <h2 class="section-title">Recent Entries</h2>
+                    <button type="button" id="open-history-editor" class="btn-view-all">View all</button>
+                </div>
                 <ul class="entry-list" id="entry-list">
                     <li class="entry-empty">No entries yet. Log your first caffeine above!</li>
                 </ul>
@@ -159,6 +162,17 @@
 
         </div>
 
+    </div>
+
+    <!-- History editor modal -->
+    <div id="history-editor-modal" class="modal-overlay" style="display:none" aria-modal="true" role="dialog" aria-label="All Entries">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">All Entries</h2>
+                <button type="button" id="close-history-editor" class="modal-close" aria-label="Close">&#10005;</button>
+            </div>
+            <div id="history-editor-list" class="history-editor-list"></div>
+        </div>
     </div>
 
     <script src="app.js"></script>
