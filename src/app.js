@@ -430,11 +430,18 @@ function drawHistoryChart() {
         }
     });
 
-    // Date/weekday labels for every day
-    days.forEach((day, i) => {
-        const x = dayX(i);
-        const isToday = i === days.length - 1;
+    // Adaptive tick interval: fewer labels as history grows
+    const tickInterval = days.length <= 21 ? 1
+        : days.length <= 60 ? 7
+        : days.length <= 180 ? 14
+        : 28;
 
+    // Date/weekday labels — thinned by tick interval; today always shown
+    days.forEach((day, i) => {
+        const isToday = i === days.length - 1;
+        if (!isToday && i % tickInterval !== 0) return;
+
+        const x = dayX(i);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
 
