@@ -7,6 +7,8 @@ const HIGH_THRESHOLD = 200; // mg — warn once when crossing above this
 
 let prevCaffeineLevel = null;
 let highWarningTimer = null;
+let historyMode = 'all';      // 'all' | 'window'
+let historyWindowOffset = 0;  // days before today for the window end (0 = today)
 
 function getHalfLife() {
     const stored = parseFloat(localStorage.getItem(HALFLIFE_KEY));
@@ -267,6 +269,35 @@ function drawWeeklyChart() {
 
 // --- Full history line chart ---
 
+function getHistoryWindowDays(allDays) {
+    if (allDays.length === 0) return [];
+    const endIdx = Math.max(0, allDays.length - 1 - historyWindowOffset);
+    const startIdx = Math.max(0, endIdx - 13);
+    return allDays.slice(startIdx, endIdx + 1);
+}
+
+function updateHistoryNav() {
+    const allDays = buildHistoryDays();
+    const nav = document.getElementById('history-nav');
+    if (!nav) return;
+
+    if (historyMode !== 'window') {
+        nav.style.display = 'none';
+        return;
+    }
+    nav.style.display = 'flex';
+
+    const windowDays = getHistoryWindowDays(allDays);
+    const label = document.getElementById('history-window-label');
+    if (windowDays.length > 0) {
+        const fmt = d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        label.textContent = `${fmt(windowDays[0].date)} – ${fmt(windowDays[windowDays.length - 1].date)}`;
+    }
+
+    document.getElementById('history-prev').disabled = historyWindowOffset >= allDays.length - 1;
+    document.getElementById('history-next').disabled = historyWindowOffset <= 0;
+}
+
 function buildHistoryDays() {
     const entries = getEntries();
     if (entries.length === 0) return [];
@@ -299,7 +330,10 @@ function drawHistoryChart() {
     const emptyMsg = document.getElementById('history-empty');
     if (!canvas) return;
 
-    const days = buildHistoryDays();
+    const allDays = buildHistoryDays();
+    const days = historyMode === 'window' ? getHistoryWindowDays(allDays) : allDays;
+
+    updateHistoryNav();
 
     if (days.length === 0) {
         canvas.style.display = 'none';
@@ -310,7 +344,6 @@ function drawHistoryChart() {
     canvas.style.display = 'block';
     emptyMsg.style.display = 'none';
 
-    const DAY_W = 44;
     const PAD_LEFT = 50;
     const PAD_RIGHT = 20;
     const PAD_TOP = 20;
@@ -320,8 +353,12 @@ function drawHistoryChart() {
     // Canvas is at least as wide as its container (so it renders at full resolution
     // even with few data points), and wider when there are many days (triggers scroll).
     const containerW = canvas.parentElement.clientWidth || 300;
+    // Window mode: fill the container exactly (no scroll). All-time: fixed 44px columns.
+    const DAY_W = historyMode === 'window'
+        ? Math.max(30, Math.floor((containerW - PAD_LEFT - PAD_RIGHT) / days.length))
+        : 44;
     const daysW = PAD_LEFT + days.length * DAY_W + PAD_RIGHT;
-    const cssW = Math.max(containerW, daysW);
+    const cssW = historyMode === 'window' ? containerW : Math.max(containerW, daysW);
     const cssH = PAD_TOP + CHART_H + PAD_BOTTOM;
 
     const dpr = window.devicePixelRatio || 1;
@@ -884,6 +921,36 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
     document.getElementById('backup-link').addEventListener('click', linkBackupFolder);
     document.getElementById('export-csv').addEventListener('click', exportCSV);
+
+    document.getElementById('history-mode-all').addEventListener('click', () => {
+        historyMode = 'all';
+        document.getElementById('history-mode-all').classList.add('active');
+        document.getElementById('history-mode-window').classList.remove('active');
+        updateHistoryNav();
+        drawHistoryChart();
+    });
+
+    document.getElementById('history-mode-window').addEventListener('click', () => {
+        historyMode = 'window';
+        historyWindowOffset = 0;
+        document.getElementById('history-mode-window').classList.add('active');
+        document.getElementById('history-mode-all').classList.remove('active');
+        updateHistoryNav();
+        drawHistoryChart();
+    });
+
+    document.getElementById('history-prev').addEventListener('click', () => {
+        const allDays = buildHistoryDays();
+        historyWindowOffset = Math.min(historyWindowOffset + 7, allDays.length - 1);
+        updateHistoryNav();
+        drawHistoryChart();
+    });
+
+    document.getElementById('history-next').addEventListener('click', () => {
+        historyWindowOffset = Math.max(historyWindowOffset - 7, 0);
+        updateHistoryNav();
+        drawHistoryChart();
+    });
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)
     setInterval(refreshUI, 60 * 1000);

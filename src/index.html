@@ -135,7 +135,18 @@
 
             <!-- Full history line chart -->
             <section class="chart-section">
-                <h2 class="section-title">Full History</h2>
+                <div class="history-header">
+                    <h2 class="section-title">Full History</h2>
+                    <div class="history-mode-toggle">
+                        <button type="button" id="history-mode-all" class="history-toggle-btn active">All Time</button>
+                        <button type="button" id="history-mode-window" class="history-toggle-btn">14 Days</button>
+                    </div>
+                </div>
+                <div class="history-nav" id="history-nav" style="display:none">
+                    <button type="button" id="history-prev" class="history-nav-btn">&#8592;</button>
+                    <span id="history-window-label" class="history-window-label"></span>
+                    <button type="button" id="history-next" class="history-nav-btn">&#8594;</button>
+                </div>
                 <div class="history-chart-container" id="history-chart-container">
                     <canvas id="history-chart"></canvas>
                 </div>

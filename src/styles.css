@@ -196,6 +196,68 @@ body {
 
 /* --- History line chart --- */
 
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.history-header .section-title {
+    margin-bottom: 0;
+}
+
+.history-mode-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.history-toggle-btn {
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    background: white;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.history-toggle-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.history-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.history-nav-btn {
+    background: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 1rem;
+    color: #667eea;
+    cursor: pointer;
+}
+
+.history-nav-btn:disabled {
+    color: #ccc;
+    border-color: #f0f0f0;
+    cursor: default;
+}
+
+.history-window-label {
+    font-size: 0.8rem;
+    color: #888;
+}
+
 .history-chart-container {
     overflow-x: auto;
     /* No border-radius here: Safari composites scroll containers separately,
