@@ -314,7 +314,7 @@ function drawHistoryChart() {
     const PAD_LEFT = 50;
     const PAD_RIGHT = 20;
     const PAD_TOP = 20;
-    const PAD_BOTTOM = 52;
+    const PAD_BOTTOM = 66;
     const CHART_H = 150;
 
     // Canvas is at least as wide as its container (so it renders at full resolution
@@ -410,34 +410,42 @@ function drawHistoryChart() {
     const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const labelY1 = PAD_TOP + CHART_H + 12; // date or month name
-    const labelY2 = PAD_TOP + CHART_H + 28; // weekday or year
+    const labelY1 = PAD_TOP + CHART_H + 12; // date
+    const labelY2 = PAD_TOP + CHART_H + 24; // weekday
+    const labelY3 = PAD_TOP + CHART_H + 40; // month name (boundary label)
+    const labelY4 = PAD_TOP + CHART_H + 52; // year (boundary label)
 
+    // Month boundary labels — drawn at the dashed line x, between columns
+    days.forEach((day, i) => {
+        if (i > 0 && day.date.getDate() === 1) {
+            const bx = PAD_LEFT + i * DAY_W; // boundary line x
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#667eea';
+            ctx.font = '600 11px sans-serif';
+            ctx.fillText(MONTHS[day.date.getMonth()], bx, labelY3);
+            ctx.fillStyle = '#aaa';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(day.date.getFullYear(), bx, labelY4);
+        }
+    });
+
+    // Date/weekday labels for every day
     days.forEach((day, i) => {
         const x = dayX(i);
-        const isMonthBoundary = i > 0 && day.date.getDate() === 1;
         const isToday = i === days.length - 1;
 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
 
-        if (isMonthBoundary) {
-            ctx.fillStyle = '#667eea';
-            ctx.font = '600 11px sans-serif';
-            ctx.fillText(MONTHS[day.date.getMonth()], x, labelY1);
-            ctx.fillStyle = '#999';
-            ctx.font = '10px sans-serif';
-            ctx.fillText(day.date.getFullYear(), x, labelY2);
-        } else {
-            const d = String(day.date.getDate()).padStart(2, '0');
-            const m = String(day.date.getMonth() + 1).padStart(2, '0');
-            ctx.fillStyle = isToday ? '#2c3e50' : '#bbb';
-            ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
-            ctx.fillText(`${d}/${m}`, x, labelY1);
-            ctx.fillStyle = isToday ? '#667eea' : '#ccc';
-            ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
-            ctx.fillText(WEEKDAYS[day.date.getDay()], x, labelY2);
-        }
+        const d = String(day.date.getDate()).padStart(2, '0');
+        const m = String(day.date.getMonth() + 1).padStart(2, '0');
+        ctx.fillStyle = isToday ? '#2c3e50' : '#bbb';
+        ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
+        ctx.fillText(`${d}/${m}`, x, labelY1);
+        ctx.fillStyle = isToday ? '#667eea' : '#ccc';
+        ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
+        ctx.fillText(WEEKDAYS[day.date.getDay()], x, labelY2);
     });
 }
 
