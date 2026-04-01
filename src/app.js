@@ -10,6 +10,37 @@ let highWarningTimer = null;
 let historyMode = 'all';      // 'all' | 'window'
 let historyWindowOffset = 0;  // days before today for the window end (0 = today)
 
+const THEME_KEY = 'caffeine_theme';
+
+function isDarkMode() {
+    return document.documentElement.dataset.theme === 'dark';
+}
+
+function getChartColors() {
+    const dark = isDarkMode();
+    return {
+        gridLine:        dark ? '#2a2b3e' : '#f0f0f0',
+        yLabel:          dark ? '#52536e' : '#ccc',
+        boundaryLine:    dark ? '#32334e' : '#ddd',
+        dateLabel:       dark ? '#52536e' : '#bbb',
+        weekdayLabel:    dark ? '#3e3f58' : '#ccc',
+        todayLabel:      dark ? '#e2e4f0' : '#2c3e50',
+        dotCenter:       dark ? '#1a1b2e' : 'white',
+        barNormal:       dark ? '#3a3d6e' : '#c5cff7',
+        barLabelNormal:  dark ? '#9a9bb8' : '#999',
+        monthYear:       dark ? '#52536e' : '#aaa',
+    };
+}
+
+function applyTheme(dark) {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) toggle.checked = dark;
+    drawWeeklyChart();
+    drawHistoryChart();
+}
+
 function getHalfLife() {
     const stored = parseFloat(localStorage.getItem(HALFLIFE_KEY));
     return isNaN(stored) ? DEFAULT_HALF_LIFE_HOURS : stored;
@@ -242,25 +273,26 @@ function drawWeeklyChart() {
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
 
+    const C = getChartColors();
     days.forEach((day, i) => {
         const x = padLeft + i * gap + gap / 2;
         const barH = day.total > 0 ? (day.total / max) * chartH : 0;
         const y = padTop + chartH - barH;
 
         const isToday = day.label === 'Today';
-        ctx.fillStyle = isToday ? '#667eea' : '#c5cff7';
+        ctx.fillStyle = isToday ? '#667eea' : C.barNormal;
         ctx.beginPath();
         ctx.roundRect(x - barW / 2, y, barW, barH, 4);
         ctx.fill();
 
         if (day.total > 0) {
-            ctx.fillStyle = isToday ? '#667eea' : '#999';
+            ctx.fillStyle = isToday ? '#667eea' : C.barLabelNormal;
             ctx.font = `${isToday ? 600 : 400} 10px sans-serif`;
             ctx.textAlign = 'center';
             ctx.fillText(day.total + 'mg', x, y - 3);
         }
 
-        ctx.fillStyle = isToday ? '#2c3e50' : '#999';
+        ctx.fillStyle = isToday ? C.todayLabel : C.barLabelNormal;
         ctx.font = `${isToday ? 600 : 400} 11px sans-serif`;
         ctx.textAlign = 'center';
         ctx.fillText(day.label, x, cssHeight - 8);
@@ -376,18 +408,20 @@ function drawHistoryChart() {
     const scaleY = val => PAD_TOP + CHART_H - (val / maxVal) * CHART_H;
     const dayX = i => PAD_LEFT + i * DAY_W + DAY_W / 2;
 
+    const C = getChartColors();
+
     // Y-axis gridlines and labels
     const gridSteps = [0, Math.round(maxVal / 2), maxVal];
     gridSteps.forEach(v => {
         const y = scaleY(v);
-        ctx.strokeStyle = '#f0f0f0';
+        ctx.strokeStyle = C.gridLine;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(PAD_LEFT, y);
         ctx.lineTo(cssW - PAD_RIGHT, y);
         ctx.stroke();
 
-        ctx.fillStyle = '#ccc';
+        ctx.fillStyle = C.yLabel;
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
@@ -398,7 +432,7 @@ function drawHistoryChart() {
     days.forEach((day, i) => {
         if (i > 0 && day.date.getDate() === 1) {
             const x = PAD_LEFT + i * DAY_W;
-            ctx.strokeStyle = '#ddd';
+            ctx.strokeStyle = C.boundaryLine;
             ctx.lineWidth = 1;
             ctx.setLineDash([4, 3]);
             ctx.beginPath();
@@ -439,7 +473,7 @@ function drawHistoryChart() {
 
         ctx.beginPath();
         ctx.arc(x, y, innerR, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = C.dotCenter;
         ctx.fill();
     });
 
@@ -461,7 +495,7 @@ function drawHistoryChart() {
             ctx.fillStyle = '#667eea';
             ctx.font = '600 11px sans-serif';
             ctx.fillText(MONTHS[day.date.getMonth()], bx, labelY3);
-            ctx.fillStyle = '#aaa';
+            ctx.fillStyle = C.monthYear;
             ctx.font = '10px sans-serif';
             ctx.fillText(day.date.getFullYear(), bx, labelY4);
         }
@@ -484,10 +518,10 @@ function drawHistoryChart() {
 
         const d = String(day.date.getDate()).padStart(2, '0');
         const m = String(day.date.getMonth() + 1).padStart(2, '0');
-        ctx.fillStyle = isToday ? '#2c3e50' : '#bbb';
+        ctx.fillStyle = isToday ? C.todayLabel : C.dateLabel;
         ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
         ctx.fillText(`${d}/${m}`, x, labelY1);
-        ctx.fillStyle = isToday ? '#667eea' : '#ccc';
+        ctx.fillStyle = isToday ? '#667eea' : C.weekdayLabel;
         ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
         ctx.fillText(WEEKDAYS[day.date.getDay()], x, labelY2);
     });
@@ -1004,6 +1038,11 @@ document.addEventListener('DOMContentLoaded', () => {
             handlePreset(parseFloat(btn.dataset.amount), btn.dataset.source);
         });
     });
+
+    // Theme toggle
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === 'dark') applyTheme(true);
+    document.getElementById('theme-toggle').addEventListener('change', e => applyTheme(e.target.checked));
 
     document.getElementById('halflife-save').addEventListener('click', saveHalfLife);
     document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
