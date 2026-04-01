@@ -856,6 +856,35 @@ function saveBackup() {
     saveToFileSystem();  // Chrome/Edge on deployed version
 }
 
+async function importFromBackupFile(file) {
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        if (!Array.isArray(data.entries)) {
+            showToast('Invalid backup file');
+            return;
+        }
+        const existing = getEntries();
+        const existingIds = new Set(existing.map(e => e.id));
+        const newEntries = data.entries.filter(e => !existingIds.has(e.id));
+        if (newEntries.length === 0) {
+            showToast('No new entries to import');
+            return;
+        }
+        const merged = [...existing, ...newEntries].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        if (data.halfLife && !localStorage.getItem(HALFLIFE_KEY)) {
+            localStorage.setItem(HALFLIFE_KEY, String(data.halfLife));
+        }
+        saveBackup();
+        updateHalfLifeDisplay();
+        refreshAll();
+        showToast(`Imported ${newEntries.length} entr${newEntries.length === 1 ? 'y' : 'ies'}`);
+    } catch {
+        showToast('Could not read backup file');
+    }
+}
+
 async function linkBackupFolder() {
     try {
         const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
@@ -979,6 +1008,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('halflife-save').addEventListener('click', saveHalfLife);
     document.getElementById('halflife-reset').addEventListener('click', resetHalfLife);
     document.getElementById('backup-link').addEventListener('click', linkBackupFolder);
+    document.getElementById('import-backup').addEventListener('click', () => {
+        document.getElementById('import-backup-file').click();
+    });
+    document.getElementById('import-backup-file').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) importFromBackupFile(file);
+        e.target.value = '';
+    });
     document.getElementById('export-csv').addEventListener('click', exportCSV);
 
     document.getElementById('open-history-editor').addEventListener('click', openHistoryEditor);
