@@ -39,6 +39,10 @@ function applyTheme(dark) {
     if (toggle) toggle.checked = dark;
     drawWeeklyChart();
     drawHistoryChart();
+    drawForecast();
+    drawTimeOfDay();
+    drawSourceBreakdown();
+    drawBedtimeCaffeine();
 }
 
 function getHalfLife() {
@@ -296,6 +300,643 @@ function drawWeeklyChart() {
         ctx.font = `${isToday ? 600 : 400} 11px sans-serif`;
         ctx.textAlign = 'center';
         ctx.fillText(day.label, x, cssHeight - 8);
+    });
+}
+
+// --- 7-day forecast (double exponential smoothing) ---
+
+const DES_ALPHA = 0.3; // level smoothing
+const DES_BETA  = 0.1; // trend smoothing
+
+function fitDES(values) {
+    if (values.length < 1) return null;
+    let L = values[0];
+    // Initial trend: slope across first few points (more stable than just y[1]-y[0])
+    let T = values.length > 1
+        ? (values[Math.min(values.length - 1, 3)] - values[0]) / Math.min(values.length - 1, 3)
+        : 0;
+    const residuals = [];
+    for (let i = 1; i < values.length; i++) {
+        const fcast = L + T;
+        residuals.push(values[i] - fcast);
+        const Lprev = L;
+        L = DES_ALPHA * values[i] + (1 - DES_ALPHA) * (L + T);
+        T = DES_BETA  * (L - Lprev) + (1 - DES_BETA)  * T;
+    }
+    return { L, T, residuals };
+}
+
+function drawForecast() {
+    const canvas = document.getElementById('forecast-chart');
+    if (!canvas) return;
+    const wrap = canvas.parentElement;
+    const cssWidth = wrap.clientWidth;
+    const cssHeight = wrap.clientHeight;
+    if (cssWidth < 10 || cssHeight < 10) return;
+
+    const C = getChartColors();
+    const dark = isDarkMode();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    const allDays = buildHistoryDays();
+    if (allDays.length === 0) {
+        ctx.fillStyle = C.yLabel;
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No entries yet', cssWidth / 2, cssHeight / 2);
+        return;
+    }
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const completedDays = allDays.filter(d => d.date < todayStart);
+    const todayDay = allDays.find(d => d.date.getTime() === todayStart.getTime());
+
+    // Fit model on all completed days
+    const model = fitDES(completedDays.map(d => d.total));
+
+    // Build 7-day forecast with 80% prediction intervals (±1.28 * RMSE * √h)
+    const HORIZON = 7;
+    const rmse = model && model.residuals.length > 1
+        ? Math.sqrt(model.residuals.reduce((s, r) => s + r * r, 0) / model.residuals.length)
+        : (model ? Math.max(model.L * 0.3, 30) : 50);
+
+    const forecastPts = model ? Array.from({ length: HORIZON }, (_, h) => {
+        const point = Math.max(0, model.L + (h + 1) * model.T);
+        const hw = 1.28 * rmse * Math.sqrt(h + 1);
+        return {
+            date: new Date(todayStart.getTime() + (h + 1) * 24 * 60 * 60 * 1000),
+            point,
+            lo: Math.max(0, point - hw),
+            hi: point + hw
+        };
+    }) : [];
+
+    // Context: last 14 completed days
+    const contextDays = completedDays.slice(-14);
+
+    const N_CTX  = contextDays.length;
+    const N_FCST = forecastPts.length;
+    const N_COLS = N_CTX + 1 + N_FCST; // +1 for today
+
+    const PAD_L = 50, PAD_R = 16, PAD_T = 24, PAD_B = 32;
+    const chartW = cssWidth - PAD_L - PAD_R;
+    const chartH = cssHeight - PAD_T - PAD_B;
+    const DAY_W = chartW / N_COLS;
+    const colX = i => PAD_L + i * DAY_W + DAY_W / 2;
+
+    const maxVal = Math.max(
+        ...contextDays.map(d => d.total),
+        todayDay ? todayDay.total : 0,
+        ...forecastPts.map(f => f.hi),
+        100
+    );
+    const scaleY = v => PAD_T + chartH - Math.max(0, Math.min(v, maxVal)) / maxVal * chartH;
+
+    // Gridlines
+    [0, Math.round(maxVal / 2), Math.round(maxVal)].forEach(v => {
+        const y = scaleY(v);
+        ctx.strokeStyle = C.gridLine;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(PAD_L, y);
+        ctx.lineTo(PAD_L + chartW, y);
+        ctx.stroke();
+        ctx.fillStyle = C.yLabel;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(v + 'mg', PAD_L - 5, y);
+    });
+
+    // Vertical separator at today/forecast boundary
+    const sepX = PAD_L + (N_CTX + 1) * DAY_W;
+    ctx.strokeStyle = C.boundaryLine;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(sepX, PAD_T);
+    ctx.lineTo(sepX, PAD_T + chartH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // "Forecast →" label
+    ctx.fillStyle = dark ? 'rgba(102,126,234,0.45)' : 'rgba(102,126,234,0.5)';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('forecast →', PAD_L + (N_CTX + 1) * DAY_W + (N_FCST * DAY_W) / 2, PAD_T + 2);
+
+    // Prediction band (shaded area + dashed bounds)
+    if (forecastPts.length > 0) {
+        ctx.fillStyle = dark ? 'rgba(102,126,234,0.13)' : 'rgba(102,126,234,0.10)';
+        ctx.beginPath();
+        forecastPts.forEach((f, i) => {
+            const x = colX(N_CTX + 1 + i), y = scaleY(f.hi);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        [...forecastPts].reverse().forEach((f, i) => {
+            ctx.lineTo(colX(N_CTX + 1 + (N_FCST - 1 - i)), scaleY(f.lo));
+        });
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = dark ? 'rgba(102,126,234,0.35)' : 'rgba(102,126,234,0.30)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ['hi', 'lo'].forEach(edge => {
+            ctx.beginPath();
+            forecastPts.forEach((f, i) => {
+                const x = colX(N_CTX + 1 + i), y = scaleY(f[edge]);
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        });
+        ctx.setLineDash([]);
+    }
+
+    // History line (greyed)
+    if (contextDays.length > 0) {
+        ctx.strokeStyle = C.barNormal;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        contextDays.forEach((d, i) => {
+            const x = colX(i), y = scaleY(d.total);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        if (todayDay) ctx.lineTo(colX(N_CTX), scaleY(todayDay.total));
+        ctx.stroke();
+    }
+
+    // Forecast line (from today's anchor to each forecast point)
+    if (forecastPts.length > 0) {
+        const anchorY = todayDay ? scaleY(todayDay.total) : scaleY(model ? model.L : 0);
+        ctx.strokeStyle = '#667eea';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(colX(N_CTX), anchorY);
+        forecastPts.forEach((f, i) => ctx.lineTo(colX(N_CTX + 1 + i), scaleY(f.point)));
+        ctx.stroke();
+    }
+
+    // History dots
+    contextDays.forEach((d, i) => {
+        ctx.beginPath();
+        ctx.arc(colX(i), scaleY(d.total), 3, 0, Math.PI * 2);
+        ctx.fillStyle = C.barNormal;
+        ctx.fill();
+    });
+
+    // Today dot
+    if (todayDay) {
+        const x = colX(N_CTX), y = scaleY(todayDay.total);
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#667eea'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = C.dotCenter; ctx.fill();
+    }
+
+    // Forecast dots
+    forecastPts.forEach((f, i) => {
+        const x = colX(N_CTX + 1 + i), y = scaleY(f.point);
+        ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#667eea'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = C.dotCenter; ctx.fill();
+    });
+
+    // X-axis labels
+    const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    ctx.textBaseline = 'top';
+
+    // History: show every 7 days
+    contextDays.forEach((d, i) => {
+        if (i % 7 !== 0) return;
+        ctx.fillStyle = C.dateLabel;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(fmt(d.date), colX(i), PAD_T + chartH + 5);
+    });
+
+    // Today
+    ctx.fillStyle = C.todayLabel;
+    ctx.font = '600 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Today', colX(N_CTX), PAD_T + chartH + 5);
+
+    // Forecast dates: every other if columns are narrow
+    const showEvery = DAY_W < 28 ? 2 : 1;
+    forecastPts.forEach((f, i) => {
+        if (i % showEvery !== 0 && i !== N_FCST - 1) return;
+        ctx.fillStyle = C.dateLabel;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(fmt(f.date), colX(N_CTX + 1 + i), PAD_T + chartH + 5);
+    });
+}
+
+// --- Source breakdown histogram ---
+
+function toTitleCase(str) {
+    return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function drawSourceBreakdown() {
+    const canvas = document.getElementById('source-breakdown-chart');
+    if (!canvas) return;
+    const wrap = canvas.parentElement;
+    const cssWidth = wrap.clientWidth;
+    const cssHeight = wrap.clientHeight;
+    if (cssWidth < 10 || cssHeight < 10) return;
+
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    // Aggregate totals by normalised source name
+    const entries = getEntries();
+    const totalsMap = {};
+    entries.forEach(e => {
+        const raw = (e.source || 'Unknown').trim();
+        const key = raw.toLowerCase() || 'unknown';
+        const display = key === 'unknown' ? 'Unknown' : toTitleCase(raw.trim());
+        totalsMap[display] = (totalsMap[display] || 0) + e.amount;
+    });
+
+    const bars = Object.entries(totalsMap)
+        .map(([name, total]) => ({ name, total }))
+        .sort((a, b) => b.total - a.total);
+
+    const C = getChartColors();
+
+    if (bars.length === 0) {
+        ctx.fillStyle = C.yLabel;
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No entries yet', cssWidth / 2, cssHeight / 2);
+        return;
+    }
+
+    const padLeft = 52, padRight = 16, padTop = 16, padBottom = 54;
+    const chartW = cssWidth - padLeft - padRight;
+    const chartH = cssHeight - padTop - padBottom;
+
+    // Log₁₀ scale: axis runs from 1mg (log=0) to 10^maxLog
+    const maxVal = bars[0].total;
+    const maxLog = Math.ceil(Math.log10(Math.max(maxVal, 10)));
+    const minLog = 0;
+
+    function logY(val) {
+        const lv = Math.log10(Math.max(val, 1));
+        return padTop + chartH - (lv - minLog) / (maxLog - minLog) * chartH;
+    }
+
+    // Gridlines + y-axis labels at powers of 10
+    for (let exp = 1; exp <= maxLog; exp++) {
+        const y = logY(Math.pow(10, exp));
+        ctx.strokeStyle = C.gridLine;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(padLeft + chartW, y);
+        ctx.stroke();
+
+        ctx.fillStyle = C.yLabel;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.pow(10, exp) + 'mg', padLeft - 6, y + 3.5);
+    }
+
+    // Bars
+    const gap = chartW / bars.length;
+    const barW = Math.min(gap * 0.55, 56);
+
+    bars.forEach((bar, i) => {
+        const cx = padLeft + i * gap + gap / 2;
+        const topY = logY(bar.total);
+        const barH = (padTop + chartH) - topY;
+
+        ctx.fillStyle = '#667eea';
+        ctx.beginPath();
+        ctx.roundRect(cx - barW / 2, topY, barW, Math.max(barH, 2), 3);
+        ctx.fill();
+
+        // Value label above bar
+        ctx.fillStyle = C.barLabelNormal;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(Math.round(bar.total) + 'mg', cx, topY - 4);
+
+        // Source label rotated -45°
+        ctx.save();
+        ctx.translate(cx, padTop + chartH + 8);
+        ctx.rotate(-Math.PI / 4);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = C.dateLabel;
+        ctx.font = '11px sans-serif';
+        ctx.fillText(bar.name, 0, 0);
+        ctx.restore();
+    });
+}
+
+// --- Time-of-day weighted KDE ---
+
+function drawTimeOfDay() {
+    const canvas = document.getElementById('timeofday-chart');
+    if (!canvas) return;
+    const wrap = canvas.parentElement;
+    const cssWidth = wrap.clientWidth;
+    const cssHeight = wrap.clientHeight;
+    if (cssWidth < 10 || cssHeight < 10) return;
+
+    const entries = getEntries();
+    const C = getChartColors();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+    if (entries.length === 0) {
+        ctx.fillStyle = C.yLabel;
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No entries yet', cssWidth / 2, cssHeight / 2);
+        return;
+    }
+
+    // Extract (time_of_day_hours, weight_mg) pairs
+    const points = entries.map(e => {
+        const d = new Date(e.timestamp);
+        return { t: d.getHours() + d.getMinutes() / 60, w: e.amount };
+    });
+
+    const totalWeight = points.reduce((s, p) => s + p.w, 0);
+    const n = points.length;
+
+    // Silverman's rule bandwidth on time-of-day values
+    const mean = points.reduce((s, p) => s + p.t * p.w, 0) / totalWeight;
+    const variance = points.reduce((s, p) => s + p.w * (p.t - mean) ** 2, 0) / totalWeight;
+    const sigma = Math.sqrt(variance);
+    const h = Math.min(Math.max(1.06 * sigma * Math.pow(n, -0.2), 0.4), 2.5);
+
+    // Evaluate KDE on a grid of 360 points across [0, 24]
+    const N_EVAL = 360;
+    const density = new Float64Array(N_EVAL);
+    const gaussian = u => Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
+
+    for (let i = 0; i < N_EVAL; i++) {
+        const x = (i / (N_EVAL - 1)) * 24;
+        let d = 0;
+        points.forEach(p => {
+            // Wrap-around: mirror entries near midnight onto both sides
+            for (const t of [p.t, p.t - 24, p.t + 24]) {
+                d += p.w * gaussian((x - t) / h);
+            }
+        });
+        density[i] = d / (totalWeight * h);
+    }
+
+    const maxDensity = Math.max(...density);
+
+    const PAD_LEFT = 12, PAD_RIGHT = 12, PAD_TOP = 12, PAD_BOTTOM = 28;
+    const chartW = cssWidth - PAD_LEFT - PAD_RIGHT;
+    const chartH = cssHeight - PAD_TOP - PAD_BOTTOM;
+
+    const xToCanvas = t => PAD_LEFT + (t / 24) * chartW;
+    const yToCanvas = d => PAD_TOP + chartH - (d / maxDensity) * chartH;
+
+    // Filled area
+    const dark = isDarkMode();
+    const fillColor = dark ? 'rgba(102,126,234,0.25)' : 'rgba(102,126,234,0.18)';
+    const lineColor = '#667eea';
+
+    ctx.beginPath();
+    ctx.moveTo(xToCanvas(0), yToCanvas(density[0]));
+    for (let i = 1; i < N_EVAL; i++) {
+        ctx.lineTo(xToCanvas((i / (N_EVAL - 1)) * 24), yToCanvas(density[i]));
+    }
+    ctx.lineTo(xToCanvas(24), PAD_TOP + chartH);
+    ctx.lineTo(xToCanvas(0), PAD_TOP + chartH);
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+
+    // Curve outline
+    ctx.beginPath();
+    ctx.moveTo(xToCanvas(0), yToCanvas(density[0]));
+    for (let i = 1; i < N_EVAL; i++) {
+        ctx.lineTo(xToCanvas((i / (N_EVAL - 1)) * 24), yToCanvas(density[i]));
+    }
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Baseline
+    ctx.strokeStyle = C.gridLine;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD_LEFT, PAD_TOP + chartH);
+    ctx.lineTo(PAD_LEFT + chartW, PAD_TOP + chartH);
+    ctx.stroke();
+
+    // X-axis labels every 3 hours
+    const hourLabels = [
+        [0, '12am'], [3, '3am'], [6, '6am'], [9, '9am'],
+        [12, '12pm'], [15, '3pm'], [18, '6pm'], [21, '9pm'], [24, '12am']
+    ];
+    ctx.fillStyle = C.dateLabel;
+    ctx.font = '10px sans-serif';
+    ctx.textBaseline = 'top';
+    hourLabels.forEach(([hr, label]) => {
+        const x = xToCanvas(hr);
+        ctx.textAlign = hr === 0 ? 'left' : hr === 24 ? 'right' : 'center';
+        ctx.fillText(label, x, PAD_TOP + chartH + 6);
+    });
+
+    // Subtle tick marks
+    hourLabels.forEach(([hr]) => {
+        const x = xToCanvas(hr);
+        ctx.strokeStyle = C.gridLine;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, PAD_TOP + chartH);
+        ctx.lineTo(x, PAD_TOP + chartH + 4);
+        ctx.stroke();
+    });
+}
+
+// --- Bedtime caffeine chart ---
+
+const BEDTIME_HOUR = 23; // 11 pm
+
+function getCaffeineAtTime(entries, targetTime) {
+    return entries.reduce((sum, e) => {
+        const consumed = new Date(e.timestamp);
+        if (consumed >= targetTime) return sum;
+        const hoursElapsed = (targetTime - consumed) / (1000 * 60 * 60);
+        return sum + e.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
+    }, 0);
+}
+
+function drawBedtimeCaffeine() {
+    const canvas = document.getElementById('bedtime-chart');
+    if (!canvas) return;
+    const wrap = canvas.parentElement;
+    const cssWidth = wrap.clientWidth;
+    const cssHeight = wrap.clientHeight;
+    if (cssWidth < 10 || cssHeight < 10) return;
+
+    const entries = getEntries();
+    const allDays = buildHistoryDays(); // reuse existing day-range builder
+    if (allDays.length === 0) {
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = cssWidth * dpr; canvas.height = cssHeight * dpr;
+        canvas.style.width = cssWidth + 'px'; canvas.style.height = cssHeight + 'px';
+        ctx.scale(dpr, dpr);
+        ctx.fillStyle = getChartColors().yLabel;
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No entries yet', cssWidth / 2, cssHeight / 2);
+        return;
+    }
+
+    // Compute caffeine-at-bedtime for each day
+    const points = allDays.map(({ date }) => {
+        const bedtime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), BEDTIME_HOUR, 0, 0);
+        return { date, value: getCaffeineAtTime(entries, bedtime) };
+    });
+
+    const PAD_LEFT = 50, PAD_RIGHT = 16, PAD_TOP = 16, PAD_BOTTOM = 50;
+    const chartH = cssHeight - PAD_TOP - PAD_BOTTOM;
+
+    const DAY_W = Math.max(20, Math.floor((cssWidth - PAD_LEFT - PAD_RIGHT) / points.length));
+    // If many days, allow horizontal scroll like history chart
+    const cssW = Math.max(cssWidth, PAD_LEFT + points.length * DAY_W + PAD_RIGHT);
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssHeight);
+
+    const maxVal = Math.max(...points.map(p => p.value), 50);
+    const scaleY = val => PAD_TOP + chartH - (val / maxVal) * chartH;
+    const ptX = i => PAD_LEFT + i * DAY_W + DAY_W / 2;
+
+    const C = getChartColors();
+
+    // Gridlines at 0, half, max
+    [0, Math.round(maxVal / 2), Math.round(maxVal)].forEach(v => {
+        const y = scaleY(v);
+        ctx.strokeStyle = C.gridLine;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(PAD_LEFT, y);
+        ctx.lineTo(cssW - PAD_RIGHT, y);
+        ctx.stroke();
+        ctx.fillStyle = C.yLabel;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(Math.round(v) + 'mg', PAD_LEFT - 5, y);
+    });
+
+    // Month boundary dashed lines
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    points.forEach((p, i) => {
+        if (i > 0 && p.date.getDate() === 1) {
+            const x = PAD_LEFT + i * DAY_W;
+            ctx.strokeStyle = C.boundaryLine;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(x, PAD_TOP);
+            ctx.lineTo(x, PAD_TOP + chartH);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#667eea';
+            ctx.font = '600 11px sans-serif';
+            ctx.fillText(MONTHS[p.date.getMonth()], x, PAD_TOP + chartH + 28);
+            ctx.fillStyle = C.monthYear;
+            ctx.font = '10px sans-serif';
+            ctx.fillText(p.date.getFullYear(), x, PAD_TOP + chartH + 40);
+        }
+    });
+
+    // Connecting line
+    if (points.length > 1) {
+        ctx.strokeStyle = '#764ba2';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        points.forEach((p, i) => {
+            const x = ptX(i), y = scaleY(p.value);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+    }
+
+    // Dots
+    points.forEach((p, i) => {
+        const x = ptX(i), y = scaleY(p.value);
+        const isToday = i === points.length - 1;
+        ctx.beginPath();
+        ctx.arc(x, y, isToday ? 5 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#764ba2';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x, y, isToday ? 3 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = C.dotCenter;
+        ctx.fill();
+    });
+
+    // Adaptive x-axis date labels
+    const tickInterval = points.length <= 21 ? 1
+        : points.length <= 60 ? 7
+        : points.length <= 180 ? 14 : 28;
+
+    const WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    points.forEach((p, i) => {
+        const isToday = i === points.length - 1;
+        if (!isToday && i % tickInterval !== 0) return;
+        const x = ptX(i);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = isToday ? C.todayLabel : C.dateLabel;
+        ctx.font = `${isToday ? 600 : 400} 10px sans-serif`;
+        ctx.fillText(`${String(p.date.getDate()).padStart(2,'0')}/${String(p.date.getMonth()+1).padStart(2,'0')}`, x, PAD_TOP + chartH + 4);
+        ctx.fillStyle = isToday ? C.todayLabel : C.weekdayLabel;
+        ctx.font = `${isToday ? 600 : 400} 9px sans-serif`;
+        ctx.fillText(isToday ? 'Today' : WEEKDAYS[p.date.getDay()], x, PAD_TOP + chartH + 15);
     });
 }
 
@@ -564,6 +1205,10 @@ function refreshAll() {
     updateSummary();
     drawWeeklyChart();
     drawHistoryChart();
+    drawForecast();
+    drawTimeOfDay();
+    drawSourceBreakdown();
+    drawBedtimeCaffeine();
     renderEntries();
 }
 
@@ -1100,6 +1745,23 @@ document.addEventListener('DOMContentLoaded', () => {
         historyWindowOffset = Math.max(historyWindowOffset - 7, 0);
         updateHistoryNav();
         drawHistoryChart();
+    });
+
+    // Page navigation
+    const pagesTrack = document.getElementById('pages-track');
+    const navToAnalysis = document.getElementById('nav-to-analysis');
+    const navToMain = document.getElementById('nav-to-main');
+
+    navToAnalysis.addEventListener('click', () => {
+        pagesTrack.classList.add('on-analysis');
+        navToAnalysis.classList.add('hidden');
+        navToMain.classList.remove('hidden');
+    });
+
+    navToMain.addEventListener('click', () => {
+        pagesTrack.classList.remove('on-analysis');
+        navToMain.classList.add('hidden');
+        navToAnalysis.classList.remove('hidden');
     });
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)

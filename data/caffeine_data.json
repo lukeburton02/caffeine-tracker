@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-04-01T17:28:09.571Z",
+  "lastSaved": "2026-04-02T18:21:47.098Z",
   "entries": [
     {
       "id": "1774903051245",
@@ -35,6 +35,18 @@
     {
       "id": "1775062302745",
       "timestamp": "2026-04-01T16:50:00.000Z",
+      "amount": 33,
+      "source": "Coca Cola"
+    },
+    {
+      "id": "1775142734155",
+      "timestamp": "2026-04-02T15:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1775146575014",
+      "timestamp": "2026-04-02T16:10:00.000Z",
       "amount": 33,
       "source": "Coca Cola"
     }

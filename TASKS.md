@@ -162,13 +162,78 @@
 
 ---
 
+## Phase 7: History Chart Enhancements & Editor ✅
+
+### Task 7.1: Adaptive Tick Density ✅
+- [x] Auto-compute tick interval based on total days (≤21 days: every day; ≤60: every 7; ≤180: every 14; else every 28)
+- [x] Today always shown regardless of tick interval
+- [x] Month boundary markers always shown
+
+### Task 7.2: Windowed View Toggle ✅
+- [x] Toggle between "all-time" (full range, scrollable) and "14-day window" modes
+- [x] Left/right arrow buttons step the window backwards/forwards
+- [x] Window defaults to most recent 14 days
+- [x] Window mode fills container exactly (no scroll); all-time uses fixed 44px columns
+
+### Task 7.3: Data History Editor ✅
+- [x] Modal to browse and delete all stored entries (including hidden ones)
+- [x] Entries grouped/sorted by date, delete with confirmation
+- [x] Deletions propagate to localStorage, JSON, and CSV
+
+### Task 7.4: Import from Backup ✅
+- [x] File input to restore from `data/caffeine_data.json` manually
+- [x] Works after moving browsers or clearing localStorage deliberately
+
+---
+
+## Phase 8: Exploratory Analysis Page
+
+### Task 8.1: 2×2 Panel Layout ✅
+- [x] Add 4 blank panel cards in a 2×2 grid on the analysis page
+- [x] Each panel has a title in the top-left; forecast panel has model subtitle
+- [x] Panels: "7-Day Forecast" (top-left), "Time of Day" (top-right), "Source Breakdown" (bottom-left), "Bedtime Caffeine" (bottom-right)
+- [x] Responsive: stacks to 1 column on mobile (≤800px)
+- [x] Dark mode styles included
+
+### Task 8.2: Time-of-Day Intake Pattern (top-right) ✅
+- [x] Weighted KDE: each entry contributes a Gaussian kernel scaled by its mg amount
+- [x] Bandwidth via Silverman's rule (clamped 0.4–2.5 hrs), shown in subtitle
+- [x] Wrap-around handling at midnight boundary
+- [x] Filled area + outline curve; x-axis labels every 3 hours (12am–12am)
+- [x] No y-axis labels — shape/relative density is what matters
+- [x] Dark mode support
+
+### Task 8.3: Source Breakdown Histogram (bottom-left) ✅
+- [x] Bar chart: x-axis = source name (Neutonic, Celsius, etc.), y-axis = total mg consumed from that source
+- [x] Log₁₀ scale on y-axis with mg labels (10, 100, 1000 etc.)
+- [x] Bars sorted descending by total
+- [x] Sources normalised to title case; "Unknown" grouped together
+- [x] Source labels rotated -45°; value labels above each bar
+- [x] Dark mode support via getChartColors()
+
+### Task 8.4: Bedtime Caffeine Trend (bottom-right) ✅
+- [x] Line chart over all history: estimated mg remaining at 23:00 each day (using half-life decay across all prior entries)
+- [x] Subtitle: "Estimated mg remaining at 11:00 pm"
+- [x] Y-axis gridlines at 0, mid, max; x-axis adaptive tick density + month boundaries
+- [x] Scrollable horizontally for long histories; dots + connecting line; today highlighted
+- [x] Dark mode support; distinct purple (#764ba2) to differentiate from other charts
+
+### Task 8.5: 7-Day Forecast with Uncertainty (top-left) ✅
+- [x] Double exponential smoothing: α=0.3 (level), β=0.1 (trend); fits on all completed days
+- [x] Initial trend from slope across first 1–3 points (more stable than y[1]-y[0])
+- [x] 80% prediction interval: ±1.28 × RMSE × √h, widening with horizon h
+- [x] Shaded band + dashed upper/lower bounds; solid forecast line from today anchor
+- [x] Last 14 completed days shown as greyed context line; today highlighted
+- [x] Dashed vertical separator between history and forecast zone
+- [x] Adaptive x-axis labels; "forecast →" label in forecast zone
+- [x] Dark mode support
+
+---
+
 ## Future Enhancements
-- [ ] **History chart: adaptive tick density** — as the number of days grows, the x-axis labels become cramped. Instead of labelling every day, automatically compute a tick interval (e.g. every 2, 7, or 14 days) based on the available canvas width and total date range, so labels never overlap. Month boundary markers should always be shown regardless of tick interval.
-- [ ] **History chart: windowed view toggle** — add a toggle button above the Full History chart to switch between two modes: (1) current "all-time" view (full range, horizontally scrollable); (2) "2-week window" view that shows exactly 14 days at a time, with left/right arrow buttons to step backwards/forwards by one day (or one week) at a time. The window should default to showing the most recent 14 days. Both modes should share the same canvas rendering logic, just with different date ranges passed in.
-- [ ] **Data history editor**: a dedicated view (e.g. panel or modal) to browse, edit, and delete all stored entries — including those hidden from Recent Entries (fully decayed or older than 7 days). Should show all entries in a scrollable list grouped by day, with a delete button (confirmation required) and an add-entry form. Deletions must propagate to localStorage, JSON, and CSV. Useful for correcting logging mistakes and cleaning up old data.
-- [ ] **Import from backup**: restore from `data/caffeine_data.json` manually (e.g. after moving browsers or clearing localStorage deliberately)
-- [ ] **Exploratory analyses**: ideas to consider — caffeine-free streaks, time-of-day intake patterns, weekday vs weekend averages, rolling average overlay on history chart, sleep impact estimate
-- [ ] Dark mode
+- [ ] Caffeine-free streaks panel (potential Phase 9 addition)
+- [ ] **[LOW PRIORITY]** Upgrade forecast to triple exponential smoothing (Holt-Winters seasonal, period=7) to capture weekday/weekend patterns — needs ≥2–3 weeks of data to fit well
+- [x] **Dark mode** — toggle switch added
 - [ ] Cloud sync — **IMPORTANT: review LSHTM's policies on third-party cloud services before implementing**
 - [ ] Native Android app (very low priority)
 

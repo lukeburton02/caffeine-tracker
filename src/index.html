@@ -19,6 +19,16 @@
     </script>
 </head>
 <body>
+
+    <!-- Page navigation arrows (fixed, one per page) -->
+    <button type="button" class="page-nav page-nav-right" id="nav-to-analysis">Analysis</button>
+    <button type="button" class="page-nav page-nav-left hidden" id="nav-to-main">Main</button>
+
+    <div class="pages-wrapper">
+    <div class="pages-track" id="pages-track">
+
+    <!-- PAGE 1: Main -->
+    <div class="page page-main">
     <div class="layout">
 
         <!-- LEFT PANEL -->
@@ -92,39 +102,6 @@
                 </ul>
             </section>
 
-            <!-- Half-life settings -->
-            <section class="settings-section">
-                <h2 class="section-title">Settings</h2>
-                <div class="theme-row">
-                    <span class="backup-label">Dark mode</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="theme-toggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="halflife-row">
-                    <label for="halflife-input">Half-life (hours)</label>
-                    <input type="number" id="halflife-input" min="1" max="24" step="0.5">
-                    <button type="button" class="btn-save" id="halflife-save">Save</button>
-                    <button type="button" class="btn-reset" id="halflife-reset">Reset</button>
-                </div>
-                <p class="halflife-note">Default is 5 hours. Caffeine half-life varies by individual (typically 3–7 hrs).</p>
-
-                <div class="backup-row">
-                    <span class="backup-label">Local backup</span>
-                    <span id="backup-status" class="backup-status">Not linked</span>
-                    <button type="button" class="btn-backup" id="backup-link">Link folder</button>
-                </div>
-                <p class="halflife-note" id="backup-note">Link a local folder to auto-save your data as caffeine_data.json after each change.</p>
-
-                <div class="backup-row">
-                    <span class="backup-label">Import backup</span>
-                    <button type="button" class="btn-backup" id="import-backup">Import JSON</button>
-                    <input type="file" id="import-backup-file" accept=".json" style="display:none">
-                </div>
-                <p class="halflife-note">Restore from a caffeine_data.json backup file. New entries are merged with existing data.</p>
-            </section>
-
         </div>
 
         <!-- RIGHT PANEL -->
@@ -179,9 +156,92 @@
                 <button type="button" class="btn-export" id="export-csv">Download CSV</button>
             </section>
 
+            <!-- Settings -->
+            <section class="settings-section">
+                <h2 class="section-title">Settings</h2>
+                <div class="theme-row">
+                    <span class="backup-label">Dark mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="halflife-row">
+                    <label for="halflife-input">Half-life (hours)</label>
+                    <input type="number" id="halflife-input" min="1" max="24" step="0.5">
+                    <button type="button" class="btn-save" id="halflife-save">Save</button>
+                    <button type="button" class="btn-reset" id="halflife-reset">Reset</button>
+                </div>
+                <p class="halflife-note">Default is 5 hours. Caffeine half-life varies by individual (typically 3–7 hrs).</p>
+
+                <div class="backup-row">
+                    <span class="backup-label">Local backup</span>
+                    <span id="backup-status" class="backup-status">Not linked</span>
+                    <button type="button" class="btn-backup" id="backup-link">Link folder</button>
+                </div>
+                <p class="halflife-note" id="backup-note">Link a local folder to auto-save your data as caffeine_data.json after each change.</p>
+
+                <div class="backup-row">
+                    <span class="backup-label">Import backup</span>
+                    <button type="button" class="btn-backup" id="import-backup">Import JSON</button>
+                    <input type="file" id="import-backup-file" accept=".json" style="display:none">
+                </div>
+                <p class="halflife-note">Restore from a caffeine_data.json backup file. New entries are merged with existing data.</p>
+            </section>
+
         </div>
 
     </div>
+    </div><!-- end .page-main -->
+
+    <!-- PAGE 2: Analysis -->
+    <div class="page page-analysis">
+        <div class="analysis-grid">
+
+            <div class="analysis-panel" id="panel-forecast">
+                <div class="analysis-panel-header">
+                    <h2 class="analysis-panel-title">7-Day Forecast</h2>
+                    <p class="analysis-panel-subtitle">Double exponential smoothing (Holt-Winters) · 80% prediction interval</p>
+                </div>
+                <div class="analysis-canvas-wrap">
+                    <canvas id="forecast-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analysis-panel" id="panel-timeofday">
+                <div class="analysis-panel-header">
+                    <h2 class="analysis-panel-title">Time of Day</h2>
+                    <p class="analysis-panel-subtitle">Weighted kernel density estimate (bandwidth: Silverman's rule)</p>
+                </div>
+                <div class="analysis-canvas-wrap">
+                    <canvas id="timeofday-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analysis-panel" id="panel-sources">
+                <div class="analysis-panel-header">
+                    <h2 class="analysis-panel-title">Source Breakdown</h2>
+                </div>
+                <div class="analysis-canvas-wrap">
+                    <canvas id="source-breakdown-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="analysis-panel" id="panel-bedtime">
+                <div class="analysis-panel-header">
+                    <h2 class="analysis-panel-title">Bedtime Caffeine</h2>
+                    <p class="analysis-panel-subtitle">Estimated mg remaining at 11:00 pm</p>
+                </div>
+                <div class="analysis-canvas-wrap">
+                    <canvas id="bedtime-chart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- end .page-analysis -->
+
+    </div><!-- end .pages-track -->
+    </div><!-- end .pages-wrapper -->
 
     <!-- History editor modal -->
     <div id="history-editor-modal" class="modal-overlay" style="display:none" aria-modal="true" role="dialog" aria-label="All Entries">
