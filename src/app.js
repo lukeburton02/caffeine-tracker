@@ -1660,6 +1660,19 @@ function exportCSV() {
     URL.revokeObjectURL(url);
 }
 
+function exportJSON() {
+    const entries = getEntries();
+    if (entries.length === 0) { showToast('No data to export'); return; }
+    const data = { version: 1, lastSaved: new Date().toISOString(), entries, halfLife: getHalfLife() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `caffeine_data_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 // --- Service Worker ---
 
 if ('serviceWorker' in navigator) {
@@ -1701,6 +1714,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.target.value = '';
     });
     document.getElementById('export-csv').addEventListener('click', exportCSV);
+    document.getElementById('export-json').addEventListener('click', exportJSON);
 
     document.getElementById('open-history-editor').addEventListener('click', openHistoryEditor);
     document.getElementById('close-history-editor').addEventListener('click', closeHistoryEditor);
