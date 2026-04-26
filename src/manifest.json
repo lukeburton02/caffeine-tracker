@@ -2,7 +2,7 @@
   "name": "Caffeine Tracker",
   "short_name": "Caffeine",
   "description": "Track your caffeine intake and see current levels",
-  "start_url": "/",
+  "start_url": "/caffeine-tracker/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

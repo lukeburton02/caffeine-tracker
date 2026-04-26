@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-04-02T18:21:47.098Z",
+  "lastSaved": "2026-04-13T14:22:27.986Z",
   "entries": [
     {
       "id": "1774903051245",
@@ -49,6 +49,60 @@
       "timestamp": "2026-04-02T16:10:00.000Z",
       "amount": 33,
       "source": "Coca Cola"
+    },
+    {
+      "id": "1775404156182",
+      "timestamp": "2026-04-05T15:45:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
+      "id": "1775404214724",
+      "timestamp": "2026-04-04T20:00:00.000Z",
+      "amount": 48,
+      "source": "Lucozade"
+    },
+    {
+      "id": "1775404236354",
+      "timestamp": "2026-04-05T15:00:00.000Z",
+      "amount": 42,
+      "source": "Lucozade"
+    },
+    {
+      "id": "1775485808313",
+      "timestamp": "2026-04-06T14:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1775565707113",
+      "timestamp": "2026-04-07T12:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1775577952152",
+      "timestamp": "2026-04-07T16:05:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1775643017133",
+      "timestamp": "2026-04-08T08:00:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
+      "id": "1775668938898",
+      "timestamp": "2026-04-08T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1775668942477",
+      "timestamp": "2026-04-08T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
     }
   ],
   "halfLife": 5
