@@ -641,20 +641,18 @@ function drawSourceBreakdown() {
     const chartW = cssWidth - padLeft - padRight;
     const chartH = cssHeight - padTop - padBottom;
 
-    // Log₁₀ scale — correct choice for data spanning multiple orders of magnitude.
-    // (Any log base produces identical bar heights; log₁₀ keeps powers-of-10 labels
-    // at visually regular intervals.)
+    // Square root scale: 10→100 occupies less vertical space than 100→1000,
+    // so high-value bars spread apart more while small sources remain visible.
     const maxVal = bars[0].total;
-    const maxExp = Math.ceil(Math.log10(Math.max(maxVal, 10)));
-    const minExp = 0; // axis base = 1mg (10^0)
+    const axisMax = Math.pow(10, Math.ceil(Math.log10(Math.max(maxVal, 10))));
+    const sqrtMax = Math.sqrt(axisMax);
 
     function scaleY(val) {
-        const lv = Math.log10(Math.max(val, 1));
-        return padTop + chartH - (lv - minExp) / (maxExp - minExp) * chartH;
+        return padTop + chartH - (Math.sqrt(Math.max(val, 0)) / sqrtMax) * chartH;
     }
 
-    // Gridlines + labels at powers of 10 only
-    for (let exp = 1; exp <= maxExp; exp++) {
+    // Gridlines + labels at powers of 10 (unequally spaced — that's the point)
+    for (let exp = 1; Math.pow(10, exp) <= axisMax; exp++) {
         const val = Math.pow(10, exp);
         const y = scaleY(val);
         ctx.strokeStyle = C.gridLine;
