@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-04-13T14:22:27.986Z",
+  "lastSaved": "2026-04-26T19:54:54.775Z",
   "entries": [
     {
       "id": "1774903051245",
@@ -101,6 +101,150 @@
     {
       "id": "1775668942477",
       "timestamp": "2026-04-08T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776176219915",
+      "timestamp": "2026-04-14T08:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776176223812",
+      "timestamp": "2026-04-14T08:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776176242979",
+      "timestamp": "2026-04-14T14:00:00.000Z",
+      "amount": 25,
+      "source": "Green Tea"
+    },
+    {
+      "id": "1776176262905",
+      "timestamp": "2026-04-13T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1776176281805",
+      "timestamp": "2026-04-11T11:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1776251094667",
+      "timestamp": "2026-04-15T10:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1776260756906",
+      "timestamp": "2026-04-15T13:45:00.000Z",
+      "amount": 48,
+      "source": "Coke Zero"
+    },
+    {
+      "id": "1776352355696",
+      "timestamp": "2026-04-16T09:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776352359686",
+      "timestamp": "2026-04-16T09:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776518836538",
+      "timestamp": "2026-04-17T08:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776518841374",
+      "timestamp": "2026-04-17T08:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776518850882",
+      "timestamp": "2026-04-17T11:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1776518878500",
+      "timestamp": "2026-04-18T11:00:00.000Z",
+      "amount": 80,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1776531191785",
+      "timestamp": "2026-04-18T16:50:00.000Z",
+      "amount": 33,
+      "source": "Coca Cola"
+    },
+    {
+      "id": "1776968486574",
+      "timestamp": "2026-04-22T09:00:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
+      "id": "1776968491165",
+      "timestamp": "2026-04-22T14:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776968496688",
+      "timestamp": "2026-04-22T14:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1776968544503",
+      "timestamp": "2026-04-23T13:00:00.000Z",
+      "amount": 106,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1776968593060",
+      "timestamp": "2026-04-20T10:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1776968600976",
+      "timestamp": "2026-04-21T10:00:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
+      "id": "1777229432995",
+      "timestamp": "2026-04-25T07:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1777229436341",
+      "timestamp": "2026-04-25T07:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1777229452341",
+      "timestamp": "2026-04-26T14:00:00.000Z",
+      "amount": 160,
+      "source": "Toxic Waste Energy"
+    },
+    {
+      "id": "1777229461492",
+      "timestamp": "2026-04-26T18:00:00.000Z",
       "amount": 45,
       "source": "Anadin"
     }
