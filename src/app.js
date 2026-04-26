@@ -2111,7 +2111,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const PAGE_LABELS_LEFT  = [null, 'Main', 'Analysis'];
 
     function applyPageTransform(page) {
-        pagesTrack.style.transform = page === 0 ? '' : `translateX(-${page * window.innerWidth}px)`;
+        const pageW = pagesTrack.firstElementChild.offsetWidth;
+        pagesTrack.style.transform = page === 0 ? '' : `translateX(-${page * pageW}px)`;
     }
 
     function navigateTo(page) {

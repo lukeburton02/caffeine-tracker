@@ -68,13 +68,13 @@ body {
 
 .pages-track {
     display: flex;
-    width: 300vw;
+    width: 300%;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
 .page {
-    width: 100vw;
+    width: 33.3333%;
     min-height: 100vh;
     display: flex;
     justify-content: center;
