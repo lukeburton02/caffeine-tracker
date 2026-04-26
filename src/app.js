@@ -2109,11 +2109,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const PAGE_LABELS_RIGHT = ['Analysis', 'Live', null];
     const PAGE_LABELS_LEFT  = [null, 'Main', 'Analysis'];
-    const PAGE_TRACK_CLASS  = [null, 'on-analysis', 'on-episode'];
+
+    function applyPageTransform(page) {
+        pagesTrack.style.transform = page === 0 ? '' : `translateX(-${page * window.innerWidth}px)`;
+    }
 
     function navigateTo(page) {
-        pagesTrack.classList.remove('on-analysis', 'on-episode');
-        if (PAGE_TRACK_CLASS[page]) pagesTrack.classList.add(PAGE_TRACK_CLASS[page]);
+        applyPageTransform(page);
 
         navRight.textContent = PAGE_LABELS_RIGHT[page] || '';
         navLeft.textContent  = PAGE_LABELS_LEFT[page]  || '';
@@ -2128,6 +2130,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentPage = page;
     }
+
+    window.addEventListener('resize', () => { if (currentPage > 0) applyPageTransform(currentPage); });
 
     navRight.addEventListener('click', () => navigateTo(Math.min(currentPage + 1, 2)));
     navLeft.addEventListener('click',  () => navigateTo(Math.max(currentPage - 1, 0)));

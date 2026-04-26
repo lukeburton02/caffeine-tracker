@@ -72,13 +72,6 @@ body {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pages-track.on-analysis {
-    transform: translateX(-100vw);
-}
-
-.pages-track.on-episode {
-    transform: translateX(-200vw);
-}
 
 .page {
     width: 100vw;
