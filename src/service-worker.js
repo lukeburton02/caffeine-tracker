@@ -2,7 +2,7 @@
 // No caching — always load fresh files from network
 // Keeps PWA installability without stale cache issues
 
-const CACHE_NAME = 'caffeine-tracker-v5';
+const CACHE_NAME = 'caffeine-tracker-v6';
 
 self.addEventListener('install', () => self.skipWaiting());
 

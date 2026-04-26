@@ -1804,17 +1804,11 @@ document.addEventListener('DOMContentLoaded', () => {
         navToAnalysis.classList.remove('hidden');
     });
 
-    // Forecast panel info tooltip (hover)
+    // Forecast panel info tooltip (click toggle)
     const infoBtn     = document.getElementById('forecast-info-btn');
     const infoTooltip = document.getElementById('forecast-tooltip');
     if (infoBtn && infoTooltip) {
-        let hideTimer;
-        const show = () => { clearTimeout(hideTimer); infoTooltip.classList.add('visible'); };
-        const hide = () => { hideTimer = setTimeout(() => infoTooltip.classList.remove('visible'), 120); };
-        infoBtn.addEventListener('mouseenter', show);
-        infoBtn.addEventListener('mouseleave', hide);
-        infoTooltip.addEventListener('mouseenter', show);
-        infoTooltip.addEventListener('mouseleave', hide);
+        infoBtn.addEventListener('click', () => infoTooltip.classList.toggle('visible'));
     }
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)
