@@ -219,20 +219,37 @@
 - [x] Dark mode support; distinct purple (#764ba2) to differentiate from other charts
 
 ### Task 8.5: 7-Day Forecast with Uncertainty (top-left) ✅
-- [x] Double exponential smoothing: α=0.3 (level), β=0.1 (trend); fits on all completed days
-- [x] Initial trend from slope across first 1–3 points (more stable than y[1]-y[0])
+- [x] Upgraded to triple exponential smoothing (Holt-Winters additive, m=7 weekly seasonality)
+- [x] Falls back to double exp smoothing when <14 days of history
 - [x] 80% prediction interval: ±1.28 × RMSE × √h, widening with horizon h
 - [x] Shaded band + dashed upper/lower bounds; solid forecast line from today anchor
 - [x] Last 14 completed days shown as greyed context line; today highlighted
 - [x] Dashed vertical separator between history and forecast zone
 - [x] Adaptive x-axis labels; "forecast →" label in forecast zone
+- [x] Info button (ⓘ) top-right: click toggles overlay with model description + equations
+- [x] Dark mode support
+
+---
+
+## Phase 9: Live Episode Page ✅
+
+### Task 9.1: Live Caffeine Chart ✅
+- [x] Third page (Main → Analysis → Live), navigated via arrow buttons
+- [x] Dynamic window: looks back to last <5mg crossing (capped 48h); projects forward to clearance
+- [x] If no active episode: shows last complete episode within 48h lookback
+- [x] Past portion: solid purple line; future projected decay: dashed + faded
+- [x] Animated pulsing "now" dot via requestAnimationFrame interpolation between 5-min samples
+- [x] "Now" vertical dashed line + x-axis label
+- [x] 5mg threshold shown as red dashed horizontal line
+- [x] Header subtitle: "Episode started Xh Ym ago · clears in ~Xh Ym"
+- [x] rAF loop only runs when episode page is active; auto-pauses when tab hidden
+- [x] Curve rebuilds every minute (via refreshUI) and on every data change (via refreshAll)
 - [x] Dark mode support
 
 ---
 
 ## Future Enhancements
-- [ ] Caffeine-free streaks panel (potential Phase 9 addition)
-- [ ] **[LOW PRIORITY]** Upgrade forecast to triple exponential smoothing (Holt-Winters seasonal, period=7) to capture weekday/weekend patterns — needs ≥2–3 weeks of data to fit well
+- [ ] Caffeine-free streaks panel (potential future addition)
 - [x] **Dark mode** — toggle switch added
 - [ ] Cloud sync — **IMPORTANT: review LSHTM's policies on third-party cloud services before implementing**
 - [ ] Native Android app (very low priority)

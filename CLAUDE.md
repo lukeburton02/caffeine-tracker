@@ -19,7 +19,11 @@ Vanilla JS PWA. Deployed to GitHub Pages at https://lukeburton02.github.io/caffe
 2. File System Access API — Chrome/Edge on GitHub Pages only
 3. localStorage — all browsers on GitHub Pages (primary storage)
 
-**Refresh split**: `refreshUI()` runs every minute (level, entries, 7-day chart). `refreshAll()` runs on data changes only (adds summary + history chart). History chart never redraws on the timer.
+**Refresh split**: `refreshUI()` runs every minute (level, entries). `refreshAll()` runs on data changes only (all charts + summary). History chart never redraws on the timer.
+
+**Episode page (page 3)**: `buildEpisodeCurve()` runs only when episode page is active (guarded by `episodeAnimFrame`). `requestAnimationFrame` loop auto-pauses when tab is hidden. Curve recomputes every minute via `refreshUI()` and on every data change via `refreshAll()`.
+
+**Page navigation**: 3 pages (main → analysis → live). `navigateTo(n)` handles track transform class, nav button labels, and starting/stopping the rAF loop.
 
 ## Dev
 - `npm run dev` — Express on port 8080
