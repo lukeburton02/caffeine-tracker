@@ -1,6 +1,6 @@
 # Caffeine Tracker PWA
 
-Vanilla JS PWA. Local dev via Express (`npm run dev`, port 8080). Hard refresh with `Cmd+Shift+R` after changes to bypass service worker cache.
+Vanilla JS PWA. Deployed to GitHub Pages at https://lukeburton02.github.io/caffeine-tracker/ — this is the primary version. Local dev via Express (`npm run dev`, port 8080) still works but is no longer the primary. Hard refresh with `Cmd+Shift+R` after changes to bypass service worker cache.
 
 **LSHTM machine** — review policies before adding any cloud sync or external storage.
 
@@ -15,9 +15,9 @@ Vanilla JS PWA. Local dev via Express (`npm run dev`, port 8080). Hard refresh w
 **Peak calculation**: checked at the exact timestamp of each today entry only — the only moment a local max can occur (caffeine only decays after that point).
 
 **Data persistence** (tried in order):
-1. Express server (`/api/save`, `/api/load`) — any browser locally
-2. File System Access API — Chrome/Edge on deployed version only
-3. localStorage only — Safari/Firefox on deployed version
+1. Express server (`/api/save`, `/api/load`) — local dev only
+2. File System Access API — Chrome/Edge on GitHub Pages only
+3. localStorage — all browsers on GitHub Pages (primary storage)
 
 **Refresh split**: `refreshUI()` runs every minute (level, entries, 7-day chart). `refreshAll()` runs on data changes only (adds summary + history chart). History chart never redraws on the timer.
 
