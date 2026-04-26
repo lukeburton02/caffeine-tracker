@@ -1241,7 +1241,7 @@ function refreshUI() {
     updateLevelDisplay();
     checkHighWarning();
     renderEntries();
-    buildEpisodeCurve(); // rebuild curve every minute (level decays)
+    if (episodeAnimFrame) buildEpisodeCurve(); // only when episode page is active
 }
 
 // Called when data changes (entry added/deleted, half-life changed).
