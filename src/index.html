@@ -20,9 +20,9 @@
 </head>
 <body>
 
-    <!-- Page navigation arrows (fixed, one per page) -->
-    <button type="button" class="page-nav page-nav-right" id="nav-to-analysis">Analysis</button>
-    <button type="button" class="page-nav page-nav-left hidden" id="nav-to-main">Main</button>
+    <!-- Page navigation arrows -->
+    <button type="button" class="page-nav page-nav-right" id="nav-right">Analysis</button>
+    <button type="button" class="page-nav page-nav-left hidden" id="nav-left">Main</button>
 
     <div class="pages-wrapper">
     <div class="pages-track" id="pages-track">
@@ -252,6 +252,22 @@
 
         </div>
     </div><!-- end .page-analysis -->
+
+    <!-- PAGE 3: Live Episode -->
+    <div class="page page-episode">
+        <div class="episode-container">
+            <div class="episode-header">
+                <div>
+                    <h2 class="episode-title">Live Caffeine</h2>
+                    <p class="episode-subtitle" id="episode-subtitle">Loading…</p>
+                </div>
+                <p class="episode-level" id="episode-level"></p>
+            </div>
+            <div class="episode-canvas-wrap" id="episode-canvas-wrap">
+                <canvas id="episode-chart"></canvas>
+            </div>
+        </div>
+    </div><!-- end .page-episode -->
 
     </div><!-- end .pages-track -->
     </div><!-- end .pages-wrapper -->
