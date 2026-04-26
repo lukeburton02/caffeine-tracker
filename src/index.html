@@ -202,10 +202,22 @@
             <div class="analysis-panel" id="panel-forecast">
                 <div class="analysis-panel-header">
                     <h2 class="analysis-panel-title">7-Day Forecast</h2>
-                    <p class="analysis-panel-subtitle">Double exponential smoothing (Holt-Winters) · 80% prediction interval</p>
+                    <p class="analysis-panel-subtitle">Holt-Winters triple exponential smoothing · 80% prediction interval</p>
                 </div>
                 <div class="analysis-canvas-wrap">
                     <canvas id="forecast-chart"></canvas>
+                </div>
+                <button type="button" class="info-btn" id="forecast-info-btn" aria-label="Model information">i</button>
+                <div class="info-tooltip" id="forecast-tooltip">
+                    <p class="info-tooltip-title">Holt-Winters Triple Exponential Smoothing</p>
+                    <p class="info-tooltip-desc">Additive seasonal model decomposing daily caffeine into level, trend, and day-of-week seasonal components, updated recursively as new data arrives.</p>
+                    <div class="info-tooltip-equations">
+                        <div>Level:    L[t] = &alpha;(y[t] &minus; S[t&minus;m]) + (1&minus;&alpha;)(L[t&minus;1] + T[t&minus;1])</div>
+                        <div>Trend:    T[t] = &beta;(L[t] &minus; L[t&minus;1]) + (1&minus;&beta;)T[t&minus;1]</div>
+                        <div>Seasonal: S[t] = &gamma;(y[t] &minus; L[t]) + (1&minus;&gamma;)S[t&minus;m]</div>
+                        <div>Forecast: &ycirc;[t+h] = L[t] + h&middot;T[t] + S[t&minus;m + (h mod m)]</div>
+                    </div>
+                    <p class="info-tooltip-params">m = 7 (weekly) &nbsp;&nbsp; &alpha; = 0.3 (level) &nbsp;&nbsp; &beta; = 0.1 (trend) &nbsp;&nbsp; &gamma; = 0.2 (seasonal)<br>80% PI: &ycirc; &plusmn; 1.28 &middot; RMSE &middot; &radic;h<br>Requires &ge;14 days of history &mdash; falls back to double exponential smoothing otherwise.</p>
                 </div>
             </div>
 

@@ -110,6 +110,81 @@ body {
     padding: 20px 24px;
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+/* --- Forecast info button + tooltip --- */
+
+.info-btn {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #ccc;
+    background: none;
+    color: #aaa;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-style: italic;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: border-color 0.15s, color 0.15s;
+    line-height: 1;
+    padding: 0;
+}
+
+.info-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.info-tooltip {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 12px;
+    padding: 20px 24px;
+    z-index: 20;
+    overflow-y: auto;
+}
+
+.info-tooltip.visible {
+    display: block;
+}
+
+.info-tooltip-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.info-tooltip-desc {
+    font-size: 0.78rem;
+    color: #555;
+    line-height: 1.55;
+    margin-bottom: 14px;
+}
+
+.info-tooltip-equations {
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 0.72rem;
+    color: #2c3e50;
+    line-height: 1.9;
+    margin-bottom: 14px;
+    white-space: nowrap;
+}
+
+.info-tooltip-params {
+    font-size: 0.75rem;
+    color: #888;
+    line-height: 1.7;
 }
 
 .analysis-canvas-wrap {
@@ -1221,4 +1296,34 @@ html[data-theme="dark"] .analysis-panel-title {
 
 html[data-theme="dark"] .analysis-panel-subtitle {
     color: #666;
+}
+
+html[data-theme="dark"] .info-btn {
+    border-color: #3a3b5a;
+    color: #52536e;
+}
+
+html[data-theme="dark"] .info-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+html[data-theme="dark"] .info-tooltip {
+    background: rgba(26, 27, 46, 0.98);
+}
+
+html[data-theme="dark"] .info-tooltip-title {
+    color: #e2e4f0;
+}
+
+html[data-theme="dark"] .info-tooltip-desc {
+    color: #8a8bb5;
+}
+
+html[data-theme="dark"] .info-tooltip-equations {
+    color: #c5c7e8;
+}
+
+html[data-theme="dark"] .info-tooltip-params {
+    color: #52536e;
 }

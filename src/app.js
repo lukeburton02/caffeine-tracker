@@ -303,15 +303,19 @@ function drawWeeklyChart() {
     });
 }
 
-// --- 7-day forecast (double exponential smoothing) ---
+// --- 7-day forecast (triple exponential smoothing / Holt-Winters additive) ---
 
-const DES_ALPHA = 0.3; // level smoothing
-const DES_BETA  = 0.1; // trend smoothing
+const TES_ALPHA  = 0.3; // level smoothing
+const TES_BETA   = 0.1; // trend smoothing
+const TES_GAMMA  = 0.2; // seasonal smoothing
+const TES_PERIOD = 7;   // weekly seasonality
+
+// Mon=0 ... Sun=6
+function weekdayIdx(d) { return (d.getDay() + 6) % 7; }
 
 function fitDES(values) {
     if (values.length < 1) return null;
     let L = values[0];
-    // Initial trend: slope across first few points (more stable than just y[1]-y[0])
     let T = values.length > 1
         ? (values[Math.min(values.length - 1, 3)] - values[0]) / Math.min(values.length - 1, 3)
         : 0;
@@ -320,10 +324,35 @@ function fitDES(values) {
         const fcast = L + T;
         residuals.push(values[i] - fcast);
         const Lprev = L;
-        L = DES_ALPHA * values[i] + (1 - DES_ALPHA) * (L + T);
-        T = DES_BETA  * (L - Lprev) + (1 - DES_BETA)  * T;
+        L = TES_ALPHA * values[i] + (1 - TES_ALPHA) * (L + T);
+        T = TES_BETA  * (L - Lprev) + (1 - TES_BETA) * T;
     }
-    return { L, T, residuals };
+    return { L, T, residuals, type: 'des' };
+}
+
+function fitTES(values, dates) {
+    // Need at least 2 full seasons for seasonal initialisation
+    if (values.length < TES_PERIOD * 2) return fitDES(values);
+
+    const m = TES_PERIOD;
+    const A1 = values.slice(0, m).reduce((a, b) => a + b, 0) / m;
+    const A2 = values.slice(m, m * 2).reduce((a, b) => a + b, 0) / m;
+    let L = A1;
+    let T = (A2 - A1) / m;
+    // Seasonal indices from first season, one per weekday
+    const S = new Array(m).fill(0);
+    for (let i = 0; i < m; i++) S[weekdayIdx(dates[i])] = values[i] - A1;
+
+    const residuals = [];
+    for (let i = 0; i < values.length; i++) {
+        const wd = weekdayIdx(dates[i]);
+        if (i > 0) residuals.push(values[i] - (L + T + S[wd]));
+        const Lprev = L;
+        L = TES_ALPHA * (values[i] - S[wd]) + (1 - TES_ALPHA) * (L + T);
+        T = TES_BETA  * (L - Lprev)          + (1 - TES_BETA)  * T;
+        S[wd] = TES_GAMMA * (values[i] - L)  + (1 - TES_GAMMA) * S[wd];
+    }
+    return { L, T, S, residuals, type: 'tes' };
 }
 
 function drawForecast() {
@@ -361,7 +390,7 @@ function drawForecast() {
     const todayDay = allDays.find(d => d.date.getTime() === todayStart.getTime());
 
     // Fit model on all completed days
-    const model = fitDES(completedDays.map(d => d.total));
+    const model = fitTES(completedDays.map(d => d.total), completedDays.map(d => d.date));
 
     // Build 7-day forecast with 80% prediction intervals (±1.28 * RMSE * √h)
     const HORIZON = 7;
@@ -370,14 +399,11 @@ function drawForecast() {
         : (model ? Math.max(model.L * 0.3, 30) : 50);
 
     const forecastPts = model ? Array.from({ length: HORIZON }, (_, h) => {
-        const point = Math.max(0, model.L + (h + 1) * model.T);
+        const date = new Date(todayStart.getTime() + (h + 1) * 86400000);
+        const seasonal = model.type === 'tes' ? model.S[weekdayIdx(date)] : 0;
+        const point = Math.max(0, model.L + (h + 1) * model.T + seasonal);
         const hw = 1.28 * rmse * Math.sqrt(h + 1);
-        return {
-            date: new Date(todayStart.getTime() + (h + 1) * 24 * 60 * 60 * 1000),
-            point,
-            lo: Math.max(0, point - hw),
-            hi: point + hw
-        };
+        return { date, point, lo: Math.max(0, point - hw), hi: point + hw };
     }) : [];
 
     // Context: last 14 completed days
@@ -1777,6 +1803,19 @@ document.addEventListener('DOMContentLoaded', () => {
         navToMain.classList.add('hidden');
         navToAnalysis.classList.remove('hidden');
     });
+
+    // Forecast panel info tooltip (hover)
+    const infoBtn     = document.getElementById('forecast-info-btn');
+    const infoTooltip = document.getElementById('forecast-tooltip');
+    if (infoBtn && infoTooltip) {
+        let hideTimer;
+        const show = () => { clearTimeout(hideTimer); infoTooltip.classList.add('visible'); };
+        const hide = () => { hideTimer = setTimeout(() => infoTooltip.classList.remove('visible'), 120); };
+        infoBtn.addEventListener('mouseenter', show);
+        infoBtn.addEventListener('mouseleave', hide);
+        infoTooltip.addEventListener('mouseenter', show);
+        infoTooltip.addEventListener('mouseleave', hide);
+    }
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)
     setInterval(refreshUI, 60 * 1000);
