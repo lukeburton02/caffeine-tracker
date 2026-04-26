@@ -577,6 +577,25 @@ function toTitleCase(str) {
     return str.replace(/\b\w/g, c => c.toUpperCase());
 }
 
+// Format a mg value to the most appropriate unit (auto-scaling)
+function formatMgLabel(mg) {
+    if (mg >= 1e6) return (mg / 1e6) + 'kg';
+    if (mg >= 1e3) return (mg / 1e3) + 'g';
+    return mg + 'mg';
+}
+
+function formatMgValue(mg) {
+    if (mg >= 1e6) {
+        const v = mg / 1e6;
+        return (Number.isInteger(v) ? v : v.toFixed(1)) + 'kg';
+    }
+    if (mg >= 1e3) {
+        const v = mg / 1e3;
+        return (Number.isInteger(v) ? v : v.toFixed(1)) + 'g';
+    }
+    return Math.round(mg) + 'mg';
+}
+
 function drawSourceBreakdown() {
     const canvas = document.getElementById('source-breakdown-chart');
     if (!canvas) return;
@@ -622,30 +641,45 @@ function drawSourceBreakdown() {
     const chartW = cssWidth - padLeft - padRight;
     const chartH = cssHeight - padTop - padBottom;
 
-    // Log₁₀ scale: axis runs from 1mg (log=0) to 10^maxLog
+    // Log₂ scale: finer visual discrimination between sources
+    const log2 = v => Math.log2(Math.max(v, 1));
     const maxVal = bars[0].total;
-    const maxLog = Math.ceil(Math.log10(Math.max(maxVal, 10)));
-    const minLog = 0;
+    const axisMax = Math.pow(2, Math.ceil(log2(maxVal * 1.05)));
+    const minLogV = 0;            // log₂(1mg) = 0
+    const maxLogV = log2(axisMax);
 
-    function logY(val) {
-        const lv = Math.log10(Math.max(val, 1));
-        return padTop + chartH - (lv - minLog) / (maxLog - minLog) * chartH;
+    function scaleY(val) {
+        const lv = log2(val);
+        return padTop + chartH - (lv - minLogV) / (maxLogV - minLogV) * chartH;
     }
 
-    // Gridlines + y-axis labels at powers of 10
-    for (let exp = 1; exp <= maxLog; exp++) {
-        const y = logY(Math.pow(10, exp));
+    // Minor gridlines at every power of 2 (unlabeled, very light)
+    for (let pw = 2; pw <= axisMax; pw *= 2) {
+        const y = scaleY(pw);
+        if (y < padTop || y > padTop + chartH) continue;
+        ctx.strokeStyle = C.gridLine;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(padLeft + chartW, y);
+        ctx.stroke();
+    }
+
+    // Major gridlines at powers of 10 (labelled)
+    for (let exp = 1; Math.pow(10, exp) <= axisMax; exp++) {
+        const val = Math.pow(10, exp);
+        const y = scaleY(val);
+        if (y < padTop || y > padTop + chartH) continue;
         ctx.strokeStyle = C.gridLine;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(padLeft, y);
         ctx.lineTo(padLeft + chartW, y);
         ctx.stroke();
-
         ctx.fillStyle = C.yLabel;
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(Math.pow(10, exp) + 'mg', padLeft - 6, y + 3.5);
+        ctx.fillText(formatMgLabel(val), padLeft - 6, y + 3.5);
     }
 
     // Bars
@@ -654,7 +688,7 @@ function drawSourceBreakdown() {
 
     bars.forEach((bar, i) => {
         const cx = padLeft + i * gap + gap / 2;
-        const topY = logY(bar.total);
+        const topY = scaleY(bar.total);
         const barH = (padTop + chartH) - topY;
 
         ctx.fillStyle = '#667eea';
@@ -662,11 +696,11 @@ function drawSourceBreakdown() {
         ctx.roundRect(cx - barW / 2, topY, barW, Math.max(barH, 2), 3);
         ctx.fill();
 
-        // Value label above bar
+        // Value label above bar (auto-formatted unit)
         ctx.fillStyle = C.barLabelNormal;
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(Math.round(bar.total) + 'mg', cx, topY - 4);
+        ctx.fillText(formatMgValue(bar.total), cx, topY - 4);
 
         // Source label rotated -45°
         ctx.save();
