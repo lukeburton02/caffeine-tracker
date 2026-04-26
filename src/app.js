@@ -641,35 +641,22 @@ function drawSourceBreakdown() {
     const chartW = cssWidth - padLeft - padRight;
     const chartH = cssHeight - padTop - padBottom;
 
-    // Log₂ scale: finer visual discrimination between sources
-    const log2 = v => Math.log2(Math.max(v, 1));
+    // Log₁₀ scale — correct choice for data spanning multiple orders of magnitude.
+    // (Any log base produces identical bar heights; log₁₀ keeps powers-of-10 labels
+    // at visually regular intervals.)
     const maxVal = bars[0].total;
-    const axisMax = Math.pow(2, Math.ceil(log2(maxVal * 1.05)));
-    const minLogV = 0;            // log₂(1mg) = 0
-    const maxLogV = log2(axisMax);
+    const maxExp = Math.ceil(Math.log10(Math.max(maxVal, 10)));
+    const minExp = 0; // axis base = 1mg (10^0)
 
     function scaleY(val) {
-        const lv = log2(val);
-        return padTop + chartH - (lv - minLogV) / (maxLogV - minLogV) * chartH;
+        const lv = Math.log10(Math.max(val, 1));
+        return padTop + chartH - (lv - minExp) / (maxExp - minExp) * chartH;
     }
 
-    // Minor gridlines at every power of 2 (unlabeled, very light)
-    for (let pw = 2; pw <= axisMax; pw *= 2) {
-        const y = scaleY(pw);
-        if (y < padTop || y > padTop + chartH) continue;
-        ctx.strokeStyle = C.gridLine;
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(padLeft, y);
-        ctx.lineTo(padLeft + chartW, y);
-        ctx.stroke();
-    }
-
-    // Major gridlines at powers of 10 (labelled)
-    for (let exp = 1; Math.pow(10, exp) <= axisMax; exp++) {
+    // Gridlines + labels at powers of 10 only
+    for (let exp = 1; exp <= maxExp; exp++) {
         const val = Math.pow(10, exp);
         const y = scaleY(val);
-        if (y < padTop || y > padTop + chartH) continue;
         ctx.strokeStyle = C.gridLine;
         ctx.lineWidth = 1;
         ctx.beginPath();
