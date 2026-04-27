@@ -156,8 +156,13 @@ Opens at `http://127.0.0.1:8080`. The Express server writes `data/caffeine_data.
 ```
 caffeine-tracker/
 ├── src/
-│   ├── index.html         # Three-page PWA shell
-│   ├── app.js             # All logic: calculations, charts, storage, UI, navigation
+│   ├── index.html         # Three-page PWA shell (<script type="module">)
+│   ├── app.js             # Event wiring, navigation, init, refreshUI/refreshAll
+│   ├── calculations.js    # Pure math: half-life decay, computeLevelAt
+│   ├── storage.js         # localStorage, Express API, File System Access, export
+│   ├── toast.js           # showToast notification helper
+│   ├── charts.js          # All canvas drawing functions + episode animation
+│   ├── ui.js              # DOM updates: level display, entries, summary, modals
 │   ├── styles.css         # Styling + dark mode
 │   ├── service-worker.js  # PWA (network-first, no caching)
 │   ├── manifest.json      # PWA config
@@ -175,7 +180,7 @@ caffeine-tracker/
 
 ## Tech Stack
 
-- **Vanilla JS** (ES6+, no framework, no bundler)
+- **Vanilla JS** (ES modules, no framework, no bundler)
 - **Canvas API** for all charts (no charting libraries)
 - **CSS custom properties + data attributes** for dark mode
 - **localStorage** as primary runtime store

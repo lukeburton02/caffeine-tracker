@@ -251,21 +251,44 @@
 ## Phase 10: UX Polish & Visual Tidiness
 
 ### Task 10.1: Settings Modal ✅
-- [ ] Move dark mode toggle, half-life, backup/import into a gear-icon modal
-- [ ] Gear button fixed in a corner (or top of right panel)
-- [ ] Remove settings section from main panel entirely
-- [ ] Move export buttons (CSV/JSON) into the modal too
+- [x] Move dark mode toggle, half-life, backup/import into a gear-icon modal
+- [x] Gear button fixed bottom-right corner
+- [x] Remove settings section from main panel entirely
+- [x] Move export buttons (CSV/JSON) into the modal too
 
-### Task 10.2: Collapse Date & Time into Quick Add row
-- [ ] Date & time inputs sit inline above preset buttons, not as a separate titled section
-- [ ] Reduces vertical scroll on left panel
+### Task 10.2: Collapse Date & Time into Quick Add row ✅
+- [x] Date & time inputs sit inline above preset buttons, not as a separate titled section
 
-### Task 10.3: Tab bar navigation
-- [ ] Replace fixed corner arrow buttons with a persistent top tab bar (Main · Analysis · Live)
-- [ ] Makes 3-page structure immediately obvious to the user
+### Task 10.3: Tab bar navigation ✅
+- [x] Replace fixed corner arrow buttons with a persistent top tab bar (Main · Analysis · Live)
 
-### Task 10.4: Unified panel style
-- [ ] Main page panels and analysis panels use consistent border-radius, background, and shadow
+### Task 10.4: Unified panel style ✅
+- [x] Main page panels and analysis panels use consistent border-radius, background, and shadow
+
+---
+
+## Phase 11: ES Module Split ✅
+
+### Task 11.1: calculations.js ✅
+- [x] Extracted: `getHalfLife`, `calculateCurrentCaffeine`, `computeLevelAt`, `getCaffeineAtTime`
+- [x] `index.html` updated to `<script type="module" src="app.js">`
+- [x] `window.handleDelete` exposed for inline onclick
+
+### Task 11.2: storage.js + toast.js ✅
+- [x] `toast.js`: `showToast`
+- [x] `storage.js`: all localStorage, Express server, File System Access, backup management, CSV/JSON export
+- [x] `initBackup` / `importFromBackupFile` accept callbacks to avoid circular dependencies
+
+### Task 11.3: charts.js ✅
+- [x] All canvas drawing functions (weekly, forecast, source breakdown, time-of-day, bedtime, history)
+- [x] Holt-Winters TES model (`fitDES`, `fitTES`)
+- [x] Episode curve building + rAF animation loop
+- [x] History state (`historyMode`, `historyWindowOffset`) via exported getters/setters
+
+### Task 11.4: ui.js ✅
+- [x] Level display, entry list, daily summary, high-caffeine warning
+- [x] History editor modal
+- [x] `app.js` reduced to ~330 lines (event wiring, navigation, init)
 
 ---
 
