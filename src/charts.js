@@ -686,7 +686,7 @@ export function drawHistoryChart() {
         yAxis.height = Math.round(cssH * dpr);
         const yCtx = yAxis.getContext('2d');
         yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        yCtx.fillStyle = dark ? '#1a1b2e' : '#ffffff';
+        yCtx.fillStyle = dark ? '#1a1b2e' : 'rgba(255,255,255,0.97)';
         yCtx.fillRect(0, 0, PAD_LEFT, cssH);
         gridSteps.forEach(v => {
             const y = scaleY(v);
