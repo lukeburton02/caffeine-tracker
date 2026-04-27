@@ -493,7 +493,8 @@ function gaussianSmooth(values, bandwidth) {
     const smoothed = values.map((_, i) => {
         let wSum = 0, vSum = 0;
         values.forEach((v, j) => {
-            const w = Math.exp(-((i - j) / bandwidth) ** 2);
+            const d = (i - j) / bandwidth;
+            const w = Math.exp(-(d * d));
             wSum += w; vSum += w * v;
         });
         return vSum / wSum;
@@ -501,8 +502,10 @@ function gaussianSmooth(values, bandwidth) {
     const sd = smoothed.map((s, i) => {
         let wSum = 0, vSum = 0;
         values.forEach((v, j) => {
-            const w = Math.exp(-((i - j) / bandwidth) ** 2);
-            wSum += w; vSum += w * (v - s) ** 2;
+            const d = (i - j) / bandwidth;
+            const w = Math.exp(-(d * d));
+            const diff = v - s;
+            wSum += w; vSum += w * (diff * diff);
         });
         return Math.sqrt(vSum / wSum);
     });
