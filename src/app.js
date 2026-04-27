@@ -1,8 +1,8 @@
 // Caffeine Tracker - Main Application Logic
 
-const DEFAULT_HALF_LIFE_HOURS = 5;
+import { DEFAULT_HALF_LIFE_HOURS, HALFLIFE_KEY, getHalfLife, calculateCurrentCaffeine, computeLevelAt, getCaffeineAtTime } from './calculations.js';
+
 const STORAGE_KEY = 'caffeine_entries';
-const HALFLIFE_KEY = 'caffeine_halflife';
 const HIGH_THRESHOLD = 200; // mg — warn once when crossing above this
 
 let prevCaffeineLevel = null;
@@ -45,19 +45,7 @@ function applyTheme(dark) {
     drawBedtimeCaffeine();
 }
 
-function getHalfLife() {
-    const stored = parseFloat(localStorage.getItem(HALFLIFE_KEY));
-    return isNaN(stored) ? DEFAULT_HALF_LIFE_HOURS : stored;
-}
-
 // --- Caffeine calculation ---
-
-function calculateCurrentCaffeine(entry) {
-    const now = new Date();
-    const consumed = new Date(entry.timestamp);
-    const hoursElapsed = (now - consumed) / (1000 * 60 * 60);
-    return entry.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
-}
 
 function getTotalCurrentCaffeine() {
     return getEntries().reduce((total, entry) => {
@@ -835,15 +823,6 @@ function drawTimeOfDay() {
 
 const BEDTIME_HOUR = 23; // 11 pm
 
-function getCaffeineAtTime(entries, targetTime) {
-    return entries.reduce((sum, e) => {
-        const consumed = new Date(e.timestamp);
-        if (consumed >= targetTime) return sum;
-        const hoursElapsed = (targetTime - consumed) / (1000 * 60 * 60);
-        return sum + e.amount * Math.pow(0.5, hoursElapsed / getHalfLife());
-    }, 0);
-}
-
 function drawBedtimeCaffeine() {
     const canvas = document.getElementById('bedtime-chart');
     if (!canvas) return;
@@ -1340,6 +1319,7 @@ function handleDelete(id, source) {
     deleteEntry(id);
     refreshAll();
 }
+window.handleDelete = handleDelete;
 
 // --- History editor modal ---
 
@@ -1770,13 +1750,6 @@ let episodeCurve     = null; // precomputed; rebuilt every minute or on data cha
 let episodeAnimFrame = null;
 let episodeCanvasW   = 0;
 let episodeCanvasH   = 0;
-
-function computeLevelAt(tMs, entries, halfLifeMs) {
-    return entries.reduce((sum, e) => {
-        const age = tMs - new Date(e.timestamp).getTime();
-        return age < 0 ? sum : sum + e.amount * Math.pow(0.5, age / halfLifeMs);
-    }, 0);
-}
 
 function buildEpisodeCurve() {
     const entries    = getEntries();

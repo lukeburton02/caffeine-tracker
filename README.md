@@ -52,7 +52,7 @@ flowchart TD
 
 Caffeine is eliminated via first-order kinetics — the rate of elimination is proportional to the current concentration. This gives an exponential decay curve:
 
-$$C(t) = C_0 \times 0.5^{\, t \, / \, t_{1/2}}$$
+$$C(t) = C_0 \times 0.5^{t / t_{1/2}}$$
 
 | Symbol | Meaning |
 |--------|---------|
@@ -63,9 +63,9 @@ $$C(t) = C_0 \times 0.5^{\, t \, / \, t_{1/2}}$$
 
 The total caffeine in system at any moment is the sum over all logged entries:
 
-$$\text{Total}(t) = \sum_i d_i \times 0.5^{\,(t - t_i)\, /\, t_{1/2}}$$
+$$\text{Total}(t) = \sum_i d_i \times 0.5^{(t - t_i) / t_{1/2}}$$
 
-**Peak calculation** — peak is sampled at the exact timestamp of each entry consumed today, not by interval sampling. This is correct because caffeine can only reach a local maximum immediately after a dose; it decays continuously thereafter. For example: 50 mg at 09:00 followed by 120 mg at 14:00 gives a peak of $50 \times 0.5^{5/5} + 120 = 145\ \text{mg}$ at 14:00, not 170 mg.
+**Peak calculation** — peak is sampled at the exact timestamp of each entry consumed today, not by interval sampling. This is correct because caffeine can only reach a local maximum immediately after a dose; it decays continuously thereafter. For example: 50 mg at 09:00 followed by 120 mg at 14:00 gives a peak of $50 \times 0.5^{5/5} + 120 = 145\text{ mg}$ at 14:00, not 170 mg.
 
 **Typical half-life values:**
 
