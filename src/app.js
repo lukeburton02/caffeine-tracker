@@ -1211,6 +1211,12 @@ function drawHistoryChart() {
         ctx.font = `${isToday ? '600' : '400'} 10px sans-serif`;
         ctx.fillText(WEEKDAYS[day.date.getDay()], x, labelY2);
     });
+
+    // Scroll to show the latest (rightmost) data by default
+    if (historyMode === 'all') {
+        const container = document.getElementById('history-chart-container');
+        if (container) container.scrollLeft = container.scrollWidth;
+    }
 }
 
 function checkHighWarning() {
