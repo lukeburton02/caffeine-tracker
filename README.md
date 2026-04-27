@@ -19,9 +19,9 @@ graph LR
 
 | Page | Contents |
 |------|----------|
-| **Main** | Current level display · Quick Add presets · Custom entry · Recent entries · Full history chart · 7-day chart · Today's summary |
-| **Analysis** | 7-day forecast · Time-of-day intake pattern · Source breakdown · Bedtime caffeine trend |
-| **Live** | Animated real-time caffeine curve for the current episode |
+| **Main** | <ul><li>Current level display with colour-coded status bar</li><li>Quick Add presets (Celsius, Huel, Neutonic, Tenzing)</li><li>Custom entry form</li><li>Recent entries list with remaining mg</li><li>Today's summary — total consumed, peak level, peak time</li><li>7-day bar chart</li><li>Full history line chart (scrollable)</li></ul> |
+| **Analysis** | <ul><li>7-day forecast with 80% prediction interval</li><li>Time-of-day intake pattern (weighted KDE)</li><li>Source breakdown histogram</li><li>Bedtime caffeine trend</li></ul> |
+| **Live** | <ul><li>Animated real-time caffeine curve for the current episode</li><li>Solid past curve · dashed future projection · pulsing now-dot</li><li>Dynamic window: back to last &lt;5 mg crossing, forward to clearance</li></ul> |
 
 ---
 
@@ -52,29 +52,25 @@ flowchart TD
 
 Caffeine is eliminated via first-order kinetics — the rate of elimination is proportional to the current concentration. This gives an exponential decay curve:
 
-```
-C(t) = C₀ × 0.5^(t / t½)
-```
+$$C(t) = C_0 \times 0.5^{\, t \, / \, t_{1/2}}$$
 
 | Symbol | Meaning |
 |--------|---------|
-| `C(t)` | Caffeine remaining at time `t` (mg) |
-| `C₀`   | Initial dose (mg) |
-| `t`    | Hours elapsed since consumption |
-| `t½`   | Half-life (default **5 hours**; configurable 1–24 h) |
+| $C(t)$ | Caffeine remaining at time $t$ (mg) |
+| $C_0$ | Initial dose (mg) |
+| $t$ | Hours elapsed since consumption |
+| $t_{1/2}$ | Half-life (default **5 hours**; configurable 1–24 h) |
 
-The total caffeine in system at any moment is the sum over all entries:
+The total caffeine in system at any moment is the sum over all logged entries:
 
-```
-Total(t) = Σᵢ  doseᵢ × 0.5^((t − tᵢ) / t½)
-```
+$$\text{Total}(t) = \sum_i d_i \times 0.5^{\,(t - t_i)\, /\, t_{1/2}}$$
 
-**Peak calculation** — peak is checked at the exact timestamp of each entry consumed today, not by sampling. This is correct because caffeine levels can only reach a local maximum immediately after consumption; they decay continuously afterwards. For example: 50 mg at 09:00 followed by 120 mg at 14:00 gives a peak of `50 × 0.5^(5/5) + 120 = 145 mg` at 14:00, not 170 mg.
+**Peak calculation** — peak is sampled at the exact timestamp of each entry consumed today, not by interval sampling. This is correct because caffeine can only reach a local maximum immediately after a dose; it decays continuously thereafter. For example: 50 mg at 09:00 followed by 120 mg at 14:00 gives a peak of $50 \times 0.5^{5/5} + 120 = 145\ \text{mg}$ at 14:00, not 170 mg.
 
 **Typical half-life values:**
 
-| Population | t½ |
-|------------|----|
+| Population | $t_{1/2}$ |
+|------------|-----------|
 | Healthy non-smoker adult | 3–5 hours |
 | Oral contraceptive users | ~6–12 hours |
 | Smokers | ~3 hours |
@@ -105,18 +101,19 @@ Entries are **never auto-deleted** from localStorage. The recent entries list fi
 
 ### 7-Day Forecast — Holt-Winters Triple Exponential Smoothing
 
-When ≥ 14 days of history exist, the forecast uses the **additive Holt-Winters** model with weekly seasonality (m = 7):
+When ≥ 14 days of history exist, the forecast uses the **additive Holt-Winters** model with weekly seasonality ($m = 7$):
 
-```
-Level:    Lₜ = α(yₜ − Sₜ₋ₘ) + (1−α)(Lₜ₋₁ + Tₜ₋₁)
-Trend:    Tₜ = β(Lₜ − Lₜ₋₁) + (1−β)Tₜ₋₁
-Seasonal: Sₜ = γ(yₜ − Lₜ) + (1−γ)Sₜ₋ₘ
-Forecast: ŷₜ₊ₕ = Lₜ + h·Tₜ + Sₜ₋ₘ₊(h mod m)
-```
+$$L_t = \alpha(y_t - S_{t-m}) + (1-\alpha)(L_{t-1} + T_{t-1})$$
 
-Parameters: α = 0.3 (level), β = 0.1 (trend), γ = 0.2 (seasonal)
+$$T_t = \beta(L_t - L_{t-1}) + (1-\beta)\,T_{t-1}$$
 
-80% prediction interval: `ŷ ± 1.28 × RMSE × √h`
+$$S_t = \gamma(y_t - L_t) + (1-\gamma)\,S_{t-m}$$
+
+$$\hat{y}_{t+h} = L_t + h \cdot T_t + S_{t-m+(h \bmod m)}$$
+
+Parameters: $\alpha = 0.3$ (level), $\beta = 0.1$ (trend), $\gamma = 0.2$ (seasonal)
+
+80% prediction interval: $\hat{y} \pm 1.28 \times \text{RMSE} \times \sqrt{h}$
 
 Falls back to **double exponential smoothing** (no seasonal component) when < 14 days of history are available.
 
@@ -126,13 +123,11 @@ Each entry contributes a Gaussian kernel centred on its hour-of-day, scaled by i
 
 ### Bedtime Caffeine
 
-Applies the full decay model to estimate `Total(23:00)` for each day in history — the caffeine level at 11 pm, which is most relevant for sleep quality.
+Applies the full decay model to estimate $\text{Total}(23{:}00)$ for each day in history — the caffeine level at 11 pm, which is most relevant for sleep quality.
 
 ---
 
 ## Live Episode Page
-
-The episode window is defined dynamically:
 
 ```mermaid
 flowchart TD
