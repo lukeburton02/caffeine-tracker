@@ -1627,10 +1627,10 @@ async function linkBackupFolder() {
 async function initBackup() {
     await checkServerAvailable();
 
-    const statusEl = document.getElementById('backup-status');
-    const noteEl = document.getElementById('backup-note');
-    const btnEl = document.getElementById('backup-link');
-    const rowEl = document.querySelector('.backup-row');
+    const statusEl     = document.getElementById('backup-status');
+    const noteEl       = document.getElementById('backup-note');
+    const btnEl        = document.getElementById('backup-link');
+    const sectionEl    = document.getElementById('backup-section');
 
     if (serverAvailable) {
         // Running locally via npm run dev — server handles saving automatically
@@ -1655,9 +1655,8 @@ async function initBackup() {
         backupDirHandle = await getDBValue('backupDir');
         updateBackupStatus();
     } else {
-        // Deployed version, Safari/Firefox — hide row (no option available)
-        if (rowEl) rowEl.style.display = 'none';
-        if (noteEl) noteEl.style.display = 'none';
+        // Deployed version, Safari/Firefox — hide backup controls (API unavailable)
+        if (sectionEl) sectionEl.style.display = 'none';
     }
 }
 
