@@ -2115,22 +2115,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Page navigation (3 pages: 0=main, 1=analysis, 2=episode)
     const pagesTrack = document.getElementById('pages-track');
-    const navRight   = document.getElementById('nav-right');
-    const navLeft    = document.getElementById('nav-left');
+    const tabBtns    = document.querySelectorAll('.tab-btn');
     let currentPage  = 0;
 
-    const PAGE_LABELS_RIGHT = ['Analysis', 'Live', null];
-    const PAGE_LABELS_LEFT  = [null, 'Main', 'Analysis'];
-    const PAGE_TRACK_CLASS  = [null, 'on-analysis', 'on-episode'];
+    const PAGE_TRACK_CLASS = [null, 'on-analysis', 'on-episode'];
 
     function navigateTo(page) {
         pagesTrack.classList.remove('on-analysis', 'on-episode');
         if (PAGE_TRACK_CLASS[page]) pagesTrack.classList.add(PAGE_TRACK_CLASS[page]);
 
-        navRight.textContent = PAGE_LABELS_RIGHT[page] || '';
-        navLeft.textContent  = PAGE_LABELS_LEFT[page]  || '';
-        navRight.classList.toggle('hidden', !PAGE_LABELS_RIGHT[page]);
-        navLeft.classList.toggle('hidden',  !PAGE_LABELS_LEFT[page]);
+        tabBtns.forEach(btn => btn.classList.toggle('active', +btn.dataset.page === page));
 
         if (page === 2) {
             buildEpisodeCurve();
@@ -2141,8 +2135,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPage = page;
     }
 
-    navRight.addEventListener('click', () => navigateTo(Math.min(currentPage + 1, 2)));
-    navLeft.addEventListener('click',  () => navigateTo(Math.max(currentPage - 1, 0)));
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => navigateTo(+btn.dataset.page));
+    });
 
     // Forecast panel info tooltip (click toggle)
     const infoBtn     = document.getElementById('forecast-info-btn');

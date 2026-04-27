@@ -20,9 +20,12 @@
 </head>
 <body>
 
-    <!-- Page navigation arrows -->
-    <button type="button" class="page-nav page-nav-right" id="nav-right">Analysis</button>
-    <button type="button" class="page-nav page-nav-left hidden" id="nav-left">Main</button>
+    <!-- Tab bar navigation -->
+    <nav class="tab-bar" aria-label="Page navigation">
+        <button type="button" class="tab-btn active" data-page="0">Main</button>
+        <button type="button" class="tab-btn" data-page="1">Analysis</button>
+        <button type="button" class="tab-btn" data-page="2">Live</button>
+    </nav>
     <button type="button" class="gear-btn" id="open-settings" aria-label="Settings">&#9881;</button>
 
     <div class="pages-wrapper">
