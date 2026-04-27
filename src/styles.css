@@ -397,6 +397,7 @@ body {
 .datetime-row {
     display: flex;
     gap: 10px;
+    margin-bottom: 10px;
 }
 
 .datetime-row input[type="date"],
