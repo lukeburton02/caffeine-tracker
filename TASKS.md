@@ -293,7 +293,6 @@
 ---
 
 ## Future Enhancements
-- [ ] Caffeine-free streaks panel (potential future addition)
 - [x] **Dark mode** — toggle switch added
 - [ ] Cloud sync — **IMPORTANT: review LSHTM's policies on third-party cloud services before implementing**
 - [ ] Native Android app (very low priority)
