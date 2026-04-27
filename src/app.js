@@ -1855,7 +1855,7 @@ function drawEpisodeFrame() {
     const nowMs  = Date.now();
     const { points, episodeStartMs, episodeEndMs } = episodeCurve;
 
-    const PAD_L = 52, PAD_R = 24, PAD_T = 20, PAD_B = 38;
+    const PAD_L = 60, PAD_R = 28, PAD_T = 20, PAD_B = 44;
     const chartW = cssW - PAD_L - PAD_R;
     const chartH = cssH - PAD_T - PAD_B;
 
@@ -1875,10 +1875,10 @@ function drawEpisodeFrame() {
         ctx.lineWidth   = 1;
         ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(PAD_L + chartW, y); ctx.stroke();
         ctx.fillStyle   = C.yLabel;
-        ctx.font        = '10px sans-serif';
+        ctx.font        = '12px sans-serif';
         ctx.textAlign   = 'right';
         ctx.textBaseline = 'middle';
-        ctx.fillText(v + 'mg', PAD_L - 5, y);
+        ctx.fillText(v + 'mg', PAD_L - 7, y);
     }
 
     // 5mg threshold line
@@ -1888,11 +1888,11 @@ function drawEpisodeFrame() {
     ctx.setLineDash([4, 4]);
     ctx.beginPath(); ctx.moveTo(PAD_L, threshY); ctx.lineTo(PAD_L + chartW, threshY); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle   = dark ? 'rgba(231,76,60,0.5)' : 'rgba(231,76,60,0.55)';
-    ctx.font        = '9px sans-serif';
+    ctx.fillStyle   = dark ? 'rgba(231,76,60,0.7)' : 'rgba(231,76,60,0.75)';
+    ctx.font        = '11px sans-serif';
     ctx.textAlign   = 'left';
     ctx.textBaseline = 'bottom';
-    ctx.fillText('5mg', PAD_L + 3, threshY - 2);
+    ctx.fillText('5mg', PAD_L + 4, threshY - 3);
 
     // X-axis time labels
     const totalMs  = tMax - tMin;
@@ -1902,7 +1902,7 @@ function drawEpisodeFrame() {
     const msPerPx  = totalMs / chartW;
 
     ctx.fillStyle   = C.dateLabel;
-    ctx.font        = '10px sans-serif';
+    ctx.font        = '12px sans-serif';
     ctx.textAlign   = 'center';
     ctx.textBaseline = 'top';
 
@@ -1991,10 +1991,10 @@ function drawEpisodeFrame() {
 
     // "Now" x-axis label
     ctx.fillStyle    = C.todayLabel;
-    ctx.font         = '600 10px sans-serif';
+    ctx.font         = '600 12px sans-serif';
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText('Now', nowX, PAD_T + chartH + 5);
+    ctx.fillText('Now', nowX, PAD_T + chartH + 6);
 }
 
 function startEpisodeAnimation() {
