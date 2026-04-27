@@ -2056,6 +2056,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('export-csv').addEventListener('click', exportCSV);
     document.getElementById('export-json').addEventListener('click', exportJSON);
 
+    // Settings modal
+    const settingsModal = document.getElementById('settings-modal');
+    document.getElementById('open-settings').addEventListener('click', () => {
+        settingsModal.style.display = 'flex';
+    });
+    document.getElementById('close-settings').addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+    });
+    settingsModal.addEventListener('click', e => {
+        if (e.target === settingsModal) settingsModal.style.display = 'none';
+    });
+
     document.getElementById('open-history-editor').addEventListener('click', openHistoryEditor);
     document.getElementById('close-history-editor').addEventListener('click', closeHistoryEditor);
     document.getElementById('history-editor-modal').addEventListener('click', e => {

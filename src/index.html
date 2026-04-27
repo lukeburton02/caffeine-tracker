@@ -23,6 +23,7 @@
     <!-- Page navigation arrows -->
     <button type="button" class="page-nav page-nav-right" id="nav-right">Analysis</button>
     <button type="button" class="page-nav page-nav-left hidden" id="nav-left">Main</button>
+    <button type="button" class="gear-btn" id="open-settings" aria-label="Settings">&#9881;</button>
 
     <div class="pages-wrapper">
     <div class="pages-track" id="pages-track">
@@ -152,43 +153,6 @@
                 <p class="history-empty" id="history-empty" style="display:none">No history yet — log your first entry to see the chart.</p>
             </section>
 
-            <section class="export-section">
-                <button type="button" class="btn-export" id="export-csv">Download CSV</button>
-                <button type="button" class="btn-export" id="export-json">Download JSON</button>
-            </section>
-
-            <!-- Settings -->
-            <section class="settings-section">
-                <h2 class="section-title">Settings</h2>
-                <div class="theme-row">
-                    <span class="backup-label">Dark mode</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="theme-toggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="halflife-row">
-                    <label for="halflife-input">Half-life (hours)</label>
-                    <input type="number" id="halflife-input" min="1" max="24" step="0.5">
-                    <button type="button" class="btn-save" id="halflife-save">Save</button>
-                    <button type="button" class="btn-reset" id="halflife-reset">Reset</button>
-                </div>
-                <p class="halflife-note">Default is 5 hours. Caffeine half-life varies by individual (typically 3–7 hrs).</p>
-
-                <div class="backup-row">
-                    <span class="backup-label">Local backup</span>
-                    <span id="backup-status" class="backup-status">Not linked</span>
-                    <button type="button" class="btn-backup" id="backup-link">Link folder</button>
-                </div>
-                <p class="halflife-note" id="backup-note">Link a local folder to auto-save your data as caffeine_data.json after each change.</p>
-
-                <div class="backup-row">
-                    <span class="backup-label">Import backup</span>
-                    <button type="button" class="btn-backup" id="import-backup">Import JSON</button>
-                    <input type="file" id="import-backup-file" accept=".json" style="display:none">
-                </div>
-                <p class="halflife-note">Restore from a caffeine_data.json backup file. New entries are merged with existing data.</p>
-            </section>
 
         </div>
 
@@ -271,6 +235,68 @@
 
     </div><!-- end .pages-track -->
     </div><!-- end .pages-wrapper -->
+
+    <!-- Settings modal -->
+    <div id="settings-modal" class="modal-overlay" style="display:none" aria-modal="true" role="dialog" aria-label="Settings">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Settings</h2>
+                <button type="button" id="close-settings" class="modal-close" aria-label="Close">&#10005;</button>
+            </div>
+            <div class="settings-modal-body">
+
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Appearance</h3>
+                    <div class="settings-row">
+                        <span class="settings-label">Dark mode</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Caffeine Half-Life</h3>
+                    <div class="settings-row">
+                        <label for="halflife-input" class="settings-label">Hours</label>
+                        <div class="halflife-controls">
+                            <input type="number" id="halflife-input" min="1" max="24" step="0.5">
+                            <button type="button" class="btn-save" id="halflife-save">Save</button>
+                            <button type="button" class="btn-reset" id="halflife-reset">Reset</button>
+                        </div>
+                    </div>
+                    <p class="settings-note">Default is 5 hours. Individual variation is typically 3–7 hrs.</p>
+                </div>
+
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Data</h3>
+                    <div class="settings-row">
+                        <span class="settings-label">Export</span>
+                        <div class="export-controls">
+                            <button type="button" class="btn-export" id="export-csv">Download CSV</button>
+                            <button type="button" class="btn-export" id="export-json">Download JSON</button>
+                        </div>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">Local backup</span>
+                        <div class="export-controls">
+                            <span id="backup-status" class="backup-status">Not linked</span>
+                            <button type="button" class="btn-backup" id="backup-link">Link folder</button>
+                        </div>
+                    </div>
+                    <p class="settings-note" id="backup-note">Link a local folder to auto-save as caffeine_data.json after each change.</p>
+                    <div class="settings-row">
+                        <span class="settings-label">Import backup</span>
+                        <button type="button" class="btn-backup" id="import-backup">Import JSON</button>
+                        <input type="file" id="import-backup-file" accept=".json" style="display:none">
+                    </div>
+                    <p class="settings-note">Restore from a caffeine_data.json file. New entries are merged with existing data.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <!-- History editor modal -->
     <div id="history-editor-modal" class="modal-overlay" style="display:none" aria-modal="true" role="dialog" aria-label="All Entries">

@@ -800,7 +800,7 @@ body {
     background: white;
 }
 
-.halflife-row .btn-save {
+.btn-save {
     padding: 10px 16px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
@@ -812,11 +812,11 @@ body {
     transition: opacity 0.15s;
 }
 
-.halflife-row .btn-save:hover {
+.btn-save:hover {
     opacity: 0.9;
 }
 
-.halflife-row .btn-reset {
+.btn-reset {
     padding: 10px 16px;
     background: #f0f0f0;
     color: #888;
@@ -828,7 +828,7 @@ body {
     transition: background 0.15s;
 }
 
-.halflife-row .btn-reset:hover {
+.btn-reset:hover {
     background: #e5e5e5;
 }
 
@@ -965,6 +965,109 @@ body {
 .modal-close:hover {
     color: #555;
     background: #f5f5f5;
+}
+
+/* --- Gear / settings button --- */
+
+.gear-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 200;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.28);
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.gear-btn:hover {
+    background: rgba(0,0,0,0.42);
+}
+
+/* --- Settings modal body --- */
+
+.settings-modal-body {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0 20px;
+}
+
+.settings-group {
+    padding: 16px 24px 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-group:last-child {
+    border-bottom: none;
+}
+
+.settings-group-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.settings-label {
+    font-size: 0.9rem;
+    color: #555;
+    flex-shrink: 0;
+    min-width: 110px;
+}
+
+.halflife-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.halflife-controls input[type="number"] {
+    width: 72px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    outline: none;
+    color: #2c3e50;
+    background: #fafafa;
+    transition: border-color 0.2s;
+}
+
+.halflife-controls input[type="number"]:focus {
+    border-color: #667eea;
+    background: white;
+}
+
+.export-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.settings-note {
+    font-size: 0.78rem;
+    color: #bbb;
+    line-height: 1.4;
+    margin-bottom: 12px;
 }
 
 .history-editor-list {
@@ -1243,41 +1346,46 @@ html[data-theme="dark"] .entry-time {
     color: #52536e;
 }
 
-html[data-theme="dark"] .settings-section {
-    border-top-color: #32334e;
-}
-
-html[data-theme="dark"] .halflife-row label,
+html[data-theme="dark"] .settings-label,
 html[data-theme="dark"] .backup-label {
     color: #9a9bb8;
 }
 
-html[data-theme="dark"] .halflife-row input[type="number"] {
+html[data-theme="dark"] .halflife-controls input[type="number"] {
     border-color: #32334e;
     background: #252636;
     color: #e2e4f0;
 }
 
-html[data-theme="dark"] .halflife-row input[type="number"]:focus {
+html[data-theme="dark"] .halflife-controls input[type="number"]:focus {
     background: #2c2d45;
 }
 
-html[data-theme="dark"] .halflife-row .btn-reset,
+html[data-theme="dark"] .btn-reset,
 html[data-theme="dark"] .btn-backup {
     background: #252636;
     color: #9a9bb8;
 }
 
-html[data-theme="dark"] .halflife-row .btn-reset:hover,
+html[data-theme="dark"] .btn-reset:hover,
 html[data-theme="dark"] .btn-backup:hover {
     background: #2c2d45;
 }
 
+html[data-theme="dark"] .settings-note,
 html[data-theme="dark"] .halflife-note {
     color: #3e3f58;
 }
 
 html[data-theme="dark"] .backup-status {
+    color: #52536e;
+}
+
+html[data-theme="dark"] .settings-group {
+    border-bottom-color: #32334e;
+}
+
+html[data-theme="dark"] .settings-group-title {
     color: #52536e;
 }
 
