@@ -145,8 +145,11 @@
                     <span id="history-window-label" class="history-window-label"></span>
                     <button type="button" id="history-next" class="history-nav-btn">&#8594;</button>
                 </div>
-                <div class="history-chart-container" id="history-chart-container">
-                    <canvas id="history-chart"></canvas>
+                <div class="history-chart-wrap" id="history-chart-wrap">
+                    <canvas id="history-yaxis" class="history-yaxis-overlay"></canvas>
+                    <div class="history-chart-container" id="history-chart-container">
+                        <canvas id="history-chart"></canvas>
+                    </div>
                 </div>
                 <p class="history-empty" id="history-empty" style="display:none">No history yet — log your first entry to see the chart.</p>
             </section>

@@ -518,6 +518,19 @@ body {
     color: #888;
 }
 
+.history-chart-wrap {
+    position: relative;
+}
+
+.history-yaxis-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    pointer-events: none;
+    display: block;
+}
+
 .history-chart-container {
     overflow-x: auto;
     /* No border-radius here: Safari composites scroll containers separately,

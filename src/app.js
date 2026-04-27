@@ -1095,6 +1095,7 @@ function drawHistoryChart() {
     const dayX = i => PAD_LEFT + i * DAY_W + DAY_W / 2;
 
     const C = getChartColors();
+    const dark = isDarkMode();
 
     // Y-axis gridlines and labels
     const gridSteps = [0, Math.round(maxVal / 2), maxVal];
@@ -1113,6 +1114,31 @@ function drawHistoryChart() {
         ctx.textBaseline = 'middle';
         ctx.fillText(v + 'mg', PAD_LEFT - 5, y);
     });
+
+    // Draw y-axis labels onto fixed overlay canvas so they stay visible while scrolling
+    const yAxis = document.getElementById('history-yaxis');
+    if (yAxis && historyMode === 'all') {
+        yAxis.style.display = 'block';
+        yAxis.style.width  = PAD_LEFT + 'px';
+        yAxis.style.height = cssH + 'px';
+        yAxis.width  = Math.round(PAD_LEFT * dpr);
+        yAxis.height = Math.round(cssH * dpr);
+        const yCtx = yAxis.getContext('2d');
+        yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        // Fill with panel background to cover scrolled chart content behind it
+        yCtx.fillStyle = dark ? '#1a1b2e' : 'rgba(255,255,255,0.97)';
+        yCtx.fillRect(0, 0, PAD_LEFT, cssH);
+        gridSteps.forEach(v => {
+            const y = scaleY(v);
+            yCtx.fillStyle = C.yLabel;
+            yCtx.font = '10px sans-serif';
+            yCtx.textAlign = 'right';
+            yCtx.textBaseline = 'middle';
+            yCtx.fillText(v + 'mg', PAD_LEFT - 5, y);
+        });
+    } else if (yAxis) {
+        yAxis.style.display = 'none';
+    }
 
     // Month boundary vertical dashed lines
     days.forEach((day, i) => {
