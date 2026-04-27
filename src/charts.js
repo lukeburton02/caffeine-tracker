@@ -547,7 +547,7 @@ export function drawBedtimeCaffeine() {
     // long: >180 days — ghost line (no dots), trend dominant + SD band
     const mode = n <= 60 ? 'short' : n <= 180 ? 'medium' : 'long';
     const showTrend = bedtimeTrendEnabled && n >= 14;
-    const rawOpacity = showTrend ? (mode === 'long' ? 0.25 : mode === 'medium' ? 0.5 : 0.6) : 1;
+    const rawOpacity = showTrend ? (mode === 'long' ? 0.25 : mode === 'medium' ? 0.4 : 0.35) : 1;
     const rawLineWidth = showTrend ? (mode === 'long' ? 1 : mode === 'medium' ? 1.5 : 2) : 2;
     const dotRadius = showTrend ? (mode === 'short' ? 3.5 : mode === 'medium' ? 2 : 0) : 3.5;
     const dotCenterRadius = showTrend && mode !== 'short' ? 1.2 : 2;
