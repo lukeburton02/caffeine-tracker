@@ -73,18 +73,13 @@ body {
 .page {
     width: 100vw;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
     padding: 72px 20px 40px;
 }
 
 /* --- Episode (live) page --- */
 
 .page-episode {
-    padding: 40px 20px;
-    align-items: stretch;
-    min-height: 100vh;
+    padding: 72px 20px 40px;
 }
 
 .episode-container {
@@ -145,8 +140,6 @@ body {
 
 .page-analysis {
     padding: 72px 24px 24px;
-    align-items: stretch;
-    min-height: 100vh;
 }
 
 .analysis-grid {
