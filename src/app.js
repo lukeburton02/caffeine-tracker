@@ -1125,11 +1125,19 @@ function drawHistoryChart() {
         yAxis.height = Math.round(cssH * dpr);
         const yCtx = yAxis.getContext('2d');
         yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        // Fill with panel background to cover scrolled chart content behind it
-        yCtx.fillStyle = dark ? '#1a1b2e' : 'rgba(255,255,255,0.97)';
+        // Match the exact panel background (canvas default is transparent, showing white panel)
+        yCtx.fillStyle = dark ? '#1a1b2e' : '#ffffff';
         yCtx.fillRect(0, 0, PAD_LEFT, cssH);
         gridSteps.forEach(v => {
             const y = scaleY(v);
+            // Extend gridlines into the overlay so they look continuous
+            yCtx.strokeStyle = C.gridLine;
+            yCtx.lineWidth = 1;
+            yCtx.beginPath();
+            yCtx.moveTo(0, y);
+            yCtx.lineTo(PAD_LEFT, y);
+            yCtx.stroke();
+            // Label
             yCtx.fillStyle = C.yLabel;
             yCtx.font = '10px sans-serif';
             yCtx.textAlign = 'right';
