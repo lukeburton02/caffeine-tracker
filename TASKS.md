@@ -299,6 +299,19 @@
 
 ---
 
+## Phase 12: Bedtime Caffeine Chart Density Handling
+
+### Task 12.1: Adaptive display based on history length
+- [ ] Decide density thresholds: e.g. ≤60 days → dots + line as now; ≤180 days → dots shrink, line thins + trend overlay; >180 days → dots hidden, line faded to ghost, trend line dominant
+- [ ] Implement a **LOESS-style local regression trend line** overlaid on the existing dot/line plot:
+  - Gaussian-weighted moving average: each output point is a weighted mean of neighbouring values, weight = exp(−(Δi/bandwidth)²)
+  - Bandwidth auto-scales with history length (wider = smoother for longer histories)
+  - Trend line drawn on top in a solid, slightly thicker stroke (e.g. `#764ba2` at full opacity)
+  - Underlying dot/line plot drawn first at reduced opacity (e.g. 0.35) so trend dominates visually but data remains readable — analogous to `geom_smooth` layered over `geom_line + geom_point` in ggplot2
+- [ ] Consider whether to add a shaded ±1 SD confidence band around the trend (like `geom_smooth(se=TRUE)`), drawn as a filled area at low opacity before the trend line
+
+---
+
 ## Notes
 - Primary device: Mac (Safari and Chrome)
 - Secondary device: Android phone (when network connectivity allows)
