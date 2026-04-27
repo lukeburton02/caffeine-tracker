@@ -772,9 +772,13 @@ export function drawHistoryChart() {
         const y = scaleY(v);
         ctx.strokeStyle = C.gridLine; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(PAD_LEFT, y); ctx.lineTo(cssW - PAD_RIGHT, y); ctx.stroke();
-        ctx.fillStyle = C.yLabel; ctx.font = '10px sans-serif';
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        ctx.fillText(v + 'mg', PAD_LEFT - 5, y);
+        // In window mode the overlay is hidden so draw labels on main canvas; in all-time mode
+        // the overlay draws its own labels, so skip here to avoid anything leaking under the overlay.
+        if (historyMode !== 'all') {
+            ctx.fillStyle = C.yLabel; ctx.font = '10px sans-serif';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText(v + 'mg', PAD_LEFT - 5, y);
+        }
     });
 
     const yAxis = document.getElementById('history-yaxis');
@@ -786,8 +790,7 @@ export function drawHistoryChart() {
         yAxis.height = Math.round(cssH * dpr);
         const yCtx = yAxis.getContext('2d');
         yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        yCtx.fillStyle = dark ? '#1a1b2e' : 'rgba(255,255,255,0.97)';
-        yCtx.fillRect(0, 0, PAD_LEFT, cssH);
+        yCtx.clearRect(0, 0, PAD_LEFT, cssH);
         gridSteps.forEach(v => {
             const y = scaleY(v);
             yCtx.strokeStyle = C.gridLine; yCtx.lineWidth = 1;

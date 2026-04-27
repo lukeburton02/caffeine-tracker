@@ -605,6 +605,11 @@ html[data-theme="dark"] .trend-toggle.active {
     z-index: 2;
     pointer-events: none;
     display: block;
+    background: rgba(255, 255, 255, 0.97);
+}
+
+html[data-theme="dark"] .history-yaxis-overlay {
+    background: #1a1b2e;
 }
 
 .history-chart-container {
