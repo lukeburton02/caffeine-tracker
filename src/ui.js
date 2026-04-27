@@ -1,4 +1,4 @@
-import { getHalfLife, calculateCurrentCaffeine } from './calculations.js';
+import { getHalfLife, calculateCurrentCaffeine, getCaffeineAtTime } from './calculations.js';
 import { getEntries } from './storage.js';
 
 const HIGH_THRESHOLD = 200;
@@ -143,6 +143,68 @@ export function checkHighWarning() {
 
 export function updateHalfLifeDisplay() {
     document.getElementById('halflife-input').value = getHalfLife();
+}
+
+// --- Analysis summary strip ---
+
+export function updateAnalysisSummary() {
+    const el = document.getElementById('analysis-summary');
+    if (!el) return;
+    const entries = getEntries();
+    if (entries.length === 0) { el.textContent = ''; return; }
+
+    const now = new Date();
+    const halfLife = getHalfLife();
+    const DAYS = 28;
+
+    // 28-day daily average
+    const cutoff = new Date(now.getTime() - DAYS * 24 * 60 * 60 * 1000);
+    const total28 = entries.filter(e => new Date(e.timestamp) >= cutoff).reduce((s, e) => s + e.amount, 0);
+    const avg28 = Math.round(total28 / DAYS);
+
+    // Usual peak time: median peak across days that had entries, rounded to nearest 30 min
+    const peakMinutes = [];
+    for (let i = 0; i < DAYS; i++) {
+        const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        const dayEnd   = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+        const dayEntries = entries.filter(e => { const t = new Date(e.timestamp); return t >= dayStart && t < dayEnd; });
+        if (dayEntries.length === 0) continue;
+        let peakMg = 0, peakTime = null;
+        dayEntries.forEach(de => {
+            const t = new Date(de.timestamp);
+            const level = entries.reduce((sum, e) => {
+                const h = (t - new Date(e.timestamp)) / 3600000;
+                return h < 0 ? sum : sum + e.amount * Math.pow(0.5, h / halfLife);
+            }, 0);
+            if (level > peakMg) { peakMg = level; peakTime = t; }
+        });
+        if (peakTime) peakMinutes.push(peakTime.getHours() * 60 + peakTime.getMinutes());
+    }
+    let peakStr = '—';
+    if (peakMinutes.length > 0) {
+        peakMinutes.sort((a, b) => a - b);
+        const median = peakMinutes[Math.floor(peakMinutes.length / 2)];
+        const rounded = Math.round(median / 30) * 30;
+        const h = Math.floor(rounded / 60) % 24;
+        const m = rounded % 60;
+        const ampm = h >= 12 ? 'pm' : 'am';
+        peakStr = `${h % 12 || 12}:${String(m).padStart(2, '0')}${ampm}`;
+    }
+
+    // Average bedtime caffeine (last 28 days)
+    let bedtimeSum = 0;
+    for (let i = 0; i < DAYS; i++) {
+        const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        bedtimeSum += getCaffeineAtTime(entries, new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 0, 0));
+    }
+    const avgBedtime = Math.round(bedtimeSum / DAYS);
+
+    el.innerHTML =
+        `<span>28-day avg: <strong>${avg28}mg</strong></span>` +
+        `<span class="summary-sep">·</span>` +
+        `<span>Usual peak: <strong>${peakStr}</strong></span>` +
+        `<span class="summary-sep">·</span>` +
+        `<span>Avg bedtime: <strong>${avgBedtime}mg</strong></span>`;
 }
 
 // --- History editor modal ---

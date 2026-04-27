@@ -883,9 +883,10 @@ export function buildEpisodeCurve() {
     const nowMs      = Date.now();
     const THRESH     = EPISODE_THRESHOLD_MG;
     const currentLevel = computeLevelAt(nowMs, entries, halfLifeMs);
-    let episodeStartMs, episodeEndMs;
+    let episodeStartMs, episodeEndMs, hadHistory;
 
     if (currentLevel >= THRESH) {
+        hadHistory = true;
         episodeStartMs = nowMs - EPISODE_MAX_LOOKBACK;
         for (let t = nowMs - EPISODE_STEP_MS; t >= nowMs - EPISODE_MAX_LOOKBACK; t -= EPISODE_STEP_MS) {
             if (computeLevelAt(t, entries, halfLifeMs) < THRESH) { episodeStartMs = t; break; }
@@ -900,9 +901,11 @@ export function buildEpisodeCurve() {
             if (computeLevelAt(t, entries, halfLifeMs) >= THRESH) { lastAboveMs = t; break; }
         }
         if (!lastAboveMs) {
+            hadHistory = false;
             episodeStartMs = nowMs - 12 * 3600 * 1000;
             episodeEndMs   = nowMs;
         } else {
+            hadHistory = true;
             episodeStartMs = nowMs - EPISODE_MAX_LOOKBACK;
             for (let t = lastAboveMs - EPISODE_STEP_MS; t >= nowMs - EPISODE_MAX_LOOKBACK; t -= EPISODE_STEP_MS) {
                 if (computeLevelAt(t, entries, halfLifeMs) < THRESH) { episodeStartMs = t; break; }
@@ -922,7 +925,7 @@ export function buildEpisodeCurve() {
     for (let t = episodeStartMs; t <= episodeEndMs; t += EPISODE_STEP_MS) {
         points.push({ t, mg: computeLevelAt(t, entries, halfLifeMs) });
     }
-    episodeCurve = { points, episodeStartMs, episodeEndMs, currentLevel, builtAtMs: nowMs };
+    episodeCurve = { points, episodeStartMs, episodeEndMs, currentLevel, builtAtMs: nowMs, hadHistory };
     updateEpisodeSubtitle();
 }
 
@@ -943,9 +946,11 @@ function updateEpisodeSubtitle() {
     if (level) level.textContent = currentLevel.toFixed(1) + ' mg now';
     if (currentLevel >= EPISODE_THRESHOLD_MG) {
         sub.textContent = `Episode started ${fmtDuration(nowMs - episodeStartMs)} ago · clears in ~${fmtDuration(episodeEndMs - nowMs)}`;
+    } else if (episodeCurve.hadHistory) {
+        const clearTime = new Date(episodeCurve.episodeEndMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        sub.textContent = `Clear since ${clearTime}`;
     } else {
-        const ended = fmtDuration(nowMs - episodeEndMs);
-        sub.textContent = ended === '0m' ? 'No active episode' : `No active episode · last ended ${ended} ago`;
+        sub.textContent = 'No active episode';
     }
 }
 

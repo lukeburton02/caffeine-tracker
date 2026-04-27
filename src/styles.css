@@ -139,7 +139,27 @@ body {
 /* --- Analysis page --- */
 
 .page-analysis {
-    padding: 72px 24px 24px;
+    padding: 68px 24px 24px;
+}
+
+.analysis-summary-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 14px;
+    padding: 0 2px;
+}
+
+.analysis-summary-strip strong {
+    color: rgba(255, 255, 255, 0.88);
+    font-weight: 600;
+}
+
+.summary-sep {
+    color: rgba(255, 255, 255, 0.3);
 }
 
 .analysis-grid {

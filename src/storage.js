@@ -41,6 +41,7 @@ export function deleteEntry(id) {
 export let serverAvailable = false;
 
 export async function checkServerAvailable() {
+    if (!/^(localhost|127\.)/.test(location.hostname)) { serverAvailable = false; return; }
     try {
         const res = await fetch('/api/load', { method: 'GET' });
         serverAvailable = res.ok;

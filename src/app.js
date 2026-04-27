@@ -13,6 +13,7 @@ import {
 import {
     getTotalCurrentCaffeine, updateLevelDisplay, renderEntries,
     updateSummary, checkHighWarning, updateHalfLifeDisplay,
+    updateAnalysisSummary,
     openHistoryEditor, closeHistoryEditor, renderHistoryEditor
 } from './ui.js';
 const THEME_KEY = 'caffeine_theme';
@@ -42,6 +43,7 @@ function refreshAll() {
     updateLevelDisplay();
     checkHighWarning();
     updateSummary();
+    updateAnalysisSummary();
     drawWeeklyChart();
     drawHistoryChart();
     drawForecast();
