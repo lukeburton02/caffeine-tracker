@@ -310,6 +310,18 @@
 
 ---
 
+## Maintenance
+
+### GitHub Actions — Node.js 20 deprecation
+- [ ] **Before 2026-06-02**: bump all four action versions in `.github/workflows/deploy.yml` to their then-current major releases, or set `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` to opt in early
+  - `actions/checkout@v4`
+  - `actions/configure-pages@v4`
+  - `actions/upload-pages-artifact@v3`
+  - `actions/deploy-pages@v4`
+- Hard deadline: **2026-09-16** (Node.js 20 removed from runners entirely)
+
+---
+
 ## Notes
 - Primary device: Mac (Safari and Chrome)
 - Secondary device: Android phone (when network connectivity allows)

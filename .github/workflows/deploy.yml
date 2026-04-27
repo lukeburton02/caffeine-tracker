@@ -19,6 +19,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # Action versions pinned 2026-04-27. Node.js 20 removed from runners 2026-09-16;
+    # bump all four to their then-current major versions before that date.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v4
