@@ -286,6 +286,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 28px;
+    min-width: 0;
 }
 
 @media (max-width: 800px) {
