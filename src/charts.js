@@ -28,11 +28,14 @@ function getChartColors() {
 
 let historyMode = 'all';       // 'all' | 'window'
 let historyWindowOffset = 0;   // days before today for the window end (0 = today)
+let bedtimeTrendEnabled = false;
 
 export function getHistoryMode() { return historyMode; }
 export function setHistoryMode(m) { historyMode = m; }
 export function getHistoryWindowOffset() { return historyWindowOffset; }
 export function setHistoryWindowOffset(v) { historyWindowOffset = v; }
+export function getBedtimeTrendEnabled() { return bedtimeTrendEnabled; }
+export function setBedtimeTrendEnabled(v) { bedtimeTrendEnabled = v; }
 
 // --- Weekly chart ---
 
@@ -484,6 +487,28 @@ export function drawTimeOfDay() {
 
 const BEDTIME_HOUR = 23;
 
+// Gaussian-weighted moving average (LOESS-style trend).
+// Returns { smoothed: number[], sd: number[] } — weighted mean and weighted SD at each point.
+function gaussianSmooth(values, bandwidth) {
+    const smoothed = values.map((_, i) => {
+        let wSum = 0, vSum = 0;
+        values.forEach((v, j) => {
+            const w = Math.exp(-((i - j) / bandwidth) ** 2);
+            wSum += w; vSum += w * v;
+        });
+        return vSum / wSum;
+    });
+    const sd = smoothed.map((s, i) => {
+        let wSum = 0, vSum = 0;
+        values.forEach((v, j) => {
+            const w = Math.exp(-((i - j) / bandwidth) ** 2);
+            wSum += w; vSum += w * (v - s) ** 2;
+        });
+        return Math.sqrt(vSum / wSum);
+    });
+    return { smoothed, sd };
+}
+
 export function drawBedtimeCaffeine() {
     const canvas = document.getElementById('bedtime-chart');
     if (!canvas) return;
@@ -511,6 +536,20 @@ export function drawBedtimeCaffeine() {
         return { date, value: getCaffeineAtTime(entries, bedtime) };
     });
 
+    const n = points.length;
+
+    // Adaptive display mode based on history length
+    // short: ≤60 days — full dots + line, no trend
+    // medium: ≤180 days — smaller dots, thinner line, trend overlay
+    // long: >180 days — ghost line (no dots), trend dominant + SD band
+    const mode = n <= 60 ? 'short' : n <= 180 ? 'medium' : 'long';
+    const showTrend = bedtimeTrendEnabled && n >= 14;
+    const rawOpacity = showTrend ? (mode === 'long' ? 0.25 : mode === 'medium' ? 0.5 : 0.6) : 1;
+    const rawLineWidth = showTrend ? (mode === 'long' ? 1 : mode === 'medium' ? 1.5 : 2) : 2;
+    const dotRadius = showTrend ? (mode === 'short' ? 3.5 : mode === 'medium' ? 2 : 0) : 3.5;
+    const dotCenterRadius = showTrend && mode !== 'short' ? 1.2 : 2;
+    const bandwidth = Math.max(3, n * 0.1);
+
     const PAD_LEFT = 50, PAD_RIGHT = 16, PAD_TOP = 16, PAD_BOTTOM = 50;
     const chartH = cssHeight - PAD_TOP - PAD_BOTTOM;
     const DAY_W = Math.max(20, Math.floor((cssWidth - PAD_LEFT - PAD_RIGHT) / points.length));
@@ -523,11 +562,20 @@ export function drawBedtimeCaffeine() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssHeight);
 
-    const maxVal = Math.max(...points.map(p => p.value), 50);
+    const rawValues = points.map(p => p.value);
+    const trend = showTrend ? gaussianSmooth(rawValues, bandwidth) : null;
+
+    // Y-axis range: include trend ± SD so nothing clips
+    const allDisplayVals = [...rawValues];
+    if (trend) {
+        trend.smoothed.forEach((s, i) => { allDisplayVals.push(s + trend.sd[i]); });
+    }
+    const maxVal = Math.max(...allDisplayVals, 50);
     const scaleY = val => PAD_TOP + chartH - (val / maxVal) * chartH;
     const ptX = i => PAD_LEFT + i * DAY_W + DAY_W / 2;
     const C = getChartColors();
 
+    // Gridlines + y labels
     [0, Math.round(maxVal / 2), Math.round(maxVal)].forEach(v => {
         const y = scaleY(v);
         ctx.strokeStyle = C.gridLine; ctx.lineWidth = 1;
@@ -537,6 +585,7 @@ export function drawBedtimeCaffeine() {
         ctx.fillText(Math.round(v) + 'mg', PAD_LEFT - 5, y);
     });
 
+    // Month boundaries
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     points.forEach((p, i) => {
         if (i > 0 && p.date.getDate() === 1) {
@@ -552,21 +601,69 @@ export function drawBedtimeCaffeine() {
         }
     });
 
+    // SD confidence band (drawn first, behind everything)
+    if (trend && mode === 'long') {
+        ctx.save();
+        ctx.globalAlpha = 0.15;
+        ctx.fillStyle = '#764ba2';
+        ctx.beginPath();
+        points.forEach((_, i) => {
+            const x = ptX(i), y = scaleY(trend.smoothed[i] + trend.sd[i]);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        for (let i = points.length - 1; i >= 0; i--) {
+            const x = ptX(i), y = scaleY(Math.max(0, trend.smoothed[i] - trend.sd[i]));
+            ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    // Raw data line
     if (points.length > 1) {
-        ctx.strokeStyle = '#764ba2'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+        ctx.save();
+        ctx.globalAlpha = rawOpacity;
+        ctx.strokeStyle = '#764ba2'; ctx.lineWidth = rawLineWidth; ctx.lineJoin = 'round';
         ctx.beginPath();
         points.forEach((p, i) => { const x = ptX(i), y = scaleY(p.value); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
         ctx.stroke();
+        ctx.restore();
     }
 
-    points.forEach((p, i) => {
-        const x = ptX(i), y = scaleY(p.value);
-        const isToday = i === points.length - 1;
-        ctx.beginPath(); ctx.arc(x, y, isToday ? 5 : 3.5, 0, Math.PI * 2); ctx.fillStyle = '#764ba2'; ctx.fill();
-        ctx.beginPath(); ctx.arc(x, y, isToday ? 3 : 2, 0, Math.PI * 2); ctx.fillStyle = C.dotCenter; ctx.fill();
-    });
+    // Raw data dots
+    if (dotRadius > 0) {
+        ctx.save();
+        ctx.globalAlpha = rawOpacity;
+        points.forEach((p, i) => {
+            const x = ptX(i), y = scaleY(p.value);
+            const isToday = i === points.length - 1;
+            const r = isToday ? dotRadius + 1.5 : dotRadius;
+            const rc = isToday ? dotCenterRadius + 1 : dotCenterRadius;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = '#764ba2'; ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, rc, 0, Math.PI * 2); ctx.fillStyle = C.dotCenter; ctx.fill();
+        });
+        ctx.restore();
+    }
 
-    const tickInterval = points.length <= 21 ? 1 : points.length <= 60 ? 7 : points.length <= 180 ? 14 : 28;
+    // Trend line (on top, full opacity)
+    if (trend) {
+        ctx.save();
+        ctx.strokeStyle = '#764ba2'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        trend.smoothed.forEach((s, i) => { const x = ptX(i), y = scaleY(s); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // Today dot always drawn on top at full opacity
+    const lastI = points.length - 1;
+    const todayX = ptX(lastI), todayY = scaleY(points[lastI].value);
+    ctx.beginPath(); ctx.arc(todayX, todayY, 5, 0, Math.PI * 2); ctx.fillStyle = '#764ba2'; ctx.fill();
+    ctx.beginPath(); ctx.arc(todayX, todayY, 3, 0, Math.PI * 2); ctx.fillStyle = C.dotCenter; ctx.fill();
+
+    // X-axis tick labels
+    const tickInterval = n <= 21 ? 1 : n <= 60 ? 7 : n <= 180 ? 14 : 28;
     const WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     points.forEach((p, i) => {
         const isToday = i === points.length - 1;

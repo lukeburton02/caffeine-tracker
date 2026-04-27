@@ -301,14 +301,12 @@
 
 ## Phase 12: Bedtime Caffeine Chart Density Handling
 
-### Task 12.1: Adaptive display based on history length
-- [ ] Decide density thresholds: e.g. ≤60 days → dots + line as now; ≤180 days → dots shrink, line thins + trend overlay; >180 days → dots hidden, line faded to ghost, trend line dominant
-- [ ] Implement a **LOESS-style local regression trend line** overlaid on the existing dot/line plot:
-  - Gaussian-weighted moving average: each output point is a weighted mean of neighbouring values, weight = exp(−(Δi/bandwidth)²)
-  - Bandwidth auto-scales with history length (wider = smoother for longer histories)
-  - Trend line drawn on top in a solid, slightly thicker stroke (e.g. `#764ba2` at full opacity)
-  - Underlying dot/line plot drawn first at reduced opacity (e.g. 0.35) so trend dominates visually but data remains readable — analogous to `geom_smooth` layered over `geom_line + geom_point` in ggplot2
-- [ ] Consider whether to add a shaded ±1 SD confidence band around the trend (like `geom_smooth(se=TRUE)`), drawn as a filled area at low opacity before the trend line
+### Task 12.1: Adaptive display based on history length ✅
+- [x] Density thresholds: ≤60 days → full dots + line (no trend); ≤180 days → dots shrink (r=2), line thins (w=1.5), raw opacity 0.5, trend overlay; >180 days → dots hidden, ghost line (opacity 0.25), trend dominant
+- [x] **LOESS-style trend line** via `gaussianSmooth()`: Gaussian-weighted moving average, weight = exp(−(Δi/bandwidth)²), bandwidth = max(3, n×0.1)
+- [x] Trend line drawn on top: solid, 2.5px, `#764ba2` full opacity — analogous to `geom_smooth` over `geom_line + geom_point`
+- [x] ±1 SD confidence band (long mode only): filled `#764ba2` at 15% opacity, drawn before trend line
+- [x] Today dot always drawn at full opacity on top regardless of mode
 
 ---
 

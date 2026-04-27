@@ -7,7 +7,8 @@ import {
     drawWeeklyChart, drawForecast, drawSourceBreakdown, drawTimeOfDay,
     drawBedtimeCaffeine, drawHistoryChart, updateHistoryNav, buildHistoryDays,
     buildEpisodeCurve, startEpisodeAnimation, stopEpisodeAnimation, isEpisodeAnimating,
-    getHistoryMode, setHistoryMode, getHistoryWindowOffset, setHistoryWindowOffset
+    getHistoryMode, setHistoryMode, getHistoryWindowOffset, setHistoryWindowOffset,
+    getBedtimeTrendEnabled, setBedtimeTrendEnabled
 } from './charts.js';
 import {
     getTotalCurrentCaffeine, updateLevelDisplay, renderEntries,
@@ -322,6 +323,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (infoBtn && infoTooltip) {
         infoBtn.addEventListener('click', () => infoTooltip.classList.toggle('visible'));
     }
+
+    // Bedtime trend toggle
+    document.getElementById('bedtime-trend-toggle').addEventListener('click', () => {
+        const enabled = !getBedtimeTrendEnabled();
+        setBedtimeTrendEnabled(enabled);
+        document.getElementById('bedtime-trend-toggle').classList.toggle('active', enabled);
+        drawBedtimeCaffeine();
+    });
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)
     setInterval(refreshUI, 60 * 1000);
