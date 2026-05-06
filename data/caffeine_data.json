@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "lastSaved": "2026-04-27T19:33:03.359Z",
+  "lastSaved": "2026-05-06T07:42:44.758Z",
   "entries": [
     {
-      "id": "1774903051245",
+      "id": "1774903714443",
       "timestamp": "2026-03-30T14:00:00.000Z",
       "amount": 200,
       "source": "Celsius"
@@ -51,12 +51,6 @@
       "source": "Coca Cola"
     },
     {
-      "id": "1775404156182",
-      "timestamp": "2026-04-05T15:45:00.000Z",
-      "amount": 100,
-      "source": "Huel"
-    },
-    {
       "id": "1775404214724",
       "timestamp": "2026-04-04T20:00:00.000Z",
       "amount": 48,
@@ -67,6 +61,12 @@
       "timestamp": "2026-04-05T15:00:00.000Z",
       "amount": 42,
       "source": "Lucozade"
+    },
+    {
+      "id": "1775404156182",
+      "timestamp": "2026-04-05T15:45:00.000Z",
+      "amount": 100,
+      "source": "Huel"
     },
     {
       "id": "1775485808313",
@@ -105,6 +105,18 @@
       "source": "Anadin"
     },
     {
+      "id": "1776176281805",
+      "timestamp": "2026-04-11T11:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1776176262905",
+      "timestamp": "2026-04-13T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
       "id": "1776176219915",
       "timestamp": "2026-04-14T08:00:00.000Z",
       "amount": 45,
@@ -121,18 +133,6 @@
       "timestamp": "2026-04-14T14:00:00.000Z",
       "amount": 25,
       "source": "Green Tea"
-    },
-    {
-      "id": "1776176262905",
-      "timestamp": "2026-04-13T09:00:00.000Z",
-      "amount": 200,
-      "source": "Celsius"
-    },
-    {
-      "id": "1776176281805",
-      "timestamp": "2026-04-11T11:00:00.000Z",
-      "amount": 200,
-      "source": "Celsius"
     },
     {
       "id": "1776251094667",
@@ -189,6 +189,18 @@
       "source": "Coca Cola"
     },
     {
+      "id": "1776968593060",
+      "timestamp": "2026-04-20T10:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1776968600976",
+      "timestamp": "2026-04-21T10:00:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
       "id": "1776968486574",
       "timestamp": "2026-04-22T09:00:00.000Z",
       "amount": 100,
@@ -213,18 +225,6 @@
       "source": "Tenzing"
     },
     {
-      "id": "1776968593060",
-      "timestamp": "2026-04-20T10:00:00.000Z",
-      "amount": 120,
-      "source": "Neutonic"
-    },
-    {
-      "id": "1776968600976",
-      "timestamp": "2026-04-21T10:00:00.000Z",
-      "amount": 100,
-      "source": "Huel"
-    },
-    {
       "id": "1777229432995",
       "timestamp": "2026-04-25T07:00:00.000Z",
       "amount": 45,
@@ -245,6 +245,84 @@
     {
       "id": "1777229461492",
       "timestamp": "2026-04-26T18:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1777303284187",
+      "timestamp": "2026-04-27T15:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1777376694837",
+      "timestamp": "2026-04-28T11:30:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1778052615892",
+      "timestamp": "2026-05-02T07:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1778052619386",
+      "timestamp": "2026-05-02T07:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1778052637933",
+      "timestamp": "2026-05-03T14:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1778052664572",
+      "timestamp": "2026-05-03T18:00:00.000Z",
+      "amount": 106,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1778052684501",
+      "timestamp": "2026-05-04T15:00:00.000Z",
+      "amount": 160,
+      "source": "Tenzing Mango"
+    },
+    {
+      "id": "1778052777421",
+      "timestamp": "2026-05-05T10:30:00.000Z",
+      "amount": 80,
+      "source": "Chilli Mocha"
+    },
+    {
+      "id": "1778052827517",
+      "timestamp": "2026-04-30T13:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1778052850701",
+      "timestamp": "2026-05-01T12:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1778052978777",
+      "timestamp": "2026-05-01T14:00:00.000Z",
+      "amount": 70,
+      "source": "Turmeric Matcha"
+    },
+    {
+      "id": "1778053160951",
+      "timestamp": "2026-05-06T05:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1778053165592",
+      "timestamp": "2026-05-06T05:00:00.000Z",
       "amount": 45,
       "source": "Anadin"
     }
