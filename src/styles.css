@@ -1162,6 +1162,24 @@ html[data-theme="dark"] .history-yaxis-overlay {
     margin-bottom: 12px;
 }
 
+.settings-repo-link {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.settings-repo-link a {
+    color: #bbb;
+    text-decoration: none;
+}
+
+.settings-repo-link a:hover {
+    color: #888;
+    text-decoration: underline;
+}
+
 .history-editor-list {
     overflow-y: auto;
     flex: 1;
@@ -1467,6 +1485,18 @@ html[data-theme="dark"] .btn-backup:hover {
 html[data-theme="dark"] .settings-note,
 html[data-theme="dark"] .halflife-note {
     color: #3e3f58;
+}
+
+html[data-theme="dark"] .settings-repo-link {
+    border-top-color: #2e2f47;
+}
+
+html[data-theme="dark"] .settings-repo-link a {
+    color: #3e3f58;
+}
+
+html[data-theme="dark"] .settings-repo-link a:hover {
+    color: #5a5b7a;
 }
 
 html[data-theme="dark"] .backup-status {
