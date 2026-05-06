@@ -47,5 +47,5 @@ src/
 
 ## Dev
 - `npm run dev` — Express on port 8080
-- Primary: Mac Chrome + Safari. Secondary: Android Chrome.
+- Mac Chrome + Safari.
 - All buttons outside forms must have `type="button"`.

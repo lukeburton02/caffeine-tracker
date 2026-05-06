@@ -167,12 +167,16 @@ body {
 .analysis-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 1fr auto;
     gap: 20px;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    height: calc(100vh - 84px);
+    min-height: calc(100vh - 84px);
+}
+
+.analysis-panel--full {
+    grid-column: 1 / -1;
 }
 
 .analysis-panel {
@@ -598,6 +602,36 @@ html[data-theme="dark"] .trend-toggle.active {
 
 .history-chart-wrap {
     position: relative;
+}
+
+.bedtime-chart-wrap {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.bedtime-chart-container {
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;
+}
+
+.bedtime-chart-container canvas {
+    display: block;
+}
+
+.heatmap-wrap {
+    position: relative;
+}
+
+.heatmap-container {
+    overflow-x: auto;
+}
+
+.heatmap-container canvas {
+    display: block;
 }
 
 .history-yaxis-overlay {

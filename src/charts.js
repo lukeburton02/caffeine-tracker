@@ -578,15 +578,33 @@ export function drawBedtimeCaffeine() {
     const ptX = i => PAD_LEFT + i * DAY_W + DAY_W / 2;
     const C = getChartColors();
 
-    // Gridlines + y labels
-    [0, Math.round(maxVal / 2), Math.round(maxVal)].forEach(v => {
+    // Gridlines (labels on overlay only, not on scrolling canvas)
+    const gridSteps = [0, Math.round(maxVal / 2), Math.round(maxVal)];
+    gridSteps.forEach(v => {
         const y = scaleY(v);
         ctx.strokeStyle = C.gridLine; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(PAD_LEFT, y); ctx.lineTo(cssW - PAD_RIGHT, y); ctx.stroke();
-        ctx.fillStyle = C.yLabel; ctx.font = '10px sans-serif';
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        ctx.fillText(Math.round(v) + 'mg', PAD_LEFT - 5, y);
     });
+
+    // Sticky y-axis overlay
+    const yAxis = document.getElementById('bedtime-yaxis');
+    if (yAxis) {
+        yAxis.style.width = PAD_LEFT + 'px';
+        yAxis.style.height = cssHeight + 'px';
+        yAxis.width = Math.round(PAD_LEFT * dpr);
+        yAxis.height = Math.round(cssHeight * dpr);
+        const yCtx = yAxis.getContext('2d');
+        yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        yCtx.clearRect(0, 0, PAD_LEFT, cssHeight);
+        gridSteps.forEach(v => {
+            const y = scaleY(v);
+            yCtx.strokeStyle = C.gridLine; yCtx.lineWidth = 1;
+            yCtx.beginPath(); yCtx.moveTo(0, y); yCtx.lineTo(PAD_LEFT, y); yCtx.stroke();
+            yCtx.fillStyle = C.yLabel; yCtx.font = '10px sans-serif';
+            yCtx.textAlign = 'right'; yCtx.textBaseline = 'middle';
+            yCtx.fillText(Math.round(v) + 'mg', PAD_LEFT - 5, y);
+        });
+    }
 
     // Month boundaries
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -680,6 +698,10 @@ export function drawBedtimeCaffeine() {
         ctx.font = `${isToday ? 600 : 400} 9px sans-serif`;
         ctx.fillText(isToday ? 'Today' : WEEKDAYS[p.date.getDay()], x, PAD_TOP + chartH + 15);
     });
+
+    // Scroll to show latest data
+    const container = canvas.parentElement;
+    if (container) container.scrollLeft = container.scrollWidth;
 }
 
 // --- Full history line chart ---
@@ -1090,4 +1112,138 @@ export function stopEpisodeAnimation() {
         cancelAnimationFrame(episodeAnimFrame);
         episodeAnimFrame = null;
     }
+}
+
+// --- Calendar heatmap ---
+
+function dateKey(d) {
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
+export function drawHeatmap() {
+    const canvas = document.getElementById('heatmap-chart');
+    if (!canvas) return;
+    const container = canvas.parentElement;
+
+    const allDays = buildHistoryDays();
+    const C = getChartColors();
+    const dark = isDarkMode();
+    const dpr = window.devicePixelRatio || 1;
+
+    const CELL = 13, GAP = 2, STEP = CELL + GAP;
+    const PAD_LEFT = 34, PAD_TOP = 22, PAD_RIGHT = 10, PAD_BOTTOM = 4;
+    const cssH = PAD_TOP + 7 * STEP + PAD_BOTTOM;
+
+    if (allDays.length === 0) {
+        const cssW = container.clientWidth || 300;
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = C.yLabel; ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('No entries yet', cssW / 2, cssH / 2);
+        return;
+    }
+
+    const dayMap = new Map();
+    allDays.forEach(({ date, total }) => dayMap.set(dateKey(date), total));
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const firstDay = new Date(allDays[0].date);
+    firstDay.setHours(0, 0, 0, 0);
+    const gridStart = new Date(firstDay);
+    gridStart.setDate(gridStart.getDate() - (firstDay.getDay() + 6) % 7); // back to Mon
+
+    const gridEnd = new Date(today);
+    gridEnd.setDate(gridEnd.getDate() + (6 - (today.getDay() + 6) % 7)); // forward to Sun
+
+    const nWeeks = Math.ceil((Math.round((gridEnd - gridStart) / 86400000) + 1) / 7);
+    const cssW = Math.max(container.clientWidth || 300, PAD_LEFT + nWeeks * STEP + PAD_RIGHT);
+
+    // Personal quantile colour scale
+    const nonZero = allDays.filter(d => d.total > 0).map(d => d.total).sort((a, b) => a - b);
+    const getQ = f => nonZero[Math.max(0, Math.floor(nonZero.length * f) - 1)] || 1;
+    const [q1, q2, q3] = [getQ(0.25), getQ(0.5), getQ(0.75)];
+    function levelOf(total) {
+        if (!total) return 0;
+        if (total <= q1) return 1;
+        if (total <= q2) return 2;
+        if (total <= q3) return 3;
+        return 4;
+    }
+    const COLORS = dark
+        ? ['rgba(118,75,162,0.12)', 'rgba(118,75,162,0.36)', 'rgba(118,75,162,0.57)', 'rgba(118,75,162,0.78)', '#9b6fd0']
+        : ['#eeeaf8', '#c9b8ed', '#a07fd4', '#7a52bc', '#5a2d9c'];
+
+    canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+    canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let prevMonth = -1, lastMonthW = -Infinity;
+
+    for (let w = 0; w < nWeeks; w++) {
+        const weekDate = new Date(gridStart);
+        weekDate.setDate(weekDate.getDate() + w * 7);
+
+        const month = weekDate.getMonth();
+        if (month !== prevMonth && w - lastMonthW >= 3) {
+            ctx.fillStyle = C.yLabel;
+            ctx.font = '600 10px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText(MONTHS[month], PAD_LEFT + w * STEP, PAD_TOP - 6);
+            prevMonth = month;
+            lastMonthW = w;
+        }
+
+        for (let d = 0; d < 7; d++) {
+            const date = new Date(gridStart);
+            date.setDate(date.getDate() + w * 7 + d);
+            if (date > today) continue;
+
+            const total = dayMap.get(dateKey(date)) || 0;
+            const x = PAD_LEFT + w * STEP;
+            const y = PAD_TOP + d * STEP;
+
+            ctx.fillStyle = COLORS[levelOf(total)];
+            ctx.beginPath();
+            ctx.roundRect(x, y, CELL, CELL, 2);
+            ctx.fill();
+
+            if (date.getTime() === today.getTime()) {
+                ctx.strokeStyle = dark ? '#b08cd8' : '#764ba2';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.roundRect(x, y, CELL, CELL, 2);
+                ctx.stroke();
+            }
+        }
+    }
+
+    // Sticky day-label overlay
+    const yAxis = document.getElementById('heatmap-yaxis');
+    if (yAxis) {
+        yAxis.style.width = PAD_LEFT + 'px';
+        yAxis.style.height = cssH + 'px';
+        yAxis.width = Math.round(PAD_LEFT * dpr);
+        yAxis.height = Math.round(cssH * dpr);
+        const yCtx = yAxis.getContext('2d');
+        yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        yCtx.clearRect(0, 0, PAD_LEFT, cssH);
+        [['Mon', 0], ['Wed', 2], ['Fri', 4], ['Sun', 6]].forEach(([label, d]) => {
+            yCtx.fillStyle = C.yLabel;
+            yCtx.font = '9px sans-serif';
+            yCtx.textAlign = 'right';
+            yCtx.textBaseline = 'middle';
+            yCtx.fillText(label, PAD_LEFT - 4, PAD_TOP + d * STEP + CELL / 2);
+        });
+    }
+
+    container.scrollLeft = container.scrollWidth;
 }

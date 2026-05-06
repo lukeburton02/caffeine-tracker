@@ -20,7 +20,7 @@ graph LR
 | Page | Contents |
 |------|----------|
 | **Main** | <ul><li>Current level display with colour-coded status bar</li><li>Quick Add presets (Celsius, Huel, Neutonic, Tenzing)</li><li>Custom entry form</li><li>Recent entries list with remaining mg</li><li>Today's summary — total consumed, peak level, peak time</li><li>7-day bar chart</li><li>Full history line chart (scrollable)</li></ul> |
-| **Analysis** | <ul><li>Summary strip: 28-day avg · usual peak · avg bedtime · all-time total (since first entry)</li><li>7-day forecast with 80% prediction interval</li><li>Time-of-day intake pattern (weighted KDE)</li><li>Source breakdown histogram</li><li>Bedtime caffeine trend</li></ul> |
+| **Analysis** | <ul><li>Summary strip: 28-day avg · usual peak · avg bedtime · all-time total (since first entry)</li><li>7-day forecast with 80% prediction interval</li><li>Time-of-day intake pattern (weighted KDE)</li><li>Source breakdown histogram</li><li>Bedtime caffeine trend (scrollable, sticky y-axis)</li><li>Daily caffeine heatmap — GitHub-style calendar grid, personal quantile colour scale</li></ul> |
 | **Live** | <ul><li>Animated real-time caffeine curve for the current episode</li><li>Solid past curve · dashed future projection · pulsing now-dot</li><li>Dynamic window: back to last &lt;5 mg crossing, forward to clearance</li></ul> |
 
 ---

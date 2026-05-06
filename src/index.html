@@ -211,13 +211,29 @@
                     <h2 class="analysis-panel-title">Bedtime Caffeine</h2>
                     <p class="analysis-panel-subtitle">Estimated mg remaining at 11:00 pm</p>
                 </div>
-                <div class="analysis-canvas-wrap">
-                    <canvas id="bedtime-chart"></canvas>
+                <div class="bedtime-chart-wrap">
+                    <canvas id="bedtime-yaxis" class="history-yaxis-overlay"></canvas>
+                    <div class="bedtime-chart-container">
+                        <canvas id="bedtime-chart"></canvas>
+                    </div>
                 </div>
                 <button type="button" class="trend-toggle" id="bedtime-trend-toggle" aria-label="Toggle trend line">
                     <span class="trend-toggle-label">Trend</span>
                     <span class="trend-toggle-box"></span>
                 </button>
+            </div>
+
+            <div class="analysis-panel analysis-panel--full" id="panel-heatmap">
+                <div class="analysis-panel-header">
+                    <h2 class="analysis-panel-title">Daily Caffeine</h2>
+                    <p class="analysis-panel-subtitle">Total mg consumed per day</p>
+                </div>
+                <div class="heatmap-wrap">
+                    <canvas id="heatmap-yaxis" class="history-yaxis-overlay"></canvas>
+                    <div class="heatmap-container">
+                        <canvas id="heatmap-chart"></canvas>
+                    </div>
+                </div>
             </div>
 
         </div>

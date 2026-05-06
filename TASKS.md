@@ -29,7 +29,6 @@
 - [x] Caffeine calculation accuracy verified
 - [x] Data persistence confirmed
 - [x] Tested on Mac Chrome and Safari (primary)
-- [ ] Test on Android Chrome (when connectivity allows)
 - [x] No console errors
 
 ---
@@ -61,7 +60,7 @@
 
 ### Task 3.2: Installability ✅
 - [x] `manifest.json` complete with SVG icon
-- [ ] Test "Add to Home Screen" on Android (pending connectivity)
+
 
 ### Task 3.3: Polish ✅
 - [x] localStorage error handling (try/catch)
@@ -292,13 +291,6 @@
 
 ---
 
-## Future Enhancements
-- [x] **Dark mode** — toggle switch added
-- [ ] Cloud sync — **IMPORTANT: review LSHTM's policies on third-party cloud services before implementing**
-- [ ] Native Android app (very low priority)
-
----
-
 ## Phase 12: Bedtime Caffeine Chart Density Handling
 
 ### Task 12.1: Adaptive display based on history length ✅
@@ -326,6 +318,24 @@
 
 ---
 
+## Phase 14: Calendar Heatmap & Bedtime Chart Y-Axis Fix
+
+### Task 14.1: Bedtime caffeine chart — sticky y-axis ✅
+- [x] Restructured bedtime panel to separate positioning context (`.bedtime-chart-wrap`) from scroll container (`.bedtime-chart-container`), matching the full history chart pattern
+- [x] Y-axis labels drawn on a `#bedtime-yaxis` overlay canvas (`position: absolute; z-index: 2`) so they remain visible when scrolled right
+- [x] Auto-scrolls to latest data on each render
+
+### Task 14.2: Daily caffeine heatmap ✅
+- [x] GitHub-style calendar grid: 7 rows (Mon top → Sun bottom) × N weeks columns, oldest left → newest right
+- [x] Personal quantile colour scale: level thresholds computed from user's own 25th/50th/75th percentile of non-zero days; 5 levels (empty + 4 intensity steps) in app purple palette
+- [x] Month labels along the top of the scrolling canvas; minimum 3-week gap to prevent collisions
+- [x] `Mon/Wed/Fri/Sun` day labels on sticky `#heatmap-yaxis` overlay canvas (same pattern as history and bedtime charts)
+- [x] Today cell highlighted with a `#764ba2` ring
+- [x] Full-width panel (`grid-column: 1 / -1`) at the bottom of the analysis grid; grid updated to `grid-template-rows: 1fr 1fr auto` and `min-height`
+- [x] Dark mode aware; wired into `refreshAll()` and `applyTheme()`
+
+---
+
 ## Maintenance
 
 ### GitHub Actions — Node.js 20 deprecation
@@ -340,6 +350,5 @@
 
 ## Notes
 - Primary device: Mac (Safari and Chrome)
-- Secondary device: Android phone (when network connectivity allows)
 - LSHTM machine — review policies before any external data storage
 - Half-life default is 5 hours; individual variation is typically 3–7 hours

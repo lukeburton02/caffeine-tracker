@@ -5,7 +5,7 @@ import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, saveBackup, initBackup
 import { showToast } from './toast.js';
 import {
     drawWeeklyChart, drawForecast, drawSourceBreakdown, drawTimeOfDay,
-    drawBedtimeCaffeine, drawHistoryChart, updateHistoryNav, buildHistoryDays,
+    drawBedtimeCaffeine, drawHistoryChart, drawHeatmap, updateHistoryNav, buildHistoryDays,
     buildEpisodeCurve, startEpisodeAnimation, stopEpisodeAnimation, isEpisodeAnimating,
     getHistoryMode, setHistoryMode, getHistoryWindowOffset, setHistoryWindowOffset,
     getBedtimeTrendEnabled, setBedtimeTrendEnabled
@@ -29,6 +29,7 @@ function applyTheme(dark) {
     drawTimeOfDay();
     drawSourceBreakdown();
     drawBedtimeCaffeine();
+    drawHeatmap();
 }
 
 function refreshUI() {
@@ -50,6 +51,7 @@ function refreshAll() {
     drawTimeOfDay();
     drawSourceBreakdown();
     drawBedtimeCaffeine();
+    drawHeatmap();
     buildEpisodeCurve();
     renderEntries();
 }
