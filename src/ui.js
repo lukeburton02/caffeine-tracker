@@ -199,12 +199,20 @@ export function updateAnalysisSummary() {
     }
     const avgBedtime = Math.round(bedtimeSum / DAYS);
 
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const oldest = entries.reduce((min, e) => new Date(e.timestamp) < min ? new Date(e.timestamp) : min, new Date(entries[0].timestamp));
+    const sinceLabel = `${MONTHS[oldest.getMonth()]} ${oldest.getFullYear()}`;
+    const allTimeTotal = entries.reduce((s, e) => s + e.amount, 0);
+    const allTimeTotalStr = allTimeTotal >= 1000 ? (allTimeTotal / 1000).toFixed(1) + 'g' : allTimeTotal + 'mg';
+
     el.innerHTML =
         `<span>28-day avg: <strong>${avg28}mg</strong></span>` +
         `<span class="summary-sep">·</span>` +
         `<span>Usual peak: <strong>${peakStr}</strong></span>` +
         `<span class="summary-sep">·</span>` +
-        `<span>Avg bedtime: <strong>${avgBedtime}mg</strong></span>`;
+        `<span>Avg bedtime: <strong>${avgBedtime}mg</strong></span>` +
+        `<span class="summary-sep">·</span>` +
+        `<span>Total since ${sinceLabel}: <strong>${allTimeTotalStr}</strong></span>`;
 }
 
 // --- History editor modal ---

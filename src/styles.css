@@ -149,8 +149,10 @@ body {
     flex-wrap: wrap;
     font-size: 0.78rem;
     color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 14px;
+    margin: 0 auto 14px;
     padding: 0 2px;
+    max-width: 1200px;
+    width: 100%;
 }
 
 .analysis-summary-strip strong {
@@ -164,7 +166,7 @@ body {
 
 .analysis-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: 1fr 1fr;
     gap: 20px;
     width: 100%;
