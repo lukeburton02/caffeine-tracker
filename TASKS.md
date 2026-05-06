@@ -310,6 +310,22 @@
 
 ---
 
+## Phase 13: Analysis Page Polish & Stats
+
+### Task 13.1: Equal-width analysis panels ✅
+- [x] Fixed `grid-template-columns` to use `minmax(0, 1fr)` — plain `1fr` let content min-width make right panels wider than left
+
+### Task 13.2: Analysis summary strip alignment ✅
+- [x] Strip now has `max-width: 1200px; margin: 0 auto` to align with the centered grid on wide screens
+
+### Task 13.3: All-time total caffeine stat ✅
+- [x] 4th bullet in analysis summary strip: "Total since [Mon YYYY]: Xg" — month+year derived from oldest entry, grams if ≥ 1000 mg
+
+### Task 13.4: GitHub repo link in settings modal ✅
+- [x] Link to `github.com/lukeburton02/caffeine-tracker` at bottom of settings modal, below Data section, with dark mode support
+
+---
+
 ## Maintenance
 
 ### GitHub Actions — Node.js 20 deprecation
