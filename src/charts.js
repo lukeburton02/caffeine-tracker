@@ -1162,6 +1162,8 @@ export function drawHeatmap() {
 
     const nWeeks = Math.ceil((Math.round((gridEnd - gridStart) / 86400000) + 1) / 7);
     const cssW = Math.max(container.clientWidth || 300, PAD_LEFT + nWeeks * STEP + PAD_RIGHT);
+    // Right-align when data fits within panel; no-op when canvas is wider than container
+    const xOffset = Math.max(0, cssW - PAD_LEFT - PAD_RIGHT - nWeeks * STEP);
 
     // Personal quantile colour scale
     const nonZero = allDays.filter(d => d.total > 0).map(d => d.total).sort((a, b) => a - b);
@@ -1197,7 +1199,7 @@ export function drawHeatmap() {
             ctx.font = '600 10px sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
-            ctx.fillText(MONTHS[month], PAD_LEFT + w * STEP, PAD_TOP - 6);
+            ctx.fillText(MONTHS[month], PAD_LEFT + xOffset + w * STEP, PAD_TOP - 6);
             prevMonth = month;
             lastMonthW = w;
         }
@@ -1208,7 +1210,7 @@ export function drawHeatmap() {
             if (date > today) continue;
 
             const total = dayMap.get(dateKey(date)) || 0;
-            const x = PAD_LEFT + w * STEP;
+            const x = PAD_LEFT + xOffset + w * STEP;
             const y = PAD_TOP + d * STEP;
 
             ctx.fillStyle = COLORS[levelOf(total)];
