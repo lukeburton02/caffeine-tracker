@@ -3,14 +3,9 @@
 import { DEFAULT_HALF_LIFE_HOURS, HALFLIFE_KEY, getHalfLife, calculateCurrentCaffeine, computeLevelAt, getCaffeineAtTime } from './calculations.js';
 import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, updateEntry, isPreviewMode, enterPreviewMode, exitPreviewMode, saveBackup, initBackup, updateBackupStatus, linkBackupFolder, importFromBackupFile, exportCSV, exportJSON } from './storage.js';
 import { showToast } from './toast.js';
-import {
-    drawWeeklyChart, drawForecast, drawSourceBreakdown, drawTimeOfDay,
-    drawBedtimeCaffeine, drawHistoryChart, drawHeatmap, initHeatmapTooltip, updateHistoryNav, buildHistoryDays,
-    buildEpisodeCurve, startEpisodeAnimation, stopEpisodeAnimation, isEpisodeAnimating,
-    getHistoryMode, setHistoryMode, getHistoryWindowOffset, setHistoryWindowOffset,
-    getBedtimeTrendEnabled, setBedtimeTrendEnabled,
-    getSourceTop10Enabled, setSourceTop10Enabled
-} from './charts.js';
+import { drawWeeklyChart, drawHistoryChart, buildHistoryDays, updateHistoryNav, getHistoryMode, setHistoryMode, getHistoryWindowOffset, setHistoryWindowOffset } from './charts-main.js';
+import { drawForecast, drawSourceBreakdown, drawTimeOfDay, drawBedtimeCaffeine, drawHeatmap, initHeatmapTooltip, getBedtimeTrendEnabled, setBedtimeTrendEnabled, getSourceTop10Enabled, setSourceTop10Enabled } from './charts-analysis.js';
+import { buildEpisodeCurve, startEpisodeAnimation, stopEpisodeAnimation, isEpisodeAnimating } from './charts-episode.js';
 import {
     getTotalCurrentCaffeine, updateLevelDisplay, renderEntries,
     updateSummary, checkHighWarning, updateHalfLifeDisplay,
