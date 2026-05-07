@@ -334,17 +334,42 @@
 - [x] Full-width panel (`grid-column: 1 / -1`) at the bottom of the analysis grid; grid updated to `grid-template-rows: 1fr 1fr auto` and `min-height`
 - [x] Dark mode aware; wired into `refreshAll()` and `applyTheme()`
 
+### Task 14.3: Heatmap polish ✅
+- [x] Right-align grid when history is shorter than panel width
+- [x] Hover tooltip: date + mg on mousemove, `position: fixed`, hit-tests via `heatmapState` module variable
+- [x] Legend: "Less [□□□□□] More" row below grid, swatch colours updated on each draw and on theme change
+
+### Task 14.4: Source Breakdown — Top 10 toggle ✅
+- [x] "Top 10" toggle button (same `.trend-toggle` pattern as Bedtime Trend)
+- [x] Off by default (show all); when active, slices sorted bars to top 10 by total mg
+
+---
+
+## Phase 15: Remaining Polish
+
+### Task 15.1: Edit entries
+Suggested approach: extend the existing history editor modal with an inline edit form per entry (pre-filled timestamp, amount, source). The 7-day age validation should be waived for existing entries — only apply it on new additions.
+
+### Task 15.2: Demo / onboarding data
+When the app has no entries, show a "Load demo data" button on the main page empty state. Fetch `https://raw.githubusercontent.com/lukeburton02/caffeine-tracker/main/data/caffeine_data.json` (public raw URL) and import via the existing JSON import logic. Simple single `fetch()` — no extra dependencies.
+
+### Task 15.3: PWA completeness audit
+- [ ] Verify service worker caches app shell correctly and serves offline
+- [ ] Test install ("Add to Home Screen") on Mac Chrome
+- [ ] Check offline fallback shows something useful rather than a blank page
+
 ---
 
 ## Maintenance
 
 ### GitHub Actions — Node.js 20 deprecation
-- [ ] **Before 2026-06-02**: bump all four action versions in `.github/workflows/deploy.yml` to their then-current major releases, or set `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` to opt in early
-  - `actions/checkout@v4`
-  - `actions/configure-pages@v4`
-  - `actions/upload-pages-artifact@v3`
-  - `actions/deploy-pages@v4`
-- Hard deadline: **2026-09-16** (Node.js 20 removed from runners entirely)
+- [x] Bumped 2026-05-06: checkout@v6, configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5
+
+### Recurring: GitHub Actions version bumps
+GitHub drops old Node.js versions from runners roughly every 1–2 years, and the official Pages actions cut a new major version to match. When deprecation warnings appear in Actions logs:
+1. Check latest releases: `gh api repos/actions/checkout/releases/latest --jq '.tag_name'` (repeat for configure-pages, upload-pages-artifact, deploy-pages)
+2. Review release notes for breaking changes (historically just Node.js version bumps — safe to update)
+3. Bump all four in `.github/workflows/deploy.yml` together
 
 ---
 

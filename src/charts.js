@@ -29,6 +29,8 @@ function getChartColors() {
 let historyMode = 'all';       // 'all' | 'window'
 let historyWindowOffset = 0;   // days before today for the window end (0 = today)
 let bedtimeTrendEnabled = false;
+let sourceTop10Enabled = false;
+let heatmapState = null;
 
 export function getHistoryMode() { return historyMode; }
 export function setHistoryMode(m) { historyMode = m; }
@@ -36,6 +38,8 @@ export function getHistoryWindowOffset() { return historyWindowOffset; }
 export function setHistoryWindowOffset(v) { historyWindowOffset = v; }
 export function getBedtimeTrendEnabled() { return bedtimeTrendEnabled; }
 export function setBedtimeTrendEnabled(v) { bedtimeTrendEnabled = v; }
+export function getSourceTop10Enabled() { return sourceTop10Enabled; }
+export function setSourceTop10Enabled(v) { sourceTop10Enabled = v; }
 
 // --- Weekly chart ---
 
@@ -355,7 +359,8 @@ export function drawSourceBreakdown() {
         const display = key === 'unknown' ? 'Unknown' : toTitleCase(raw.trim());
         totalsMap[display] = (totalsMap[display] || 0) + e.amount;
     });
-    const bars = Object.entries(totalsMap).map(([name, total]) => ({ name, total })).sort((a, b) => b.total - a.total);
+    const allBars = Object.entries(totalsMap).map(([name, total]) => ({ name, total })).sort((a, b) => b.total - a.total);
+    const bars = sourceTop10Enabled ? allBars.slice(0, 10) : allBars;
     const C = getChartColors();
 
     if (bars.length === 0) {
@@ -1247,5 +1252,59 @@ export function drawHeatmap() {
         });
     }
 
+    // Update legend swatches
+    COLORS.forEach((c, i) => {
+        const swatch = document.getElementById(`hl-${i}`);
+        if (swatch) swatch.style.background = c;
+    });
+
+    // Store state for tooltip hit-testing
+    heatmapState = { gridStart, nWeeks, dayMap, today, xOffset, PAD_LEFT, PAD_TOP, STEP, CELL };
+
     container.scrollLeft = container.scrollWidth;
+}
+
+export function initHeatmapTooltip() {
+    const canvas = document.getElementById('heatmap-chart');
+    if (!canvas) return;
+    const container = canvas.parentElement;
+
+    const tip = document.createElement('div');
+    tip.className = 'heatmap-tooltip';
+    document.body.appendChild(tip);
+
+    container.addEventListener('mousemove', e => {
+        if (!heatmapState) { tip.style.display = 'none'; return; }
+        const { gridStart, nWeeks, dayMap, today, xOffset, PAD_LEFT, PAD_TOP, STEP, CELL } = heatmapState;
+
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const gx = x - PAD_LEFT - xOffset;
+        const gy = y - PAD_TOP;
+
+        if (gx < 0 || gy < 0) { tip.style.display = 'none'; return; }
+
+        const col = Math.floor(gx / STEP);
+        const row = Math.floor(gy / STEP);
+        if (col >= nWeeks || row >= 7 || gx % STEP > CELL || gy % STEP > CELL) {
+            tip.style.display = 'none'; return;
+        }
+
+        const date = new Date(gridStart);
+        date.setDate(date.getDate() + col * 7 + row);
+        if (date > today) { tip.style.display = 'none'; return; }
+
+        const total = dayMap.get(dateKey(date)) || 0;
+        const label = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+        tip.textContent = total > 0 ? `${label} · ${Math.round(total)}mg` : `${label} · no data`;
+        tip.style.display = 'block';
+
+        const tx = e.clientX + 14;
+        const ty = e.clientY - 38;
+        tip.style.left = Math.min(tx, window.innerWidth - tip.offsetWidth - 8) + 'px';
+        tip.style.top = Math.max(8, ty) + 'px';
+    });
+
+    container.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
 }

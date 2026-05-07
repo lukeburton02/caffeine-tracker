@@ -5,10 +5,11 @@ import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, saveBackup, initBackup
 import { showToast } from './toast.js';
 import {
     drawWeeklyChart, drawForecast, drawSourceBreakdown, drawTimeOfDay,
-    drawBedtimeCaffeine, drawHistoryChart, drawHeatmap, updateHistoryNav, buildHistoryDays,
+    drawBedtimeCaffeine, drawHistoryChart, drawHeatmap, initHeatmapTooltip, updateHistoryNav, buildHistoryDays,
     buildEpisodeCurve, startEpisodeAnimation, stopEpisodeAnimation, isEpisodeAnimating,
     getHistoryMode, setHistoryMode, getHistoryWindowOffset, setHistoryWindowOffset,
-    getBedtimeTrendEnabled, setBedtimeTrendEnabled
+    getBedtimeTrendEnabled, setBedtimeTrendEnabled,
+    getSourceTop10Enabled, setSourceTop10Enabled
 } from './charts.js';
 import {
     getTotalCurrentCaffeine, updateLevelDisplay, renderEntries,
@@ -335,6 +336,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('bedtime-trend-toggle').classList.toggle('active', enabled);
         drawBedtimeCaffeine();
     });
+
+    // Source breakdown Top 10 toggle
+    document.getElementById('source-top10-toggle').addEventListener('click', () => {
+        const enabled = !getSourceTop10Enabled();
+        setSourceTop10Enabled(enabled);
+        document.getElementById('source-top10-toggle').classList.toggle('active', enabled);
+        drawSourceBreakdown();
+    });
+
+    initHeatmapTooltip();
 
     // Minute tick: refresh level, entries, 7-day chart (not history chart)
     setInterval(refreshUI, 60 * 1000);
