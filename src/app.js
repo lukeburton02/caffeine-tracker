@@ -1,7 +1,7 @@
 // Caffeine Tracker - Main Application Logic
 
 import { DEFAULT_HALF_LIFE_HOURS, HALFLIFE_KEY, getHalfLife, calculateCurrentCaffeine, computeLevelAt, getCaffeineAtTime } from './calculations.js';
-import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, saveBackup, initBackup, updateBackupStatus, linkBackupFolder, importFromBackupFile, exportCSV, exportJSON } from './storage.js';
+import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, updateEntry, loadDemoData, saveBackup, initBackup, updateBackupStatus, linkBackupFolder, importFromBackupFile, exportCSV, exportJSON } from './storage.js';
 import { showToast } from './toast.js';
 import {
     drawWeeklyChart, drawForecast, drawSourceBreakdown, drawTimeOfDay,
@@ -55,6 +55,7 @@ function refreshAll() {
     drawHeatmap();
     buildEpisodeCurve();
     renderEntries();
+    updateDemoBanner();
 }
 
 // --- Event handlers ---
@@ -191,6 +192,17 @@ function validateTimestamp(ts) {
     return true;
 }
 
+function toLocalDatetimeInput(isoString) {
+    const d = new Date(isoString);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function updateDemoBanner() {
+    const banner = document.getElementById('demo-banner');
+    if (banner) banner.style.display = getEntries().length === 0 ? 'block' : 'none';
+}
+
 
 
 // --- Service Worker ---
@@ -257,13 +269,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === e.currentTarget) closeHistoryEditor();
     });
     document.getElementById('history-editor-list').addEventListener('click', e => {
-        const btn = e.target.closest('.he-delete');
-        if (!btn) return;
-        const { id, source } = btn.dataset;
-        if (!confirm(`Delete "${source}"?`)) return;
-        deleteEntry(id);
-        refreshAll();
-        renderHistoryEditor();
+        // Delete
+        const deleteBtn = e.target.closest('.he-delete');
+        if (deleteBtn) {
+            const { id, source } = deleteBtn.dataset;
+            if (!confirm(`Delete "${source}"?`)) return;
+            deleteEntry(id);
+            refreshAll();
+            renderHistoryEditor();
+            return;
+        }
+
+        // Open inline edit form
+        const editBtn = e.target.closest('.he-edit');
+        if (editBtn) {
+            const { id, timestamp, amount, source } = editBtn.dataset;
+            const nowDT = toLocalDatetimeInput(new Date().toISOString());
+            const entryEl = editBtn.closest('.he-entry');
+            entryEl.innerHTML = `
+                <input type="datetime-local" class="he-edit-datetime" value="${toLocalDatetimeInput(timestamp)}" max="${nowDT}">
+                <input type="number" class="he-edit-amount" value="${amount}" min="1" max="2000" step="any" placeholder="mg">
+                <input type="text" class="he-edit-source" value="${source.replace(/"/g, '&quot;')}" placeholder="Source">
+                <button type="button" class="he-save" data-id="${id}">Save</button>
+                <button type="button" class="he-cancel">Cancel</button>`;
+            entryEl.querySelector('.he-edit-datetime').focus();
+            return;
+        }
+
+        // Save edited entry
+        const saveBtn = e.target.closest('.he-save');
+        if (saveBtn) {
+            const entryEl = saveBtn.closest('.he-entry');
+            const dtVal = entryEl.querySelector('.he-edit-datetime').value;
+            const amountVal = parseFloat(entryEl.querySelector('.he-edit-amount').value);
+            const sourceVal = entryEl.querySelector('.he-edit-source').value.trim() || 'Unknown';
+            if (!dtVal) { showToast('Please set a date and time'); return; }
+            const [datePart, timePart] = dtVal.split('T');
+            const [y, mo, d] = datePart.split('-').map(Number);
+            const [h, mi] = timePart.split(':').map(Number);
+            const ts = new Date(y, mo - 1, d, h, mi, 0, 0);
+            if (ts > new Date()) { showToast('Cannot set a future timestamp'); return; }
+            if (isNaN(amountVal) || amountVal <= 0) { showToast('Please enter a valid amount'); return; }
+            if (amountVal > 2000) { showToast('Amount too high — max 2000mg'); return; }
+            updateEntry(saveBtn.dataset.id, { timestamp: ts.toISOString(), amount: amountVal, source: sourceVal });
+            refreshAll();
+            renderHistoryEditor();
+            return;
+        }
+
+        // Cancel edit
+        if (e.target.closest('.he-cancel')) {
+            renderHistoryEditor();
+        }
+    });
+
+    // Demo data banner
+    document.getElementById('demo-load-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('demo-load-btn');
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
+        await loadDemoData({ onLoad: () => { updateHalfLifeDisplay(); refreshAll(); } });
+        btn.disabled = false;
+        btn.textContent = 'Load sample data';
     });
 
     document.getElementById('history-mode-all').addEventListener('click', () => {

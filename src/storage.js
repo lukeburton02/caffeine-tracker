@@ -36,6 +36,34 @@ export function deleteEntry(id) {
     }
 }
 
+export function updateEntry(id, { timestamp, amount, source }) {
+    try {
+        const entries = getEntries();
+        const idx = entries.findIndex(e => e.id === id);
+        if (idx === -1) return;
+        entries[idx] = { ...entries[idx], timestamp, amount, source };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        saveBackup();
+    } catch {
+        showToast('Could not update entry');
+    }
+}
+
+export async function loadDemoData(callbacks = {}) {
+    try {
+        const res = await fetch('https://raw.githubusercontent.com/lukeburton02/caffeine-tracker/main/data/caffeine_data.json');
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        if (!data.entries || !Array.isArray(data.entries)) throw new Error('invalid format');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.entries));
+        saveBackup();
+        callbacks.onLoad?.();
+    } catch {
+        showToast('Could not load sample data — check your connection');
+        callbacks.onError?.();
+    }
+}
+
 // --- Server-based save (works in all browsers when running via npm run dev) ---
 
 export let serverAvailable = false;

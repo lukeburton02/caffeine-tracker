@@ -255,11 +255,14 @@ export function renderHistoryEditor() {
         const entriesHTML = group.entries.map(entry => {
             const time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const source = entry.source || 'Unknown';
+            const srcEsc = source.replace(/"/g, '&quot;');
+            const tsEsc = entry.timestamp.replace(/"/g, '&quot;');
             return `<div class="he-entry">
                 <span class="he-time">${time}</span>
                 <span class="he-source">${source}</span>
                 <span class="he-amount">${entry.amount}mg</span>
-                <button type="button" class="he-delete" data-id="${entry.id}" data-source="${source.replace(/"/g, '&quot;')}">Delete</button>
+                <button type="button" class="he-edit" data-id="${entry.id}" data-timestamp="${tsEsc}" data-amount="${entry.amount}" data-source="${srcEsc}">Edit</button>
+                <button type="button" class="he-delete" data-id="${entry.id}" data-source="${srcEsc}">Delete</button>
             </div>`;
         }).join('');
 

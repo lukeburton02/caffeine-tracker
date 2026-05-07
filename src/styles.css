@@ -1314,6 +1314,23 @@ html[data-theme="dark"] .history-yaxis-overlay {
     flex-shrink: 0;
 }
 
+.he-edit {
+    background: none;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    color: #ccc;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.1s, border-color 0.1s;
+}
+
+.he-edit:hover {
+    color: #667eea;
+    border-color: #667eea;
+}
+
 .he-delete {
     background: none;
     border: 1px solid #eee;
@@ -1331,6 +1348,85 @@ html[data-theme="dark"] .history-yaxis-overlay {
     border-color: #e74c3c;
     background: #fff0f0;
 }
+
+.he-entry .he-edit-datetime,
+.he-entry .he-edit-amount,
+.he-entry .he-edit-source {
+    font-size: 0.8rem;
+    padding: 3px 7px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #2c3e50;
+}
+
+.he-entry .he-edit-datetime { flex-shrink: 0; }
+.he-entry .he-edit-amount   { width: 64px; flex-shrink: 0; }
+.he-entry .he-edit-source   { flex: 1; min-width: 70px; }
+
+.he-save {
+    background: #667eea;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.he-save:hover { background: #5a6fd6; }
+
+.he-cancel {
+    background: none;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    color: #aaa;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.he-cancel:hover { color: #888; border-color: #ccc; }
+
+/* --- Demo / onboarding banner --- */
+
+.demo-banner {
+    background: linear-gradient(135deg, #f0eeff 0%, #eaf0ff 100%);
+    border: 1px solid #d4cbf5;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+}
+
+.demo-banner-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2c3e50;
+    margin: 0 0 4px;
+}
+
+.demo-banner-text {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0 0 12px;
+}
+
+.demo-load-btn {
+    background: #667eea;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.demo-load-btn:hover { background: #5a6fd6; }
+.demo-load-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* --- Dark mode toggle switch --- */
 
@@ -1630,10 +1726,32 @@ html[data-theme="dark"] .he-amount {
     color: #52536e;
 }
 
-html[data-theme="dark"] .he-delete {
+html[data-theme="dark"] .he-delete,
+html[data-theme="dark"] .he-edit {
     border-color: #32334e;
     color: #52536e;
 }
+
+html[data-theme="dark"] .he-entry .he-edit-datetime,
+html[data-theme="dark"] .he-entry .he-edit-amount,
+html[data-theme="dark"] .he-entry .he-edit-source {
+    background: #12132a;
+    border-color: #32334e;
+    color: #c8cae8;
+}
+
+html[data-theme="dark"] .he-cancel {
+    border-color: #32334e;
+    color: #52536e;
+}
+
+html[data-theme="dark"] .demo-banner {
+    background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.08) 100%);
+    border-color: #32334e;
+}
+
+html[data-theme="dark"] .demo-banner-title { color: #c8cae8; }
+html[data-theme="dark"] .demo-banner-text  { color: #52536e; }
 
 html[data-theme="dark"] .he-empty {
     color: #32334e;
