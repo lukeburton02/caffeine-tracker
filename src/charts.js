@@ -1195,7 +1195,7 @@ export function drawHeatmap() {
 
         const month = weekDate.getMonth();
         if (month !== prevMonth && w - lastMonthW >= 3) {
-            ctx.fillStyle = C.yLabel;
+            ctx.fillStyle = dark ? '#9a9bb8' : '#888';
             ctx.font = '600 10px sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'alphabetic';
@@ -1239,7 +1239,7 @@ export function drawHeatmap() {
         yCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         yCtx.clearRect(0, 0, PAD_LEFT, cssH);
         [['Mon', 0], ['Wed', 2], ['Fri', 4], ['Sun', 6]].forEach(([label, d]) => {
-            yCtx.fillStyle = C.yLabel;
+            yCtx.fillStyle = dark ? '#9a9bb8' : '#888';
             yCtx.font = '9px sans-serif';
             yCtx.textAlign = 'right';
             yCtx.textBaseline = 'middle';
