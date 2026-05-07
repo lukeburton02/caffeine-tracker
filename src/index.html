@@ -28,6 +28,12 @@
     </nav>
     <button type="button" class="gear-btn" id="open-settings" aria-label="Settings">&#9881;</button>
 
+    <!-- Preview mode bar (shown when browsing sample data) -->
+    <div id="preview-bar" class="preview-bar" style="display:none">
+        <span class="preview-bar-label">Preview mode — sample data, not saved</span>
+        <button type="button" id="preview-bar-exit" class="preview-bar-exit">Exit preview</button>
+    </div>
+
     <div class="pages-wrapper">
     <div class="pages-track" id="pages-track">
 
@@ -90,11 +96,11 @@
                 </form>
             </section>
 
-            <!-- Demo / onboarding banner (hidden once entries exist) -->
+            <!-- Demo / onboarding banner (hidden once entries exist or in preview mode) -->
             <div id="demo-banner" class="demo-banner" style="display:none">
                 <p class="demo-banner-title">New here?</p>
-                <p class="demo-banner-text">Load sample data to explore the app before logging your own.</p>
-                <button type="button" id="demo-load-btn" class="demo-load-btn">Load sample data</button>
+                <p class="demo-banner-text">Preview the app with sample data. Your data won't be affected.</p>
+                <button type="button" id="demo-load-btn" class="demo-load-btn">Preview sample data</button>
             </div>
 
             <!-- Recent entries list -->

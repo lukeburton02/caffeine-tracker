@@ -1428,6 +1428,46 @@ html[data-theme="dark"] .history-yaxis-overlay {
 .demo-load-btn:hover { background: #5a6fd6; }
 .demo-load-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* Preview mode bar */
+.preview-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 10px 16px;
+    background: rgba(82, 54, 160, 0.96);
+    color: #fff;
+    font-size: 0.84rem;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.preview-bar-label {
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.preview-bar-exit {
+    border: 1px solid rgba(255,255,255,0.35);
+    cursor: pointer;
+    padding: 5px 14px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.preview-bar-exit:hover {
+    background: rgba(255,255,255,0.28);
+}
+
 /* --- Dark mode toggle switch --- */
 
 .theme-row {

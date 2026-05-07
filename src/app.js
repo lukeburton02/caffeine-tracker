@@ -1,7 +1,7 @@
 // Caffeine Tracker - Main Application Logic
 
 import { DEFAULT_HALF_LIFE_HOURS, HALFLIFE_KEY, getHalfLife, calculateCurrentCaffeine, computeLevelAt, getCaffeineAtTime } from './calculations.js';
-import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, updateEntry, loadDemoData, saveBackup, initBackup, updateBackupStatus, linkBackupFolder, importFromBackupFile, exportCSV, exportJSON } from './storage.js';
+import { STORAGE_KEY, getEntries, saveEntry, deleteEntry, updateEntry, isPreviewMode, enterPreviewMode, exitPreviewMode, saveBackup, initBackup, updateBackupStatus, linkBackupFolder, importFromBackupFile, exportCSV, exportJSON } from './storage.js';
 import { showToast } from './toast.js';
 import {
     drawWeeklyChart, drawForecast, drawSourceBreakdown, drawTimeOfDay,
@@ -56,6 +56,7 @@ function refreshAll() {
     buildEpisodeCurve();
     renderEntries();
     updateDemoBanner();
+    updatePreviewBar();
 }
 
 // --- Event handlers ---
@@ -200,7 +201,12 @@ function toLocalDatetimeInput(isoString) {
 
 function updateDemoBanner() {
     const banner = document.getElementById('demo-banner');
-    if (banner) banner.style.display = getEntries().length === 0 ? 'block' : 'none';
+    if (banner) banner.style.display = (!isPreviewMode() && getEntries().length === 0) ? 'block' : 'none';
+}
+
+function updatePreviewBar() {
+    const bar = document.getElementById('preview-bar');
+    if (bar) bar.style.display = isPreviewMode() ? 'flex' : 'none';
 }
 
 
@@ -219,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setDefaultDateTime();
     updateHalfLifeDisplay();
     refreshAll();
+    updatePreviewBar();
     initBackup({
         onDataLoaded: () => { updateHalfLifeDisplay(); refreshAll(); },
         updateBackupStatus
@@ -323,14 +330,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Demo data banner
+    // Demo banner — enter preview mode
     document.getElementById('demo-load-btn').addEventListener('click', async () => {
         const btn = document.getElementById('demo-load-btn');
         btn.disabled = true;
         btn.textContent = 'Loading…';
-        await loadDemoData({ onLoad: () => { updateHalfLifeDisplay(); refreshAll(); } });
+        await enterPreviewMode({ onLoad: () => { updateHalfLifeDisplay(); refreshAll(); } });
         btn.disabled = false;
-        btn.textContent = 'Load sample data';
+        btn.textContent = 'Preview sample data';
+    });
+
+    // Preview bar exit
+    document.getElementById('preview-bar-exit').addEventListener('click', () => {
+        exitPreviewMode();
+        updateHalfLifeDisplay();
+        refreshAll();
+        showToast('Preview mode ended');
     });
 
     document.getElementById('history-mode-all').addEventListener('click', () => {

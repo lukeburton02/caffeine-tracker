@@ -2,12 +2,45 @@ import { getHalfLife, HALFLIFE_KEY } from './calculations.js';
 import { showToast } from './toast.js';
 
 export const STORAGE_KEY = 'caffeine_entries';
+const PREVIEW_FLAG_KEY = 'caffeine_preview_mode';
+const PREVIEW_DATA_KEY = 'caffeine_preview_data';
+
+// --- Preview mode (sessionStorage overlay — never touches localStorage) ---
+
+export function isPreviewMode() {
+    return sessionStorage.getItem(PREVIEW_FLAG_KEY) === '1';
+}
+
+export async function enterPreviewMode(callbacks = {}) {
+    try {
+        const res = await fetch('https://raw.githubusercontent.com/lukeburton02/caffeine-tracker/main/data/caffeine_data.json');
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        if (!data.entries || !Array.isArray(data.entries)) throw new Error('invalid format');
+        sessionStorage.setItem(PREVIEW_DATA_KEY, JSON.stringify(data.entries));
+        sessionStorage.setItem(PREVIEW_FLAG_KEY, '1');
+        callbacks.onLoad?.();
+    } catch {
+        showToast('Could not load preview data — check your connection');
+        callbacks.onError?.();
+    }
+}
+
+export function exitPreviewMode(callbacks = {}) {
+    sessionStorage.removeItem(PREVIEW_FLAG_KEY);
+    sessionStorage.removeItem(PREVIEW_DATA_KEY);
+    callbacks.onExit?.();
+}
 
 // --- LocalStorage ---
 // All entries are kept forever — never auto-deleted — so charts always have full history.
 
 export function getEntries() {
     try {
+        if (isPreviewMode()) {
+            const data = sessionStorage.getItem(PREVIEW_DATA_KEY);
+            return data ? JSON.parse(data) : [];
+        }
         const data = localStorage.getItem(STORAGE_KEY);
         return data ? JSON.parse(data) : [];
     } catch {
@@ -16,6 +49,7 @@ export function getEntries() {
 }
 
 export function saveEntry(entry) {
+    if (isPreviewMode()) { showToast('Exit preview mode to log entries'); return; }
     try {
         const entries = getEntries();
         entries.push(entry);
@@ -27,6 +61,7 @@ export function saveEntry(entry) {
 }
 
 export function deleteEntry(id) {
+    if (isPreviewMode()) { showToast('Exit preview mode to delete entries'); return; }
     try {
         const entries = getEntries().filter(e => e.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
@@ -37,6 +72,7 @@ export function deleteEntry(id) {
 }
 
 export function updateEntry(id, { timestamp, amount, source }) {
+    if (isPreviewMode()) { showToast('Exit preview mode to edit entries'); return; }
     try {
         const entries = getEntries();
         const idx = entries.findIndex(e => e.id === id);
@@ -46,21 +82,6 @@ export function updateEntry(id, { timestamp, amount, source }) {
         saveBackup();
     } catch {
         showToast('Could not update entry');
-    }
-}
-
-export async function loadDemoData(callbacks = {}) {
-    try {
-        const res = await fetch('https://raw.githubusercontent.com/lukeburton02/caffeine-tracker/main/data/caffeine_data.json');
-        if (!res.ok) throw new Error('fetch failed');
-        const data = await res.json();
-        if (!data.entries || !Array.isArray(data.entries)) throw new Error('invalid format');
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.entries));
-        saveBackup();
-        callbacks.onLoad?.();
-    } catch {
-        showToast('Could not load sample data — check your connection');
-        callbacks.onError?.();
     }
 }
 
@@ -181,6 +202,7 @@ export async function saveToFileSystem() {
 
 // saveBackup: called after every data change.
 export function saveBackup() {
+    if (isPreviewMode()) return;
     saveToServer();
     saveToFileSystem();
 }
