@@ -358,6 +358,14 @@ When the app has no entries, show a "Load demo data" button on the main page emp
 - [ ] Test install ("Add to Home Screen") on Mac Chrome
 - [ ] Check offline fallback shows something useful rather than a blank page
 
+Note: service worker currently has **no caching** (intentional — avoids stale deploys). Offline support would require versioned cache busting. "Audit" is mainly: confirm install still works, and decide if offline fallback is worth adding.
+
+### Task 15.4: Code file split
+Current line counts: `charts.js` 1310, `styles.css` 1862, `storage.js` 342, `ui.js` 271.
+- Split `charts.js` into `charts-analysis.js` (forecast, time-of-day, source breakdown, bedtime, heatmap) and `charts-main.js` (weekly bar, history line, episode curve + animation)
+- Split `styles.css` into logical partials (layout, components, charts, modals, dark-mode) or at minimum extract the ~400-line dark mode block into `styles-dark.css`
+- Goal: no file over ~600 lines so full reads don't eat context
+
 ---
 
 ## Maintenance
