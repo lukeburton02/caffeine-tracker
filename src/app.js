@@ -207,6 +207,8 @@ function updateDemoBanner() {
 function updatePreviewBar() {
     const bar = document.getElementById('preview-bar');
     if (bar) bar.style.display = isPreviewMode() ? 'flex' : 'none';
+    const btn = document.getElementById('settings-preview-btn');
+    if (btn) btn.textContent = isPreviewMode() ? 'Exit preview' : 'Preview sample data';
 }
 
 
@@ -346,6 +348,22 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHalfLifeDisplay();
         refreshAll();
         showToast('Preview mode ended');
+    });
+
+    // Settings preview toggle
+    document.getElementById('settings-preview-btn').addEventListener('click', async () => {
+        if (isPreviewMode()) {
+            exitPreviewMode();
+            updateHalfLifeDisplay();
+            refreshAll();
+            showToast('Preview mode ended');
+        } else {
+            const btn = document.getElementById('settings-preview-btn');
+            btn.disabled = true;
+            btn.textContent = 'Loading…';
+            await enterPreviewMode({ onLoad: () => { updateHalfLifeDisplay(); refreshAll(); } });
+            btn.disabled = false;
+        }
     });
 
     document.getElementById('history-mode-all').addEventListener('click', () => {
