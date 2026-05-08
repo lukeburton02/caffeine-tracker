@@ -820,7 +820,13 @@ html[data-theme="dark"] .history-yaxis-overlay {
     opacity: 1;
 }
 
-/* --- Log form --- */
+/* --- Log form (inside merged add section) --- */
+
+#log-form {
+    border-top: 1px solid #f0f0f0;
+    margin-top: 4px;
+    padding-top: 16px;
+}
 
 .form-group {
     margin-bottom: 16px;

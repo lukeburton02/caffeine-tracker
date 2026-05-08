@@ -556,6 +556,10 @@ html[data-theme="dark"] .preset-name {
     color: #e2e4f0;
 }
 
+html[data-theme="dark"] #log-form {
+    border-top-color: #2a2b40;
+}
+
 html[data-theme="dark"] .form-group label {
     color: #52536e;
 }
