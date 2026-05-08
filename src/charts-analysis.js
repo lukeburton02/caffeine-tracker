@@ -144,8 +144,8 @@ export function drawForecast() {
     ctx.setLineDash([]);
 
     ctx.fillStyle = dark ? 'rgba(102,126,234,0.45)' : 'rgba(102,126,234,0.5)';
-    ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillText('forecast →', PAD_L + (N_CTX + 1) * DAY_W + (N_FCST * DAY_W) / 2, PAD_T + 2);
+    ctx.font = '10px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('forecast →', PAD_L + (N_CTX + 1) * DAY_W + (N_FCST * DAY_W) / 2, PAD_T - 12);
 
     if (forecastPts.length > 0) {
         ctx.fillStyle = dark ? 'rgba(102,126,234,0.13)' : 'rgba(102,126,234,0.10)';
