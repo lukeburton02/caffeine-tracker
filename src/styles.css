@@ -372,20 +372,29 @@ html[data-theme="dark"] .trend-toggle.active {
     min-width: 0;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
     .layout {
         grid-template-columns: 1fr;
     }
     .page {
-        padding: 20px 12px;
+        padding: 72px 12px 32px;
+    }
+    .page-episode {
+        padding: 72px 12px 24px;
+    }
+    .episode-container {
+        height: calc(100dvh - 120px);
     }
     .analysis-grid {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
-        height: auto;
+        min-height: unset;
     }
     .analysis-panel {
         min-height: 260px;
+    }
+    .presets-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
