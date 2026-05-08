@@ -7,9 +7,9 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(160deg, #1c1f3a 0%, #2d1b4e 60%, #1a1230 100%);
     min-height: 100vh;
 }
 
@@ -23,11 +23,12 @@ body {
     z-index: 200;
     display: flex;
     gap: 4px;
-    background: rgba(0, 0, 0, 0.28);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
     padding: 4px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .tab-btn {
@@ -86,7 +87,7 @@ body {
     background: rgba(255, 255, 255, 0.97);
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.18);
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -183,7 +184,7 @@ body {
     background: rgba(255, 255, 255, 0.97);
     border-radius: 20px;
     padding: 20px 24px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.18);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -364,7 +365,7 @@ html[data-theme="dark"] .trend-toggle.active {
     background: rgba(255, 255, 255, 0.97);
     border-radius: 20px;
     padding: 28px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.18);
     display: flex;
     flex-direction: column;
     gap: 28px;
@@ -405,31 +406,66 @@ html[data-theme="dark"] .trend-toggle.active {
     text-align: center;
     background: #f5f7ff;
     border-radius: 20px;
-    padding: 28px 20px 20px;
+    padding: 20px 20px 16px;
+}
+
+.level-arc-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 8px;
+}
+
+.level-arc-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-210deg);
+}
+
+.level-arc-track {
+    stroke: #e5e9f0;
+    stroke-dasharray: 377;
+    stroke-dashoffset: 94;
+}
+
+.level-arc-fill {
+    stroke: #27ae60;
+    stroke-dasharray: 377;
+    stroke-dashoffset: 377;
+    transition: stroke-dashoffset 0.6s ease, stroke 0.4s;
+}
+
+.level-arc-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
 }
 
 .level-label {
-    font-size: 0.8rem;
-    color: #667eea;
+    font-size: 0.7rem;
+    color: #aaa;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     font-weight: 600;
-    margin-bottom: 10px;
 }
 
 .level-amount {
-    font-size: 3rem;
+    font-size: 2.4rem;
     font-weight: 800;
     color: #2c3e50;
     line-height: 1;
-    margin-bottom: 6px;
     transition: color 0.4s;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
 }
 
 .level-status {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 16px;
     transition: color 0.4s;
     min-height: 1.2em;
 }
@@ -450,8 +486,9 @@ html[data-theme="dark"] .trend-toggle.active {
 }
 
 .level-updated {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: #bbb;
+    margin-bottom: 4px;
 }
 
 .high-warning {
@@ -862,21 +899,22 @@ html[data-theme="dark"] .history-yaxis-overlay {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     background: #fafafa;
     border-radius: 12px;
+    border-left: 3px solid #667eea;
     transition: background 0.15s;
 }
 
 .entry-item:hover {
-    background: #f5f7ff;
+    background: #f0f2ff;
 }
 
 .entry-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
 }
 
 .entry-source {
@@ -894,7 +932,7 @@ html[data-theme="dark"] .history-yaxis-overlay {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 3px;
+    gap: 5px;
 }
 
 .entry-original {
@@ -904,8 +942,13 @@ html[data-theme="dark"] .history-yaxis-overlay {
 }
 
 .entry-current {
-    font-size: 0.78rem;
+    font-size: 0.72rem;
+    font-weight: 600;
     color: #667eea;
+    background: rgba(102, 126, 234, 0.12);
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
 }
 
 .btn-delete {

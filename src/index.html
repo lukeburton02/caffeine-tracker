@@ -12,6 +12,9 @@
     <title>Caffeine Tracker</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles-modals.css">
     <script>
@@ -48,14 +51,20 @@
 
             <!-- Current caffeine level display -->
             <header class="level-display">
-                <p class="level-label">Current caffeine in system</p>
-                <p class="level-amount" id="current-level">0.0 mg</p>
-                <p class="level-status" id="level-status">—</p>
-                <div class="level-bar-track">
-                    <div class="level-bar" id="level-bar"></div>
+                <div class="level-arc-wrap">
+                    <svg class="level-arc-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="level-arc-track" cx="100" cy="100" r="80" stroke-width="10" stroke-linecap="round"/>
+                        <circle class="level-arc-fill" id="level-arc" cx="100" cy="100" r="80" stroke-width="10" stroke-linecap="round"/>
+                    </svg>
+                    <div class="level-arc-inner">
+                        <p class="level-label">Caffeine</p>
+                        <p class="level-amount" id="current-level">0.0 mg</p>
+                        <p class="level-status" id="level-status">—</p>
+                    </div>
                 </div>
                 <p class="level-updated" id="last-updated"></p>
                 <div id="high-warning" class="high-warning" aria-live="assertive"></div>
+                <div class="level-bar-track" style="display:none"><div class="level-bar" id="level-bar"></div></div>
             </header>
 
             <!-- Quick entry presets (date/time inline above) -->

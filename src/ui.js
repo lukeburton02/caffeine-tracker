@@ -49,6 +49,15 @@ export function updateLevelDisplay() {
     const bar = document.getElementById('level-bar');
     bar.style.width = pct + '%';
     bar.style.background = color;
+
+    // Arc: 240° sweep → usable dashoffset range is 377 (full arc) to 94 (empty, 30° gap each side)
+    const arc = document.getElementById('level-arc');
+    if (arc) {
+        const FULL = 377, EMPTY = 94;
+        const offset = FULL - (pct / 100) * (FULL - EMPTY);
+        arc.style.strokeDashoffset = offset;
+        arc.style.stroke = color;
+    }
 }
 
 export function renderEntries() {
