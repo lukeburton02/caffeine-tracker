@@ -4,7 +4,7 @@ A Progressive Web App for tracking caffeine intake and monitoring real-time caff
 
 **Live app → https://lukeburton02.github.io/caffeine-tracker/**
 
-No install, no accounts, no cloud. All data stays in your browser.
+No install, no accounts, no cloud. All data stays in your browser. New users can try the app with sample data via **Preview mode** (Settings ⚙ → Preview sample data) before logging anything real.
 
 ---
 

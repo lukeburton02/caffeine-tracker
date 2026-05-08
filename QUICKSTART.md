@@ -14,34 +14,53 @@ npm run dev
 
 Then open `http://127.0.0.1:8080` in your browser.
 
+---
+
 ## Using the App
 
-**Quick Add** — click a preset (Celsius, Huel, Neutonic, Tenzing) to log it immediately using the current date and time shown in the inputs. Adjust date/time first if needed.
+### Pages
 
-**Custom Entry** — fill in amount (mg) and optional source, confirm date/time, then hit Log Caffeine.
+The app has three pages, navigated via the tab bar at the top: **Main**, **Analysis**, and **Live**.
 
-**Retrospective entry** — change the date/time inputs to log something from earlier (up to 7 days back). Future timestamps are blocked.
+### Logging caffeine (Main page)
 
-**Recent Entries** — shows entries still contributing meaningful caffeine (>= 1mg remaining, within 7 days). Older or fully decayed entries are hidden from this list but remain in the charts.
+The **Add Caffeine** section has date/time inputs at the top that apply to everything below:
 
-**Half-life** — change in Settings. Default is 5 hours. Saving recalculates everything instantly.
+- **Quick presets** — click Celsius, Huel, Neutonic, or Tenzing to log instantly at the selected date/time
+- **Custom entry** — fill in amount (mg) and optional source, then hit Log Caffeine
+- **Retrospective entry** — adjust the date/time inputs before logging; entries up to 7 days back are accepted; future timestamps are blocked
 
-**Local backup** — when running via `npm run dev`, data is automatically saved to `data/caffeine_data.json` in the project folder after every change. If localStorage is ever cleared, the app restores from this file on next load.
+### Recent Entries
 
-## Accessing on Android
+Shows entries still contributing meaningful caffeine (≥ 1 mg remaining, within 7 days). Older or fully decayed entries are hidden here but remain in all charts. Tap **View all** to open the full history editor where you can edit or delete any entry.
 
-Phone and Mac must be on the same Wi-Fi network. Find your Mac's IP:
+### Settings (⚙)
 
-```bash
-ipconfig getifaddr en0
-```
+- **Half-life** — default 5 hours; adjusting this recalculates everything instantly
+- **Dark mode** toggle
+- **Backup/export** — download CSV or JSON; import from a backup file
+- **Preview mode** — loads sample data into a temporary session so you can explore the app without affecting your real data
 
-Then open `http://[YOUR_MAC_IP]:8080` in Chrome on Android.
+### Analysis page
+
+28-day summary strip, 7-day forecast, time-of-day intake pattern, source breakdown, bedtime caffeine trend, and a daily heatmap.
+
+### Live page
+
+Animated real-time curve for the current caffeine episode. Shows past intake (solid line), projected decay (dashed), and labels each dose peak with its source.
+
+---
 
 ## Troubleshooting
 
 **Stale page after updates** — hard refresh with `Cmd+Shift+R` to bypass the service worker cache.
 
-**Android can't connect** — check both devices are on the same Wi-Fi; check Mac firewall (System Settings → Network → Firewall).
+**Data missing after browser data clear** — if running locally via `npm run dev`, the app restores from `data/caffeine_data.json` automatically on next load.
 
-**Data missing after browser data clear** — if running locally via `npm run dev`, the app will restore from `data/caffeine_data.json` automatically on next load.
+**Accessing on a phone (same Wi-Fi)**
+
+```bash
+ipconfig getifaddr en0   # find your Mac's local IP
+```
+
+Open `http://[YOUR_MAC_IP]:8080` in the phone's browser.
