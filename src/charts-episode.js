@@ -62,7 +62,21 @@ export function buildEpisodeCurve() {
     for (let t = episodeStartMs; t <= episodeEndMs; t += EPISODE_STEP_MS) {
         points.push({ t, mg: computeLevelAt(t, entries, halfLifeMs) });
     }
-    episodeCurve = { points, episodeStartMs, episodeEndMs, currentLevel, builtAtMs: nowMs, hadHistory };
+
+    // Local peaks: exact caffeine level at the moment each entry was consumed
+    const peakLabels = entries
+        .filter(e => {
+            const t = new Date(e.timestamp).getTime();
+            return t >= episodeStartMs && t <= nowMs;
+        })
+        .map(e => ({
+            t:      new Date(e.timestamp).getTime(),
+            mg:     computeLevelAt(new Date(e.timestamp).getTime(), entries, halfLifeMs),
+            label:  e.source || `${e.amount}mg`,
+            amount: e.amount,
+        }));
+
+    episodeCurve = { points, episodeStartMs, episodeEndMs, currentLevel, builtAtMs: nowMs, hadHistory, peakLabels };
     updateEpisodeSubtitle();
 }
 
@@ -113,7 +127,7 @@ function drawEpisodeFrame() {
     const C = getChartColors();
     const dark = isDarkMode();
     const nowMs = Date.now();
-    const { points, episodeStartMs, episodeEndMs } = episodeCurve;
+    const { points, episodeStartMs, episodeEndMs, peakLabels = [] } = episodeCurve;
 
     const PAD_L = 60, PAD_R = 28, PAD_T = 20, PAD_B = 44;
     const chartW = cssW - PAD_L - PAD_R;
@@ -197,6 +211,31 @@ function drawEpisodeFrame() {
         ctx.stroke();
         ctx.setLineDash([]);
     }
+
+    // Source labels at each local peak
+    peakLabels.forEach(pk => {
+        const x = sx(pk.t);
+        const y = sy(pk.mg);
+        const nearNow = Math.abs(pk.t - nowMs) < EPISODE_STEP_MS * 1.5;
+
+        if (!nearNow) {
+            ctx.beginPath();
+            ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#667eea';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = dark ? '#1a1b2e' : 'white';
+            ctx.fill();
+        }
+
+        const above = y - PAD_T > 22;
+        ctx.font = '600 10.5px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = above ? 'bottom' : 'top';
+        ctx.fillStyle = dark ? 'rgba(162,172,240,0.85)' : 'rgba(70,80,160,0.8)';
+        ctx.fillText(pk.label, x, above ? y - 9 : y + 9);
+    });
 
     const pulse = 1 + 0.2 * Math.sin(Date.now() / 600);
     ctx.beginPath(); ctx.arc(nowX, nowY, 7 * pulse, 0, Math.PI * 2);
