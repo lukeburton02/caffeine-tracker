@@ -323,7 +323,7 @@ export function exportCSV() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `caffeine_data_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = 'caffeine_data.csv';
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -336,7 +336,7 @@ export function exportJSON() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `caffeine_data_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = 'caffeine_data.json';
     a.click();
     URL.revokeObjectURL(url);
 }
