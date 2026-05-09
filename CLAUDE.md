@@ -4,6 +4,10 @@ Vanilla JS PWA using native ES modules (no bundler). Deployed to GitHub Pages at
 
 **LSHTM machine** — review policies before adding any cloud sync or external storage.
 
+## Sister project — bac-tracker
+
+`../bac-tracker` is a parallel PWA with the same architecture (same module names, same storage stack, same chart patterns, same CSS split). When making a structural change here — new chart patterns, storage behaviour, UI conventions, CSS rules, service worker bumps — flag it to the user and ask whether to: (a) apply the same change to `../bac-tracker` now (both repos are local siblings, so this is straightforward), or (b) add a note to `../bac-tracker/TASKS.md` to do it next session. Don't silently skip it, but don't do the work twice without asking.
+
 ## Module structure
 
 ```
