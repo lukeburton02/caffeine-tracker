@@ -168,7 +168,7 @@ body {
 .analysis-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: 1fr 1fr auto;
+    grid-template-rows: minmax(340px, 1fr) minmax(340px, 1fr) auto;
     gap: 20px;
     width: 100%;
     max-width: 1200px;
