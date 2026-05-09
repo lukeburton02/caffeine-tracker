@@ -1,9 +1,9 @@
 # Caffeine Tracker — Open Tasks
 
 ## Mobile layout
-- [ ] Test on real device after 900px breakpoint change and 2×2 preset grid fix
-- [ ] Check analysis page panel stacking on phone
-- [ ] Verify Live page chart height fills screen correctly on mobile (uses `100dvh`)
+- [x] Test on real device after 900px breakpoint change and 2×2 preset grid fix
+- [x] Check analysis page panel stacking on phone
+- [x] Verify Live page chart height fills screen correctly on mobile (uses `100dvh`)
 
 ## Recurring maintenance
 
