@@ -57,3 +57,9 @@ src/
 - `npm run dev` — Express on port 8080
 - Mac Chrome + Safari. Mobile breakpoint at 900px.
 - All buttons outside forms must have `type="button"`.
+
+## Maintenance
+**GitHub Actions version bumps**: GitHub drops old Node.js versions from runners every 1–2 years; the Pages actions cut a new major version to match. When deprecation warnings appear in Actions logs:
+1. Check latest releases: `gh api repos/actions/checkout/releases/latest --jq '.tag_name'` (repeat for configure-pages, upload-pages-artifact, deploy-pages)
+2. Review release notes for breaking changes (historically just Node.js bumps — safe to update)
+3. Bump all four in `.github/workflows/deploy.yml` together
