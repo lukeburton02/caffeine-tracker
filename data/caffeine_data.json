@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-05-06T07:42:44.758Z",
+  "lastSaved": "2026-05-09T16:00:12.236Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -325,6 +325,42 @@
       "timestamp": "2026-05-06T05:00:00.000Z",
       "amount": 45,
       "source": "Anadin"
+    },
+    {
+      "id": "1778078773842",
+      "timestamp": "2026-05-06T11:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1778172415398",
+      "timestamp": "2026-05-07T16:00:00.000Z",
+      "amount": 80,
+      "source": "Red Bull Infusion"
+    },
+    {
+      "id": "1778272862837",
+      "timestamp": "2026-05-08T08:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1778272870487",
+      "timestamp": "2026-05-08T08:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1778342252652",
+      "timestamp": "2026-05-09T11:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1778342403078",
+      "timestamp": "2026-05-09T16:00:00.000Z",
+      "amount": 80,
+      "source": "Iced Latte"
     }
   ],
   "halfLife": 5
