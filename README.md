@@ -6,6 +6,8 @@ A Progressive Web App for tracking caffeine intake and monitoring real-time caff
 
 No install, no accounts, no cloud. All data stays in your browser. New users can try the app with sample data via **Preview mode** (Settings ⚙ → Preview sample data) before logging anything real.
 
+Sister project: [bac-tracker](https://github.com/lukeburton02/bac-tracker) — same architecture, Widmark BAC formula, red/black colour scheme.
+
 ---
 
 ## Pages
