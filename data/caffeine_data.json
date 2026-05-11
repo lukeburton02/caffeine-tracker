@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-05-09T16:00:12.236Z",
+  "lastSaved": "2026-05-11T21:12:27.896Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -261,6 +261,24 @@
       "source": "Neutonic"
     },
     {
+      "id": "1778052827517",
+      "timestamp": "2026-04-30T13:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1778052850701",
+      "timestamp": "2026-05-01T12:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1778052978777",
+      "timestamp": "2026-05-01T14:00:00.000Z",
+      "amount": 70,
+      "source": "Turmeric Matcha"
+    },
+    {
       "id": "1778052615892",
       "timestamp": "2026-05-02T07:00:00.000Z",
       "amount": 45,
@@ -295,24 +313,6 @@
       "timestamp": "2026-05-05T10:30:00.000Z",
       "amount": 80,
       "source": "Chilli Mocha"
-    },
-    {
-      "id": "1778052827517",
-      "timestamp": "2026-04-30T13:00:00.000Z",
-      "amount": 120,
-      "source": "Neutonic"
-    },
-    {
-      "id": "1778052850701",
-      "timestamp": "2026-05-01T12:00:00.000Z",
-      "amount": 200,
-      "source": "Celsius"
-    },
-    {
-      "id": "1778052978777",
-      "timestamp": "2026-05-01T14:00:00.000Z",
-      "amount": 70,
-      "source": "Turmeric Matcha"
     },
     {
       "id": "1778053160951",
@@ -361,6 +361,30 @@
       "timestamp": "2026-05-09T16:00:00.000Z",
       "amount": 80,
       "source": "Iced Latte"
+    },
+    {
+      "id": "1778533919836",
+      "timestamp": "2026-05-10T11:00:00.000Z",
+      "amount": 70,
+      "source": "Blueberry Matcha"
+    },
+    {
+      "id": "1778533929535",
+      "timestamp": "2026-05-10T14:00:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
+      "id": "1778533938830",
+      "timestamp": "2026-05-11T09:00:00.000Z",
+      "amount": 100,
+      "source": "Huel"
+    },
+    {
+      "id": "1778533943113",
+      "timestamp": "2026-05-11T13:00:00.000Z",
+      "amount": 160,
+      "source": "Tenzing Mango"
     }
   ],
   "halfLife": 5
