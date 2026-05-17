@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-05-11T21:12:27.896Z",
+  "lastSaved": "2026-05-17T09:32:31.391Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -385,6 +385,42 @@
       "timestamp": "2026-05-11T13:00:00.000Z",
       "amount": 160,
       "source": "Tenzing Mango"
+    },
+    {
+      "id": "1779010163117",
+      "timestamp": "2026-05-16T10:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779010165334",
+      "timestamp": "2026-05-16T15:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779010202533",
+      "timestamp": "2026-05-13T11:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1779010227844",
+      "timestamp": "2026-05-12T09:00:00.000Z",
+      "amount": 70,
+      "source": "Cappuccino"
+    },
+    {
+      "id": "1779010270505",
+      "timestamp": "2026-05-15T14:00:00.000Z",
+      "amount": 70,
+      "source": "Iced Mocha"
+    },
+    {
+      "id": "1779010315456",
+      "timestamp": "2026-05-14T12:00:00.000Z",
+      "amount": 48,
+      "source": "Coca Cola"
     }
   ],
   "halfLife": 5
