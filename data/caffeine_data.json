@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-05-17T09:32:31.391Z",
+  "lastSaved": "2026-05-24T13:27:12.972Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -421,6 +421,78 @@
       "timestamp": "2026-05-14T12:00:00.000Z",
       "amount": 48,
       "source": "Coca Cola"
+    },
+    {
+      "id": "1779019840089",
+      "timestamp": "2026-05-17T12:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779115724990",
+      "timestamp": "2026-05-18T12:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779115729009",
+      "timestamp": "2026-05-18T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1779115731714",
+      "timestamp": "2026-05-18T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1779203238510",
+      "timestamp": "2026-05-19T12:00:00.000Z",
+      "amount": 32,
+      "source": "Coke Zero"
+    },
+    {
+      "id": "1779203244810",
+      "timestamp": "2026-05-19T14:30:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779312720174",
+      "timestamp": "2026-05-20T11:00:00.000Z",
+      "amount": 160,
+      "source": "Tenzing Mango"
+    },
+    {
+      "id": "1779389396824",
+      "timestamp": "2026-05-21T12:00:00.000Z",
+      "amount": 160,
+      "source": "Tenzing Mango"
+    },
+    {
+      "id": "1779448343140",
+      "timestamp": "2026-05-22T11:00:00.000Z",
+      "amount": 160,
+      "source": "Tenzing Mango"
+    },
+    {
+      "id": "1779624355500",
+      "timestamp": "2026-05-23T09:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779624380486",
+      "timestamp": "2026-05-24T09:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1779629213077",
+      "timestamp": "2026-05-24T13:20:00.000Z",
+      "amount": 80,
+      "source": "Red Bull"
     }
   ],
   "halfLife": 5
