@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-05-30T16:34:22.132Z",
+  "lastSaved": "2026-06-16T19:58:13.606Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -547,6 +547,162 @@
       "timestamp": "2026-05-30T16:00:00.000Z",
       "amount": 120,
       "source": "Neutonic"
+    },
+    {
+      "id": "1780234203647",
+      "timestamp": "2026-05-31T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1780259534266",
+      "timestamp": "2026-05-31T15:00:00.000Z",
+      "amount": 32,
+      "source": "Coke Zero"
+    },
+    {
+      "id": "1780320735901",
+      "timestamp": "2026-06-01T10:00:00.000Z",
+      "amount": 160,
+      "source": "Tenzing Mango"
+    },
+    {
+      "id": "1780320818042",
+      "timestamp": "2026-06-01T13:30:00.000Z",
+      "amount": 51,
+      "source": "Diet Coke"
+    },
+    {
+      "id": "1780426609869",
+      "timestamp": "2026-06-02T09:30:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1780494283865",
+      "timestamp": "2026-06-03T09:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1780494306768",
+      "timestamp": "2026-06-03T13:30:00.000Z",
+      "amount": 48,
+      "source": "Coke Zero"
+    },
+    {
+      "id": "1780523819461",
+      "timestamp": "2026-06-03T22:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1780567822756",
+      "timestamp": "2026-06-04T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1780760717700",
+      "timestamp": "2026-06-06T15:30:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1780837759280",
+      "timestamp": "2026-06-07T11:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1780856439254",
+      "timestamp": "2026-06-07T17:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1781105393499",
+      "timestamp": "2026-06-10T08:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1781105408229",
+      "timestamp": "2026-06-10T13:00:00.000Z",
+      "amount": 48,
+      "source": "Coke Zero"
+    },
+    {
+      "id": "1781148114742",
+      "timestamp": "2026-06-11T01:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1781188092088",
+      "timestamp": "2026-06-11T13:30:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1781361071001",
+      "timestamp": "2026-06-12T09:00:00.000Z",
+      "amount": 60,
+      "source": "Coffee"
+    },
+    {
+      "id": "1781361081175",
+      "timestamp": "2026-06-12T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1781361083640",
+      "timestamp": "2026-06-12T13:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1781361089921",
+      "timestamp": "2026-06-13T08:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1781361094262",
+      "timestamp": "2026-06-13T14:30:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1781539931139",
+      "timestamp": "2026-06-14T13:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1781539958700",
+      "timestamp": "2026-06-14T17:00:00.000Z",
+      "amount": 79,
+      "source": "Purdey's"
+    },
+    {
+      "id": "1781539996572",
+      "timestamp": "2026-06-15T10:00:00.000Z",
+      "amount": 106,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1781639858697",
+      "timestamp": "2026-06-16T19:30:00.000Z",
+      "amount": 79,
+      "source": "Purdey's"
+    },
+    {
+      "id": "1781639875814",
+      "timestamp": "2026-06-16T08:00:00.000Z",
+      "amount": 106,
+      "source": "Tenzing"
     }
   ],
   "halfLife": 5
