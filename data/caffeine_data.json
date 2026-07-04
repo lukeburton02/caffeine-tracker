@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-06-16T19:58:13.606Z",
+  "lastSaved": "2026-07-04T18:45:10.570Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -703,6 +703,132 @@
       "timestamp": "2026-06-16T08:00:00.000Z",
       "amount": 106,
       "source": "Tenzing"
+    },
+    {
+      "id": "1781780880083",
+      "timestamp": "2026-06-18T11:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1782120176466",
+      "timestamp": "2026-06-19T08:00:00.000Z",
+      "amount": 106,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1782120339739",
+      "timestamp": "2026-06-19T18:30:00.000Z",
+      "amount": 80,
+      "source": "Red Bull"
+    },
+    {
+      "id": "1782120379240",
+      "timestamp": "2026-06-20T14:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1782120394591",
+      "timestamp": "2026-06-21T00:00:00.000Z",
+      "amount": 106,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1782120461372",
+      "timestamp": "2026-06-21T08:00:00.000Z",
+      "amount": 80,
+      "source": "Tenzing"
+    },
+    {
+      "id": "1782120477613",
+      "timestamp": "2026-06-22T07:00:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1782120482602",
+      "timestamp": "2026-06-22T08:30:00.000Z",
+      "amount": 45,
+      "source": "Anadin"
+    },
+    {
+      "id": "1782292521324",
+      "timestamp": "2026-06-23T12:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1782292526191",
+      "timestamp": "2026-06-24T09:15:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1783190530709",
+      "timestamp": "2026-06-29T12:00:00.000Z",
+      "amount": 180,
+      "source": "Nocco"
+    },
+    {
+      "id": "1783190542761",
+      "timestamp": "2026-06-30T09:00:00.000Z",
+      "amount": 120,
+      "source": "Neutonic"
+    },
+    {
+      "id": "1783190578017",
+      "timestamp": "2026-07-01T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1783190590967",
+      "timestamp": "2026-07-02T08:00:00.000Z",
+      "amount": 50,
+      "source": "Treo"
+    },
+    {
+      "id": "1783190596087",
+      "timestamp": "2026-07-02T10:00:00.000Z",
+      "amount": 50,
+      "source": "Coffee"
+    },
+    {
+      "id": "1783190602558",
+      "timestamp": "2026-07-02T14:00:00.000Z",
+      "amount": 50,
+      "source": "Coffee"
+    },
+    {
+      "id": "1783190611033",
+      "timestamp": "2026-07-03T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1783190629584",
+      "timestamp": "2026-07-02T14:00:00.000Z",
+      "amount": 50,
+      "source": "Treo"
+    },
+    {
+      "id": "1783190641896",
+      "timestamp": "2026-07-03T08:00:00.000Z",
+      "amount": 50,
+      "source": "Treo"
+    },
+    {
+      "id": "1783190656106",
+      "timestamp": "2026-07-04T09:00:00.000Z",
+      "amount": 50,
+      "source": "Treo"
+    },
+    {
+      "id": "1783190662744",
+      "timestamp": "2026-07-04T14:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
     }
   ],
   "halfLife": 5
