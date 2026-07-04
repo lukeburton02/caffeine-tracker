@@ -152,7 +152,7 @@ function setDefaultDateTime() {
 
     // Constrain date range
     const maxDate = now;
-    const minDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const minDate = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     document.getElementById('entry-date').max = toDateInputValue(maxDate);
     document.getElementById('entry-date').min = toDateInputValue(minDate);
 }
@@ -180,9 +180,9 @@ function validateTimestamp(ts) {
         showToast('Cannot log future entries');
         return false;
     }
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    if (ts < sevenDaysAgo) {
-        showToast('Cannot log entries older than 7 days');
+    const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    if (ts < fourteenDaysAgo) {
+        showToast('Cannot log entries older than 14 days');
         return false;
     }
     return true;

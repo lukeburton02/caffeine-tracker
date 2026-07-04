@@ -32,7 +32,7 @@ src/
 - Recent Entries list: only entries with ≥1mg remaining AND age ≤7 days
 - Charts and current level: use full unfiltered entry list
 
-**Entry validation**: future timestamps hard-blocked; entries older than 7 days rejected (both with toast).
+**Entry validation**: future timestamps hard-blocked; entries older than 14 days rejected (both with toast).
 
 **Peak calculation**: checked at the exact timestamp of each today entry only — the only moment a local max can occur (caffeine only decays after that point).
 
