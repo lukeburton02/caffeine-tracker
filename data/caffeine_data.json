@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSaved": "2026-07-04T18:45:10.570Z",
+  "lastSaved": "2026-07-04T18:57:53.065Z",
   "entries": [
     {
       "id": "1774903714443",
@@ -829,6 +829,36 @@
       "timestamp": "2026-07-04T14:00:00.000Z",
       "amount": 200,
       "source": "Celsius"
+    },
+    {
+      "id": "1783191414146",
+      "timestamp": "2026-06-25T09:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1783191427743",
+      "timestamp": "2026-06-26T07:00:00.000Z",
+      "amount": 50,
+      "source": "Treo"
+    },
+    {
+      "id": "1783191434900",
+      "timestamp": "2026-06-26T13:00:00.000Z",
+      "amount": 200,
+      "source": "Celsius"
+    },
+    {
+      "id": "1783191450699",
+      "timestamp": "2026-06-27T09:00:00.000Z",
+      "amount": 50,
+      "source": "Coffee"
+    },
+    {
+      "id": "1783191454610",
+      "timestamp": "2026-06-27T11:00:00.000Z",
+      "amount": 50,
+      "source": "Coffee"
     }
   ],
   "halfLife": 5
